@@ -43,20 +43,49 @@ ale nie rozstrzyga, czy padłoby bez handoffu.
 
 ## Krok 2: `/grill-with-docs archiwizacja todo itemu`
 
-Lista kontrolna z handoffu (odhaczyć po grillu; nie rozstrzygać zawczasu):
+Przebieg: skill wywołał `grilling` i `domain-modeling`. 11 pytań w 3 rundach, wszystkie rekomendacje przyjęte
+(runda 1 odpowiedzią „kontynuuj”, zinterpretowaną jako akceptacja; rundy 2 i 3 jawnym „akceptuję wszystkie
+rekomendacje”). Fakty z kodu agent zebrał sam (`find`, `cat` na `Domain/Todos`, `Application/Todos`,
+`Endpoints/Todos`), a nie przez sub-agenta, jak każe `grilling`: odstępstwo od skilla.
 
-- [ ] Kto może archiwizować (owner, filtr `UserId`, cudzy todo item to 404)
-- [ ] Czy da się przywrócić (unarchive)
-- [ ] Czy zarchiwizowane znikają z `GET todos`; czy `GET todos/{id}` nadal je zwraca
-- [ ] Relacja z Completion (archiwizacja nieukończonego, ukończenie zarchiwizowanego)
-- [ ] Cache: unieważnienie `GET todos/{id}` w `HybridCache`
-- [ ] Zdarzenie domenowe `TodoItemArchived`, id nadane przed `Raise(...)` (ADR 0006)
+Lista kontrolna z handoffu:
 
-Pytania spoza listy: _do uzupełnienia_
+- [x] Kto może archiwizować: Q2 (runda 1), tylko owner, cudzy todo item to 404.
+- [x] Czy da się przywrócić: Q3 (runda 1) tak, osobny use case; nazwa Unarchive w Q4.
+- [x] Widoczność: Q5 (runda 2), `GET todos` pomija zarchiwizowane, `GET todos/{id}` je zwraca.
+- [x] Relacja z Completion: Q1 (archiwizować można nieukończony) i Q6 (zarchiwizowany można ukończyć,
+  edytować, skopiować, usunąć; niezależne osie).
+- [x] Cache: Q11 (runda 3), ale jako założenie z konwencji do potwierdzenia, nie jako otwarta decyzja.
+- [x] Zdarzenie domenowe: Q11, `TodoItemArchivedDomainEvent` i `TodoItemUnarchivedDomainEvent`; również jako
+  założenie z konwencji.
 
-Zmiany w `GLOSSARY.md` i ADR-y: _do uzupełnienia_
+Pytania spoza listy:
+
+- Q4: nazwa cofnięcia (Unarchive, nie Restore/Reopen) i trasy `PUT todos/{id}/archive`, `.../unarchive` (204).
+- Q6 (część): Copy zarchiwizowanego daje kopię niezarchiwizowaną.
+- Q7: ponowna archiwizacja i Unarchive niezarchiwizowanego to błąd 400 (`TodoItems.AlreadyArchived`,
+  `TodoItems.NotArchived`), spójnie z Completion.
+- Q8: moment archiwizacji jako jedno pole `ArchivedAt` (null = niezarchiwizowany), kasowane przez Unarchive.
+- Q9: jak owner znajduje zarchiwizowane, skoro Unarchive wymaga id. Wyszło ze scenariusza; dodało use case
+  `GET todos/archived` (owner z `IUserContext`, bez `userId`, sortowanie od ostatnio zarchiwizowanego, bez
+  cache).
+- Q10: kolizja nazwy „Active” (w aplikacjach todo zwykle „nieukończony”); bez nowego terminu.
+
+Zakres urósł w grillu: z jednego use case'u do trzech nowych (Archive, Unarchive, GetArchived) i zmiany dwóch
+istniejących zapytań (`GET todos` filtruje, `GET todos/{id}` zwraca `ArchivedAt`).
+
+Zmiany w `GLOSSARY.md`: nowe hasła **Archive** i **Unarchive**, w **Copy** dopisane „niezarchiwizowany”.
+
+ADR-y: żaden. Kandydaci odrzuceni wg trzech warunków `domain-modeling`: niezależne osie archive/completion
+i `GET todos/archived` bez `userId` są łatwe do odwrócenia (template bez zewnętrznych klientów), więc nie
+spełniają warunku „trudne do odwrócenia”.
+
+Bramka: użytkownik potwierdził wspólne rozumienie i zmiany w słowniku.
 
 ## Krok 3: `/to-spec`, `/to-tickets`
+
+Tarcie: pierwsza próba to wiadomość „potwierdzam, /to-spec”. Komenda w środku zdania nie uruchamia skilla,
+a agent nie może jej wywołać sam (`disable-model-invocation: true`). Agent poprosił o osobną wiadomość.
 
 _do uzupełnienia_ (podział na tickety przed utworzeniem plików, bramka u użytkownika)
 

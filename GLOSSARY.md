@@ -55,6 +55,17 @@ Jednorazowe oznaczenie todo itemu jako zrobionego, z zapisanym momentem ukończe
 ponowne ukończenie to błąd.
 _Avoid_: Done, Close, Finish
 
+**Archive**:
+Odłożenie todo itemu przez ownera poza bieżącą listę, z zapisanym momentem archiwizacji, bez usuwania go
+i bez zmiany jego completion. Ponowna archiwizacja zarchiwizowanego to błąd.
+_Avoid_: Hide, Soft delete, Trash; Active dla niezarchiwizowanego (zwykle znaczy „nieukończony”)
+
+**Unarchive**:
+Cofnięcie archive: todo item wraca na bieżącą listę, a moment archiwizacji przepada. Unarchive
+niezarchiwizowanego to błąd.
+_Avoid_: Restore, Reopen
+
 **Copy**:
-Nowy todo item tego samego ownera z tym samym opisem, priorytetem, due date i labelami, ale nieukończony.
+Nowy todo item tego samego ownera z tym samym opisem, priorytetem, due date i labelami, ale nieukończony
+i niezarchiwizowany.
 _Avoid_: Duplicate, Clone
