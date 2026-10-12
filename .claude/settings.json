@@ -1,0 +1,57 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build*)",
+      "Bash(dotnet test*)",
+      "Bash(dotnet ef migrations *)",
+      "Bash(dotnet restore*)",
+      "Bash(dotnet tool restore*)",
+      "Bash(dotnet format*)",
+      "Bash(dotnet list*)",
+      "Bash(dotnet nuget why*)",
+      "Bash(docker info*)",
+      "Bash(sha256sum*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(date*)",
+      "Bash(git rev-parse*)",
+      "Bash(git merge-base*)",
+      "Bash(git ls-files*)",
+      "Bash(git show*)",
+      "PowerShell(dotnet build*)",
+      "PowerShell(dotnet test*)",
+      "PowerShell(dotnet ef migrations *)",
+      "PowerShell(dotnet restore*)",
+      "PowerShell(dotnet tool restore*)",
+      "PowerShell(dotnet format*)",
+      "PowerShell(dotnet list*)",
+      "PowerShell(dotnet nuget why*)",
+      "PowerShell(docker info*)",
+      "PowerShell(Get-FileHash*)",
+      "PowerShell(git status*)",
+      "PowerShell(git diff*)",
+      "PowerShell(git log*)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)",
+      "PowerShell(Get-Date*)",
+      "PowerShell(git rev-parse*)",
+      "PowerShell(git merge-base*)",
+      "PowerShell(git ls-files*)",
+      "PowerShell(git show*)"
+    ],
+    "deny": [
+      "Bash(git diff *--output*)",
+      "Bash(git log *--output*)",
+      "Bash(git show *--output*)",
+      "PowerShell(git diff *--output*)",
+      "PowerShell(git log *--output*)",
+      "PowerShell(git show *--output*)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false
+  }
+}
