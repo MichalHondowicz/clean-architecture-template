@@ -175,6 +175,22 @@ tani. Reguła repo: bez em-dashy w prozie.
    `claude plugin marketplace add D:\Projects\skills`, `claude plugin install mattpocock-skills@mattpocock`,
    restart sesji. Te kroki zmieniają globalną konfigurację: wykonuje je użytkownik albo agent za jego zgodą.
 
+**Wynik (2026-10-12):** `main` klonu przewinięty do upstreamu `49dd158` (było 18 commitów zaległości),
+branch `dotnet`, commit `2f5489b`. Odstępstwa od planu:
+- `setup-matt-pocock-skills`: jedna solucja z wieloma projektami **nie** jest sygnałem monorepo (to warstwy
+  jednej aplikacji); sygnałem są osobne solucje albo `Modules/*` modularnego monolitu.
+- `wizard`: zamiast portu `template.sh` na PowerShell (223 linie do ręcznego synchronizowania z upstreamem)
+  instrukcja uruchomienia z Git Bash i ostrzeżenie, że `bash` w PowerShellu może trafić do WSL.
+- Strony `docs/engineering/*.md` bez zmian: żadne ich zdanie nie stało się nieprawdziwe.
+- `claude plugin validate . --strict` pada na ostrzeżeniu o `CLAUDE.md` w katalogu głównym pluginu; czysty
+  upstream pada tak samo, bez `--strict` oba przechodzą.
+
+Instalacja przełączona: marketplace `mattpocock` to katalog `D:\Projects\skills` (wpis w
+`extraKnownMarketplaces` zapisał `marketplace add`), zainstalowana wersja `1.3.1-dotnet.1`. Marketplace czyta
+working tree klonu, więc klon musi zostać na branchu `dotnet`. Aktualizacja od Matta: `git fetch`, rebase
+`dotnet` na `origin/main`, podbicie wersji, `claude plugin marketplace update mattpocock`,
+`claude plugin update mattpocock-skills@mattpocock`, restart sesji.
+
 ### Faza 5: pilot end-to-end
 
 W `clean-architecture_new`, na branchu `pilot/archive-todo`:
