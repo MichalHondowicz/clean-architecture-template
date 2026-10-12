@@ -69,6 +69,9 @@ więc dwa formularze). Rekomendacje są w pierwszej opcji.
 Zatrzymaj się na odpowiedziach. Dalsze fazy zakładają rekomendacje. Inna odpowiedź oznacza korektę planu
 w tym pliku przed Fazą 1.
 
+**Wynik (2026-10-12):** użytkownik potwierdził wszystkie rekomendacje: D1 (a), D2 (a), D3 (a), D4 (a),
+D5 (a), D6 (a). Plan bez korekt.
+
 ### Faza 1: bootstrap repo
 
 1. `git init` w `D:\Projects\clean-architecture_new`. Sprawdź, że `.gitignore` wyklucza `bin/`, `obj/`.
@@ -77,6 +80,12 @@ w tym pliku przed Fazą 1.
    `dotnet build CleanArchitecture.slnx`, potem `dotnet test CleanArchitecture.slnx`.
    Zapisz własne liczby testów. Ostatnie znane dla tej bazy kodu (stary katalog, 2026-09-30): build 0/0,
    UnitTests 22/22, ArchitectureTests 6/6, IntegrationTests 8/8 (ta ostatnia liczba niepotwierdzona).
+
+**Wynik (2026-10-12):** gałąź `main`. Baseline bez `docs/`, plan i handoff w osobnym commicie. Build
+na czystym template'cie padał już na restore: NuGet audit (NU1903) zgłaszał `SSH.NET` 2025.1.0, ciągnięty
+przez `Testcontainers.PostgreSql` 4.12.0 (GHSA-mggc-4xg6-vcxf, GHSA-q939-rpr3-3284). Naprawa: podbicie
+do 4.16.0 (`SSH.NET` 2026.0.0), osobny commit. Po niej, z własnego przebiegu (Docker 29.8.1): build 0/0,
+UnitTests 22/22, ArchitectureTests 6/6, IntegrationTests 8/8.
 
 ### Faza 2: przeniesienie warstwy konwencji ze starego template'u
 
