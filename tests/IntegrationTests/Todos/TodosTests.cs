@@ -135,9 +135,7 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
         (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
         Authenticate(tokens.AccessToken);
         Guid todoId = await CreateTodoAsync(userId, "Todo archived twice");
-
-        HttpResponseMessage firstArchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/archive", null);
-        firstArchiveResponse.EnsureSuccessStatusCode();
+        await ArchiveTodoAsync(todoId);
 
         // Act
         HttpResponseMessage secondArchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/archive", null);
@@ -186,6 +184,93 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
 
         // Assert
         archiveResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetArchivedTodos_Should_ReturnArchivedTodo()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Todo to find among archived");
+        await ArchiveTodoAsync(todoId);
+
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync("todos/archived");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        List<TodoDto>? todos = await response.Content.ReadFromJsonAsync<List<TodoDto>>();
+        todos!.ShouldContain(t => t.Id == todoId && t.ArchivedAt != null);
+    }
+
+    [Fact]
+    public async Task GetArchivedTodos_Should_NotReturnTodo_WhenItIsNotArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Todo on the current list");
+
+        // Act
+        List<TodoDto>? todos = await HttpClient.GetFromJsonAsync<List<TodoDto>>("todos/archived");
+
+        // Assert
+        todos!.ShouldNotContain(t => t.Id == todoId);
+    }
+
+    [Fact]
+    public async Task GetArchivedTodos_Should_NotReturnTodo_WhenItBelongsToAnotherUser()
+    {
+        // Arrange
+        (Guid ownerId, AccessTokens ownerTokens) = await RegisterAndLoginAsync();
+        Authenticate(ownerTokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(ownerId, "Somebody else's archived todo");
+        await ArchiveTodoAsync(todoId);
+
+        (_, AccessTokens otherTokens) = await RegisterAndLoginAsync();
+        Authenticate(otherTokens.AccessToken);
+
+        // Act
+        List<TodoDto>? todos = await HttpClient.GetFromJsonAsync<List<TodoDto>>("todos/archived");
+
+        // Assert
+        todos!.ShouldNotContain(t => t.Id == todoId);
+    }
+
+    [Fact]
+    public async Task GetArchivedTodos_Should_ReturnEmptyList_WhenNothingIsArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        await CreateTodoAsync(userId, "Todo on the current list");
+
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync("todos/archived");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        List<TodoDto>? todos = await response.Content.ReadFromJsonAsync<List<TodoDto>>();
+        todos.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetArchivedTodos_Should_ReturnUnauthorized_WhenTokenIsMissing()
+    {
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync("todos/archived");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    private async Task ArchiveTodoAsync(Guid todoId)
+    {
+        HttpResponseMessage archiveResponse = await HttpClient.PutAsync($"todos/{todoId}/archive", null);
+        archiveResponse.EnsureSuccessStatusCode();
     }
 
     private async Task<Guid> CreateTodoAsync(Guid userId, string description)
