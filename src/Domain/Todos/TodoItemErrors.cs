@@ -12,6 +12,10 @@ public static class TodoItemErrors
         "TodoItems.AlreadyArchived",
         $"The todo item with Id = '{todoItemId}' is already archived.");
 
+    public static Error NotArchived(Guid todoItemId) => Error.Problem(
+        "TodoItems.NotArchived",
+        $"The todo item with Id = '{todoItemId}' is not archived.");
+
     public static Error NotFound(Guid todoItemId) => Error.NotFound(
         "TodoItems.NotFound",
         $"The to-do item with the Id = '{todoItemId}' was not found");

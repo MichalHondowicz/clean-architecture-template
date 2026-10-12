@@ -1,5 +1,6 @@
 using Application.Todos.Archive;
 using Application.Todos.Create;
+using Application.Todos.Unarchive;
 using Application.Todos.Update;
 using Domain.Todos;
 using FluentValidation.TestHelper;
@@ -11,6 +12,7 @@ public sealed class TodoValidatorsTests
     private readonly CreateTodoCommandValidator _createValidator = new();
     private readonly UpdateTodoCommandValidator _updateValidator = new();
     private readonly ArchiveTodoCommandValidator _archiveValidator = new();
+    private readonly UnarchiveTodoCommandValidator _unarchiveValidator = new();
 
     [Fact]
     public void CreateValidator_Should_HaveError_WhenDescriptionIsEmpty()
@@ -79,6 +81,26 @@ public sealed class TodoValidatorsTests
         var command = new ArchiveTodoCommand(Guid.NewGuid());
 
         TestValidationResult<ArchiveTodoCommand> result = _archiveValidator.TestValidate(command);
+
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void UnarchiveValidator_Should_HaveError_WhenTodoItemIdIsEmpty()
+    {
+        var command = new UnarchiveTodoCommand(Guid.Empty);
+
+        TestValidationResult<UnarchiveTodoCommand> result = _unarchiveValidator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(c => c.TodoItemId);
+    }
+
+    [Fact]
+    public void UnarchiveValidator_Should_NotHaveErrors_WhenCommandIsValid()
+    {
+        var command = new UnarchiveTodoCommand(Guid.NewGuid());
+
+        TestValidationResult<UnarchiveTodoCommand> result = _unarchiveValidator.TestValidate(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }

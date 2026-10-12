@@ -267,6 +267,111 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task UnarchiveTodo_Should_ReturnTodoToCurrentList()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Todo to unarchive");
+        await ArchiveTodoAsync(todoId);
+
+        // Act
+        HttpResponseMessage unarchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/unarchive", null);
+
+        // Assert
+        unarchiveResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        List<TodoDto>? currentTodos = await HttpClient.GetFromJsonAsync<List<TodoDto>>($"todos?userId={userId}");
+        currentTodos!.ShouldContain(t => t.Id == todoId);
+
+        List<TodoDto>? archivedTodos = await HttpClient.GetFromJsonAsync<List<TodoDto>>("todos/archived");
+        archivedTodos!.ShouldNotContain(t => t.Id == todoId);
+
+        TodoDto? todo = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
+        todo!.ArchivedAt.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task UnarchiveTodo_Should_RefreshTodoRetrievedById_WhenItWasCachedBeforeUnarchiving()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Todo read before unarchiving");
+        await ArchiveTodoAsync(todoId);
+
+        TodoDto? todoBeforeUnarchiving = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
+        todoBeforeUnarchiving!.ArchivedAt.ShouldNotBeNull();
+
+        // Act
+        HttpResponseMessage unarchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/unarchive", null);
+
+        // Assert
+        unarchiveResponse.EnsureSuccessStatusCode();
+
+        TodoDto? todoAfterUnarchiving = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
+        todoAfterUnarchiving!.ArchivedAt.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task UnarchiveTodo_Should_ReturnNotFound_WhenTodoBelongsToAnotherUser()
+    {
+        // Arrange
+        (Guid ownerId, AccessTokens ownerTokens) = await RegisterAndLoginAsync();
+        Authenticate(ownerTokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(ownerId, "Somebody else's archived todo");
+        await ArchiveTodoAsync(todoId);
+
+        (_, AccessTokens otherTokens) = await RegisterAndLoginAsync();
+        Authenticate(otherTokens.AccessToken);
+
+        // Act
+        HttpResponseMessage unarchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/unarchive", null);
+
+        // Assert
+        unarchiveResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task UnarchiveTodo_Should_ReturnBadRequest_WhenTodoIsNotArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Todo on the current list");
+
+        // Act
+        HttpResponseMessage unarchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/unarchive", null);
+
+        // Assert
+        unarchiveResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UnarchiveTodo_Should_ReturnBadRequest_WhenTodoItemIdIsEmpty()
+    {
+        // Arrange
+        (_, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PutAsync($"todos/{Guid.Empty}/unarchive", null);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UnarchiveTodo_Should_ReturnUnauthorized_WhenTokenIsMissing()
+    {
+        // Act
+        HttpResponseMessage response = await HttpClient.PutAsync($"todos/{Guid.NewGuid()}/unarchive", null);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
     private async Task ArchiveTodoAsync(Guid todoId)
     {
         HttpResponseMessage archiveResponse = await HttpClient.PutAsync($"todos/{todoId}/archive", null);
