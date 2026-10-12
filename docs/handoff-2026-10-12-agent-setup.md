@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-12-phase5-pilot.md
+
 # Handoff: template .NET gotowy do pracy z agentem, start od bramki decyzyjnej
 
 Uruchom tę sesję w `D:\Projects\clean-architecture_new`. Pracujesz według planu
