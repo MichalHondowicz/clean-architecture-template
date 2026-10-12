@@ -87,7 +87,12 @@ Bramka: użytkownik potwierdził wspólne rozumienie i zmiany w słowniku.
 Tarcie: pierwsza próba to wiadomość „potwierdzam, /to-spec”. Komenda w środku zdania nie uruchamia skilla,
 a agent nie może jej wywołać sam (`disable-model-invocation: true`). Agent poprosił o osobną wiadomość.
 
-_do uzupełnienia_ (podział na tickety przed utworzeniem plików, bramka u użytkownika)
+`/to-spec`: agent przedstawił seamy (HTTP główny, handler dla porażek i czasu, walidator; bez nowych),
+użytkownik je przyjął. Spec: `.scratch/archive-todo/spec.md`, `Status: ready-for-agent`, 22 historyjki.
+Spec sam z siebie wymienia migrację EF Core dla `ArchivedAt` (zastrzeżenie: agent znał tę pułapkę
+z handoffu, sekcja 6) i wskazuje test integracyjny, który pilnuje unieważnienia cache.
+
+`/to-tickets`: _do uzupełnienia_ (podział na tickety przed utworzeniem plików, bramka u użytkownika)
 
 ## Krok 4: `/implement`
 
