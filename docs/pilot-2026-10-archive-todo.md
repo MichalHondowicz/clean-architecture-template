@@ -92,7 +92,17 @@ użytkownik je przyjął. Spec: `.scratch/archive-todo/spec.md`, `Status: ready-
 Spec sam z siebie wymienia migrację EF Core dla `ArchivedAt` (zastrzeżenie: agent znał tę pułapkę
 z handoffu, sekcja 6) i wskazuje test integracyjny, który pilnuje unieważnienia cache.
 
-`/to-tickets`: _do uzupełnienia_ (podział na tickety przed utworzeniem plików, bramka u użytkownika)
+`/to-tickets`: agent nie znalazł potrzeby prefactoringu (`ArchivedAt` jak `CompletedAt`, bez konwersji
+w konfiguracji EF). Podział przyjęty bez zmian w pierwszej iteracji:
+
+- 01 Archive todo itemu (bez blokad): nowy use case plus filtr w `GET todos` i `archivedAt` w `GET todos/{id}`,
+  żeby slice był weryfikowalny przez HTTP; migracja.
+- 02 Lista zarchiwizowanych (blokuje 01).
+- 03 Unarchive (blokują 01 i 02; krawędź 02 → 03 produktowa: bez listy owner nie zna id do przywrócenia).
+
+Napięcie z `AGENTS.md` („one ticket per use case”): 01 dodaje jeden use case i zmienia dwa istniejące
+zapytania. Agent zgłosił to sam w pytaniu o podział; reguła nie mówi, gdzie trafiają zmiany istniejących
+use case'ów potrzebne nowemu. Kandydat do `/retro`.
 
 ## Krok 4: `/implement`
 
