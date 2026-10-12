@@ -104,6 +104,10 @@ UnitTests 22/22, ArchitectureTests 6/6, IntegrationTests 8/8.
 4. D3: dopisz do `.claude/settings.json` wyłączenie superpowers per projekt.
 5. `dotnet tool restore`, build, commit: `chore: agent convention layer (AGENTS.md, project skills, allowlist)`.
 
+**Wynik (2026-10-12):** commit `006a925`. `docs/tasks/` nie został przeniesiony. Z allowlisty wypadły
+`git stash push`/`list` (używał ich tylko `dotnet-workflow`, a skille projektu zabraniają `git stash`).
+Build 0/0, testy 22/22, 6/6, 8/8.
+
 ### Faza 3: warstwa domeny i spięcie z Pocockiem
 
 1. Uruchom `/setup-matt-pocock-skills` (tracker z D5, domyślne etykiety, single-context).
@@ -133,6 +137,16 @@ UnitTests 22/22, ArchitectureTests 6/6, IntegrationTests 8/8.
      pojedynczy test = `dotnet test <projekt> --filter "FullyQualifiedName~<Nazwa>"`; pełny suite na koniec;
    - `code-review`, oś Standards: źródłem standardów jest `AGENTS.md` + `ca-review`.
 5. Commit: `docs: glossary, ADRs and process mapping for agent skills`.
+
+**Wynik (2026-10-12):** `setup-matt-pocock-skills` wykonany ręcznie (skill tylko dla użytkownika), blok
+`## Agent skills` w `AGENTS.md`. Grillowanie (wszystkie rekomendacje przyjęte) zmieniło zakres:
+- ADR 0005 to decyzja o **403** (`ErrorType.Forbidden`), nie utrwalenie 500; wdrożenie w ticketcie
+  `.scratch/ownership-forbidden/`, do tego czasu `AGENTS.md` i skille mówią 500.
+- Dodany ADR 0006: domain events po zapisie, poza transakcją komendy.
+- Tickety `needs-triage`: `.scratch/refresh-token-lifetime/` (sesja bez bezwzględnego limitu) i
+  `.scratch/copy-todo-created-event/` (copy publikuje zdarzenie z pustym id).
+- Słownik: terminy po angielsku jak w kodzie, definicje po polsku; kanoniczny „Todo item”, w nazwach use
+  case'ów skrót „Todo”, identyfikator zawsze `TodoItemId`.
 
 ### Faza 4: Pocock po .NET (wariant D6a)
 

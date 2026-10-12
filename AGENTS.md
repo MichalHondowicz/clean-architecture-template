@@ -8,8 +8,9 @@ generic pattern from a plugin. Details live in the project skills listed below.
 Output language: Polish for documents and reports (specs, tickets, ADRs, reviews). Code
 identifiers, file paths, JSON/YAML keys and commit messages stay English.
 
-Fixed-shape text that a skill defines (template headings such as `## Acceptance criteria`, `Status:`
-lines, label strings) stays exactly as the skill writes it. Only prose is Polish.
+Fixed-shape text that a skill defines (template labels such as `**What to build:**` and `**Status:**`,
+label strings) stays exactly as the skill writes it. Only prose is Polish. In `GLOSSARY.md`, terms stay
+English as in code; definitions are Polish.
 
 ## Layers and dependencies
 
@@ -30,8 +31,8 @@ lines, label strings) stays exactly as the skill writes it. Only prose is Polish
 - **Expected failures** return `Result` / `Result<T>` with errors from static `{Entity}Errors` catalogs (`"{Feature}.{Reason}"` codes). Never throw for control flow. `CustomResults.Problem` maps `NotFound→404, Conflict→409, Validation/Problem→400, Failure→500`.
 - **Use cases** are vertical slices: one folder per use case in `src/Application/{Feature}/{UseCase}/`; custom `ICommandHandler` / `IQueryHandler` (no MediatR), `internal sealed`, primary constructors, registered by Scrutor — never by hand.
 - **Validation**: a FluentValidation `{Command}Validator` per new command (`LoginUserCommand` predates this rule), executed by `ValidationDecorator`.
-- **Endpoints**: one `IEndpoint` class per use case in `src/Web.Api/Endpoints/{Feature}/`, `.WithTags(Tags.X)`, and `.RequireAuthorization()` or `.HasPermission(...)` — only the auth endpoints (register, login, refresh) are anonymous.
-- **Ownership**: handlers on user-owned data filter by `IUserContext.UserId` or return `UserErrors.Unauthorized()`. `UserErrors.Unauthorized()` is an `ErrorType.Failure`, so an ownership mismatch answers **500** — don't plan a 401/403 acceptance criterion unless the task changes that.
+- **Endpoints**: one `IEndpoint` class per use case in `src/Web.Api/Endpoints/{Feature}/`, `.WithTags(Tags.X)`, and `.RequireAuthorization()` or `.HasPermission(...)` — only the auth endpoints (register, login, refresh) are anonymous. `HasPermission` admits every authenticated user today (the permission provider is a stub), so a "403 without the permission" test cannot pass.
+- **Ownership**: handlers on user-owned data filter by `IUserContext.UserId` or return `UserErrors.Unauthorized()`. `UserErrors.Unauthorized()` is an `ErrorType.Failure`, so an ownership mismatch answers **500** — don't plan a 401/403 acceptance criterion unless the task changes that. ADR 0005 moves it to 403 in its own ticket; until that ticket closes, 500 is the fact.
 - **Time**: `IDateTimeProvider`, never `DateTime.UtcNow` / `DateTime.Now` in Application.
 - **Caching**: `HybridCache` with keys from a static `{Feature}CacheKeys` class (e.g. `TodoCacheKeys`); every command that mutates cached data invalidates it.
 - **Entities**: `sealed`; entities that raise domain events inherit `SharedKernel.Entity` and call `Raise(...)`; public setters are this project's style.
@@ -46,8 +47,30 @@ lines, label strings) stays exactly as the skill writes it. Only prose is Polish
 | Backfilling tests for an existing use case | `add-tests` |
 | Reviewing changes against these conventions | `ca-review` |
 
-Cut tickets along these skills: one ticket per use case, implemented with `add-feature`; a ticket
-that needs a new entity runs `add-entity` first.
+## Agent skills
+
+### Issue tracker
+
+Local markdown under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default role strings (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`,
+`wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Process skills in this project
+
+- `to-tickets`: one ticket per use case, implemented with `add-feature`; a ticket that needs a new
+  entity runs `add-entity` first.
+- `implement`, `tdd`: typechecking is `dotnet build CleanArchitecture.slnx` (analyzers are errors, so
+  a warning fails it); a single test file is `dotnet test <test project> --filter
+  "FullyQualifiedName~<TestClass>"`; the full suite is `dotnet test CleanArchitecture.slnx`.
+- `code-review`: the Standards sources are this file and the checklist in
+  `.claude/skills/ca-review/SKILL.md`.
 
 ## Build and verification
 
