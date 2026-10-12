@@ -31,7 +31,8 @@ internal sealed class GetTodoByIdQueryHandler(
                     Labels = todoItem.Labels,
                     IsCompleted = todoItem.IsCompleted,
                     CreatedAt = todoItem.CreatedAt,
-                    CompletedAt = todoItem.CompletedAt
+                    CompletedAt = todoItem.CompletedAt,
+                    ArchivedAt = todoItem.ArchivedAt
                 })
                 .SingleOrDefaultAsync(cancellation),
             cancellationToken: cancellationToken);

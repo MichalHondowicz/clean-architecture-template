@@ -1,3 +1,4 @@
+using Application.Todos.Archive;
 using Application.Todos.Create;
 using Application.Todos.Update;
 using Domain.Todos;
@@ -9,6 +10,7 @@ public sealed class TodoValidatorsTests
 {
     private readonly CreateTodoCommandValidator _createValidator = new();
     private readonly UpdateTodoCommandValidator _updateValidator = new();
+    private readonly ArchiveTodoCommandValidator _archiveValidator = new();
 
     [Fact]
     public void CreateValidator_Should_HaveError_WhenDescriptionIsEmpty()
@@ -57,6 +59,26 @@ public sealed class TodoValidatorsTests
         var command = new UpdateTodoCommand(Guid.NewGuid(), "Updated description");
 
         TestValidationResult<UpdateTodoCommand> result = _updateValidator.TestValidate(command);
+
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void ArchiveValidator_Should_HaveError_WhenTodoItemIdIsEmpty()
+    {
+        var command = new ArchiveTodoCommand(Guid.Empty);
+
+        TestValidationResult<ArchiveTodoCommand> result = _archiveValidator.TestValidate(command);
+
+        result.ShouldHaveValidationErrorFor(c => c.TodoItemId);
+    }
+
+    [Fact]
+    public void ArchiveValidator_Should_NotHaveErrors_WhenCommandIsValid()
+    {
+        var command = new ArchiveTodoCommand(Guid.NewGuid());
+
+        TestValidationResult<ArchiveTodoCommand> result = _archiveValidator.TestValidate(command);
 
         result.ShouldNotHaveAnyValidationErrors();
     }
