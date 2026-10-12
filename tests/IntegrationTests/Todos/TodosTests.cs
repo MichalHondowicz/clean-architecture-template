@@ -89,7 +89,7 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
     }
 
     [Fact]
-    public async Task ArchiveTodo_Should_RemoveTodoFromList()
+    public async Task ArchiveTodo_Should_RemoveTodoFromCurrentList()
     {
         // Arrange
         (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
@@ -101,7 +101,7 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
         HttpResponseMessage archiveResponse = await HttpClient.PutAsync($"todos/{archivedTodoId}/archive", null);
 
         // Assert
-        archiveResponse.EnsureSuccessStatusCode();
+        archiveResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         List<TodoDto>? todos = await HttpClient.GetFromJsonAsync<List<TodoDto>>($"todos?userId={userId}");
         todos!.Select(t => t.Id).ShouldBe([currentTodoId]);
@@ -122,7 +122,7 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
         HttpResponseMessage archiveResponse = await HttpClient.PutAsync($"todos/{todoId}/archive", null);
 
         // Assert
-        archiveResponse.EnsureSuccessStatusCode();
+        archiveResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         TodoDto? todoAfterArchiving = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
         todoAfterArchiving!.ArchivedAt.ShouldNotBeNull();
@@ -308,7 +308,7 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
         HttpResponseMessage unarchiveResponse = await HttpClient.PutAsync($"todos/{todoId}/unarchive", null);
 
         // Assert
-        unarchiveResponse.EnsureSuccessStatusCode();
+        unarchiveResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         TodoDto? todoAfterUnarchiving = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
         todoAfterUnarchiving!.ArchivedAt.ShouldBeNull();
@@ -370,6 +370,92 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task CompleteTodo_Should_MarkTodoAsCompleted_WhenTodoIsArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Archived todo to complete");
+        await ArchiveTodoAsync(todoId);
+
+        // Act
+        HttpResponseMessage completeResponse = await HttpClient.PutAsync($"todos/{todoId}/complete", null);
+
+        // Assert
+        completeResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        TodoDto? todo = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
+        todo!.IsCompleted.ShouldBeTrue();
+        todo.ArchivedAt.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task UpdateTodo_Should_ChangeDescription_WhenTodoIsArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Archived todo to edit");
+        await ArchiveTodoAsync(todoId);
+
+        // Act
+        HttpResponseMessage updateResponse = await HttpClient.PutAsJsonAsync(
+            $"todos/{todoId}",
+            new { description = "Edited while archived" });
+
+        // Assert
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        TodoDto? todo = await HttpClient.GetFromJsonAsync<TodoDto>($"todos/{todoId}");
+        todo!.Description.ShouldBe("Edited while archived");
+        todo.ArchivedAt.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task DeleteTodo_Should_RemoveTodo_WhenTodoIsArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Archived todo to delete");
+        await ArchiveTodoAsync(todoId);
+
+        // Act
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"todos/{todoId}");
+
+        // Assert
+        deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        HttpResponseMessage getResponse = await HttpClient.GetAsync($"todos/{todoId}");
+        getResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task CopyTodo_Should_PutCopyOnCurrentList_WhenTodoIsArchived()
+    {
+        // Arrange
+        (Guid userId, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+        Guid todoId = await CreateTodoAsync(userId, "Archived todo to copy");
+        await ArchiveTodoAsync(todoId);
+
+        // Act
+        HttpResponseMessage copyResponse = await HttpClient.PostAsJsonAsync(
+            $"todos/{todoId}/copy",
+            new { userId, todoId });
+
+        // Assert
+        copyResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        Guid copyId = await copyResponse.Content.ReadFromJsonAsync<Guid>();
+
+        List<TodoDto>? currentTodos = await HttpClient.GetFromJsonAsync<List<TodoDto>>($"todos?userId={userId}");
+        currentTodos!.Select(t => t.Id).ShouldBe([copyId]);
+
+        List<TodoDto>? archivedTodos = await HttpClient.GetFromJsonAsync<List<TodoDto>>("todos/archived");
+        archivedTodos!.Select(t => t.Id).ShouldBe([todoId]);
     }
 
     private async Task ArchiveTodoAsync(Guid todoId)
