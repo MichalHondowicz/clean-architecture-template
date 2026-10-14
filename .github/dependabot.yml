@@ -4,3 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      microsoft-dotnet:
+        patterns:
+          - "Microsoft.AspNetCore.*"
+          - "Microsoft.EntityFrameworkCore*"
+          - "Microsoft.Extensions.*"
+          - "dotnet-ef"
