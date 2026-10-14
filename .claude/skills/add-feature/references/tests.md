@@ -140,6 +140,8 @@ public async Task ArchiveTodo_Should_MarkTodoAsArchived()
 
 Minimum coverage per endpoint: one unauthorized test (no token → 401) if it's a new route family, one happy-path test asserting observable state via a follow-up GET, and one failure translation test (e.g. unknown id → 404) when the handler has failure paths.
 
+Time-dependent behaviour (expiry, limits) runs on a host of its own with the shared `TestDateTimeProvider`: see add-tests, Conventions, "Time over HTTP".
+
 ## Tests that pass for the wrong reason
 
 A test that passes while asserting nothing looks identical to a real one in every report. Traps seen in practice:

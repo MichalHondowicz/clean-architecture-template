@@ -153,9 +153,4 @@ public sealed class UsersTests : BaseIntegrationTest
         ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problem!.Title.ShouldBe("Users.InvalidRefreshToken");
     }
-
-    private sealed class TestDateTimeProvider : IDateTimeProvider
-    {
-        public DateTime UtcNow { get; set; }
-    }
 }

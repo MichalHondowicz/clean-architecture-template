@@ -225,6 +225,8 @@ wszystkie rekomendacje przyjęte:
 - **F2:** template trafia do prywatnego repo GitHub oznaczonego jako template. Repo zakłada użytkownik (na tej
   maszynie nie ma `gh`), agent dodaje remote i pushuje `main`, więc CI rusza pierwszy raz. Publikacja publiczna
   dopiero po sprawdzeniu licencji upstreamu: w kopii nie ma `LICENSE`, a `README.md` to README Milana Jovanovića.
+  **Zmiana 2026-10-14 (decyzja użytkownika):** template jest wyłącznie na własny użytek; publikacji publicznej
+  nie będzie, więc licencja upstreamu i własne `README.md` przestają być warunkiem czegokolwiek.
 - **F3:** gałąź `dotnet` forka Pococka (`D:\Projects\skills`) dostaje kopię w prywatnym repo GitHub (remote
   `backup`).
 - **F4:** punkt 7 retro jako reguła projektu w `AGENTS.md` („Process skills in this project”): w `/implement`

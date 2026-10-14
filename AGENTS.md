@@ -32,7 +32,7 @@ English as in code; definitions are Polish.
 - **Use cases** are vertical slices: one folder per use case in `src/Application/{Feature}/{UseCase}/`; custom `ICommandHandler` / `IQueryHandler` (no MediatR), `internal sealed`, primary constructors, registered by Scrutor — never by hand.
 - **Validation**: a FluentValidation `{Command}Validator` per new command (`LoginUserCommand` predates this rule), executed by `ValidationDecorator`.
 - **Endpoints**: one `IEndpoint` class per use case in `src/Web.Api/Endpoints/{Feature}/`, `.WithTags(Tags.X)`, and `.RequireAuthorization()` or `.HasPermission(...)` — only the auth endpoints (register, login, refresh) are anonymous. `HasPermission` admits every authenticated user today (the permission provider is a stub), so a "403 without the permission" test cannot pass.
-- **Ownership**: handlers on user-owned data filter by `IUserContext.UserId` or return `UserErrors.Forbidden()` (ADR 0005). A `userId` the client supplies that is not the current user's → `UserErrors.Forbidden()`, an `ErrorType.Forbidden`, which answers **403** with the error code and description. An item read by its own id → filter by `UserId`, so another user's item answers 404 and doesn't reveal that it exists. Never plan a 401 acceptance criterion for an ownership mismatch.
+- **Ownership**: handlers on user-owned data filter by `IUserContext.UserId` or return `UserErrors.Forbidden()` (ADR 0005). A `userId` the client supplies that is not the current user's → `UserErrors.Forbidden()`, an `ErrorType.Forbidden`, which answers **403** with the error code and description. An item read by its own id → filter by `UserId`, so another user's item answers 404 and doesn't reveal that it exists. A user looked up by e-mail → filter by `UserId` as well: another user's e-mail answers the same 404 as an unknown one, because an e-mail can be guessed (ADR 0005). Never plan a 401 acceptance criterion for an ownership mismatch.
 - **Time**: `IDateTimeProvider`, never `DateTime.UtcNow` / `DateTime.Now` in Application.
 - **Caching**: `HybridCache` with keys from a static `{Feature}CacheKeys` class (e.g. `TodoCacheKeys`); every command that mutates cached data invalidates it.
 - **Entities**: `sealed`; entities that raise domain events inherit `SharedKernel.Entity` and call `Raise(...)`; public setters are this project's style.
@@ -103,3 +103,5 @@ Migrations: `dotnet ef migrations add {PascalCase_With_Underscores} --project sr
   plus a `<PackageReference>` without `Version` in the csproj.
 - Verification commands must terminate on their own: no `dotnet run` or `docker compose up` as a
   verification step.
+- Chain `dotnet test --no-build` behind a successful build (`dotnet build ... && dotnet test ... --no-build`):
+  after a failed build it runs the previous binaries and reports a stale green.
