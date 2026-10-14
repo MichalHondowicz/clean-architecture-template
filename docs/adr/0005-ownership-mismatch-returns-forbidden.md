@@ -14,8 +14,8 @@ własnym id dalej filtrujemy po `UserId`, więc cudzy todo item daje 404 i nie u
 Wyjątek: wyszukiwanie usera po e-mailu (`GetUserByEmailQueryHandler`, bez endpointu). E-mail da się zgadnąć,
 a id (GUID) nie, więc 403 dla cudzego e-maila obok 404 dla nieznanego zdradzałoby, które konta istnieją. Cudzy
 e-mail daje ten sam błąd co nieznany (`UserErrors.NotFoundByEmail`, 404), jak cudzy todo item czytany po
-własnym id. Decyzja z triage 2026-10-14; do czasu wdrożenia (`.scratch/user-by-email-enumeration/`) handler
-zwraca 403. Wdrożenie reszty: `.scratch/ownership-forbidden/`.
+własnym id. Decyzja z triage 2026-10-14, wdrożenie: `.scratch/user-by-email-enumeration/`. Wdrożenie reszty:
+`.scratch/ownership-forbidden/`.
 
 ## Considered options
 

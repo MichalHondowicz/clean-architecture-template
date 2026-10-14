@@ -28,9 +28,10 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context, 
             return Result.Failure<UserResponse>(UserErrors.NotFoundByEmail);
         }
 
+        // Another user's e-mail answers like an unknown one, so the response doesn't reveal the account (ADR 0005).
         if (user.Id != userContext.UserId)
         {
-            return Result.Failure<UserResponse>(UserErrors.Forbidden());
+            return Result.Failure<UserResponse>(UserErrors.NotFoundByEmail);
         }
 
         return user;

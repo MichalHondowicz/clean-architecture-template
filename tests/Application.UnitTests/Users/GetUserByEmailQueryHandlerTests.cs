@@ -40,7 +40,7 @@ public sealed class GetUserByEmailQueryHandlerTests : BaseHandlerTest
     }
 
     [Fact]
-    public async Task Handle_Should_ReturnForbidden_WhenEmailBelongsToAnotherUser()
+    public async Task Handle_Should_ReturnNotFoundByEmail_WhenEmailBelongsToAnotherUser()
     {
         // Arrange
         await using TestDbContext context = CreateDbContext();
@@ -59,7 +59,7 @@ public sealed class GetUserByEmailQueryHandlerTests : BaseHandlerTest
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.Forbidden());
+        result.Error.ShouldBe(UserErrors.NotFoundByEmail);
     }
 
     [Fact]
