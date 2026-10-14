@@ -72,7 +72,7 @@ public sealed class ArchiveTodoCommandHandlerTests : BaseHandlerTest
         result.IsSuccess.ShouldBeTrue();
 
         TodoItem archived = await context.TodoItems.SingleAsync(t => t.Id == todoItem.Id);
-        archived.IsArchived.ShouldBeTrue();
+        archived.ArchivedAt.ShouldNotBeNull();
         archived.DomainEvents.ShouldContain(e => e is TodoItemArchivedDomainEvent);
     }
 }
@@ -82,7 +82,6 @@ Conventions:
 - Test names: `Handle_Should_{Outcome}_When{Condition}`.
 - Every handler and integration test marks `// Arrange` `// Act` `// Assert` (`// Arrange` omitted only when there is no setup).
 - Assert failures by comparing the exact error: `result.Error.ShouldBe(TodoItemErrors.NotFound(id))`.
-- `GlobalUsings.cs` already imports `Xunit`, `NSubstitute`, `Shouldly`, and `SharedKernel` — don't re-add those usings.
 - If the entity gains new properties, `TestDbContext` picks them up automatically; only touch it when adding a whole new `DbSet`.
 
 ## Validator tests
@@ -148,7 +147,7 @@ A test that passes while asserting nothing looks identical to a real one in ever
 - **The shared host neutralises what you test.** `IntegrationTestWebAppFactory` raises both rate-limit `PermitLimit`s to 100000 so ordinary tests are not throttled. A test of a limit must build its own host: `factory.WithWebHostBuilder(b => b.UseSetting("RateLimiting:Authentication:PermitLimit", "3")).CreateClient()` (the factory is `sealed`, so no subclass; store `factory` in a field from an explicit constructor — capturing it in a primary constructor while passing it to the base is CS9107). On the shared host it either fails confusingly or — if it only asserts requests succeed — passes and proves nothing.
 - **The request is rejected earlier than you think.** A test expects 401 for an expired token and gets 401 — because the hand-crafted token's signature was invalid. Derive keys exactly as production does (`TokenProvider` uses `Encoding.UTF8.GetBytes(Jwt:Secret)`), or obtain tokens through the real `users/login` flow (`RegisterAndLoginAsync`).
 - **The fixture is malformed.** A fixture that is invalid in two ways fails for the wrong one. Make fixtures valid in every respect except the one under test.
-- **The seam under test isn't the seam exercised.** Integration tests replay migration files (`MigrateAsync`). Editing an `IEntityTypeConfiguration` without a migration changes nothing in the test database; for mapping-dependent behaviour (unique index, cascade) see add-entity "Red proof for mappings".
+- **The seam under test isn't the seam exercised.** Integration tests replay migration files (`MigrateAsync`). Editing an `IEntityTypeConfiguration` without a migration makes every integration test fail at startup with `PendingModelChangesWarning` — a crash, not a red; for mapping-dependent behaviour (unique index, cascade) see add-entity "Red proof for mappings".
 
 The check that catches all four: break the one line the test defends and watch it fail (red proof).
 

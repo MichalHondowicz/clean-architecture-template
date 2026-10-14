@@ -203,6 +203,12 @@ W `clean-architecture_new`, na branchu `pilot/archive-todo`:
 4. `/code-review` (przeciw `main`).
 5. Kryteria z sekcji „Cel”. Zapisz wynik i lekcje w `docs/pilot-2026-10-archive-todo.md`, potem `/retro`.
 
+**Wynik (2026-10-14):** wszystkie pięć kryteriów spełnione na gałęzi `pilot/archive-todo` (build 0/0, testy
+40/6/30, `ca-review` bez uwag, słownik zaktualizowany, zero korekt w sprawie konwencji), z jednym
+zastrzeżeniem: `ca-review` był czysty dopiero po poprawkach z review całej gałęzi. Zakres z grilla: trzy use
+case'y (Archive, GetArchived, Unarchive). Gałąź zostaje jako dowód (P1 a); na `main` trafiły dziennik
+i poprawki warstwy agentowej z `/retro` (punkty 1–6, 8, 9). Odstępstwa i pełny przebieg: dziennik pilota.
+
 ### Faza 6: porządki
 
 - Decyzja o `dotnet-workflow`: zamrozić (README: „paused, see clean-architecture_new”) albo wrócić do jego E2E.

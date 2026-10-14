@@ -21,6 +21,7 @@ If a ticket or spec file is given, also check acceptance-criteria coverage. Repo
 
 ### Acceptance criteria (only with a ticket or spec)
 - Every AC maps to the `file:line` implementing it and a test exercising it. Missing AC → blocker; AC without a test → test gap.
+- With a spec, every user story maps to a test too, including a story the existing code satisfies unchanged. Story without a test → test gap.
 - An AC expecting 401/403 for an ownership mismatch is a spec conflict — report it as such, not as a code blocker (`UserErrors.Unauthorized()` answers 500; the `UserId` filter answers 404).
 
 ### Build & packages

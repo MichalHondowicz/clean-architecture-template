@@ -88,12 +88,11 @@ internal sealed class ArchiveTodoCommandHandler(
             return Result.Failure(TodoItemErrors.NotFound(command.TodoItemId));
         }
 
-        if (todoItem.IsArchived)
+        if (todoItem.ArchivedAt is not null)
         {
             return Result.Failure(TodoItemErrors.AlreadyArchived(command.TodoItemId));
         }
 
-        todoItem.IsArchived = true;
         todoItem.ArchivedAt = dateTimeProvider.UtcNow;
 
         todoItem.Raise(new TodoItemArchivedDomainEvent(todoItem.Id));
