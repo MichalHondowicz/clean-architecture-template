@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IntegrationTests.Users;
 
@@ -64,6 +65,24 @@ public sealed class UsersTests(IntegrationTestWebAppFactory factory) : BaseInteg
         AccessTokens? rotated = await response.Content.ReadFromJsonAsync<AccessTokens>();
         rotated!.AccessToken.ShouldNotBeNullOrWhiteSpace();
         rotated.RefreshToken.ShouldNotBe(tokens.RefreshToken);
+    }
+
+    [Fact]
+    public async Task GetUserById_Should_ReturnForbidden_WhenUserIdBelongsToAnotherUser()
+    {
+        // Arrange
+        Guid otherUserId = await RegisterUserAsync(UniqueEmail());
+        (_, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync($"users/{otherUserId}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem!.Title.ShouldBe("Users.Forbidden");
+        problem.Detail.ShouldBe("You are not authorized to perform this action.");
     }
 
     [Fact]

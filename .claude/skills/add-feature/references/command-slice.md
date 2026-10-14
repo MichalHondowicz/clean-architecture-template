@@ -105,7 +105,7 @@ internal sealed class ArchiveTodoCommandHandler(
 ```
 
 Notes:
-- Ownership: prefer the `UserId` filter (→ 404) — filter by `userContext.UserId` in the query. The alternative, comparing explicitly and returning `Result.Failure(UserErrors.Unauthorized())`, answers 500, so never write a test or AC expecting 401/403 for an ownership mismatch.
+- Ownership (ADR 0005): an item read by its own id, as here, is filtered by `userContext.UserId` in the query (→ 404, another user's item stays hidden). A command that takes a client-supplied `userId` compares it with `userContext.UserId` and returns `Result.Failure(UserErrors.Forbidden())` on mismatch (→ 403). Never write a test or AC expecting 401 for an ownership mismatch.
 - `IDateTimeProvider` (from `SharedKernel`) for timestamps — never `DateTime.UtcNow` directly.
 - If the command invalidates cached query data, inject `HybridCache` and call `cache.RemoveAsync({Feature}CacheKeys.X(...), cancellationToken)` after saving.
 - For a returning command (`ICommand<Guid>`), return the value directly — `Result<T>` has an implicit conversion: `return todoItem.Id;`.
@@ -120,7 +120,7 @@ public static Error AlreadyArchived(Guid todoItemId) => Error.Problem(
     $"The todo item with Id = '{todoItemId}' is already archived.");
 ```
 
-Error type → HTTP status (via `CustomResults.Problem`): `NotFound` → 404, `Conflict` → 409, `Problem`/`Validation` → 400, `Failure` → 500.
+Error type → HTTP status (via `CustomResults.Problem`): `NotFound` → 404, `Conflict` → 409, `Problem`/`Validation` → 400, `Forbidden` → 403, `Failure` → 500.
 
 Domain event, one file each in `src/Domain/{Feature}/`:
 

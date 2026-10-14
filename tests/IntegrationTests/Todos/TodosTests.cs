@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IntegrationTests.Todos;
 
@@ -78,5 +79,82 @@ public sealed class TodosTests(IntegrationTestWebAppFactory factory) : BaseInteg
         getResponse.EnsureSuccessStatusCode();
         TodoDto? todo = await getResponse.Content.ReadFromJsonAsync<TodoDto>();
         todo!.IsCompleted.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task GetTodos_Should_ReturnForbidden_WhenUserIdBelongsToAnotherUser()
+    {
+        // Arrange
+        Guid otherUserId = await RegisterUserAsync(UniqueEmail());
+        (_, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync($"todos?userId={otherUserId}");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem!.Title.ShouldBe("Users.Forbidden");
+        problem.Detail.ShouldBe("You are not authorized to perform this action.");
+    }
+
+    [Fact]
+    public async Task CreateTodo_Should_ReturnForbidden_WhenUserIdBelongsToAnotherUser()
+    {
+        // Arrange
+        Guid otherUserId = await RegisterUserAsync(UniqueEmail());
+        (_, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+
+        var createRequest = new
+        {
+            userId = otherUserId,
+            description = "Todo for another user",
+            labels = Array.Empty<string>(),
+            priority = 1
+        };
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PostAsJsonAsync("todos", createRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem!.Title.ShouldBe("Users.Forbidden");
+        problem.Detail.ShouldBe("You are not authorized to perform this action.");
+    }
+
+    [Fact]
+    public async Task CopyTodo_Should_ReturnForbidden_WhenUserIdBelongsToAnotherUser()
+    {
+        // Arrange
+        (Guid otherUserId, AccessTokens otherTokens) = await RegisterAndLoginAsync();
+        Authenticate(otherTokens.AccessToken);
+
+        var createRequest = new
+        {
+            userId = otherUserId,
+            description = "Another user's todo",
+            labels = Array.Empty<string>(),
+            priority = 1
+        };
+        HttpResponseMessage createResponse = await HttpClient.PostAsJsonAsync("todos", createRequest);
+        createResponse.EnsureSuccessStatusCode();
+        Guid otherTodoId = await createResponse.Content.ReadFromJsonAsync<Guid>();
+
+        (_, AccessTokens tokens) = await RegisterAndLoginAsync();
+        Authenticate(tokens.AccessToken);
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PostAsJsonAsync(
+            $"todos/{otherTodoId}/copy",
+            new { userId = otherUserId });
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem!.Title.ShouldBe("Users.Forbidden");
+        problem.Detail.ShouldBe("You are not authorized to perform this action.");
     }
 }

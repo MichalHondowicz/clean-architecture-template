@@ -21,7 +21,7 @@ public sealed class CreateTodoCommandHandlerTests : BaseHandlerTest
     };
 
     [Fact]
-    public async Task Handle_Should_ReturnUnauthorized_WhenUserIdDoesNotMatchContext()
+    public async Task Handle_Should_ReturnForbidden_WhenUserIdDoesNotMatchContext()
     {
         // Arrange
         await using TestDbContext context = CreateDbContext();
@@ -36,7 +36,7 @@ public sealed class CreateTodoCommandHandlerTests : BaseHandlerTest
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.Unauthorized());
+        result.Error.ShouldBe(UserErrors.Forbidden());
     }
 
     [Fact]
