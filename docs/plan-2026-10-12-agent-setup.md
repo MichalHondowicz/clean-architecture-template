@@ -231,7 +231,15 @@ wszystkie rekomendacje przyjęte:
   review ticketu tylko na osi Spec, oś Standards raz na gałąź przez `ca-review`. Fork bez zmian. Podstawa: w
   tickecie 403 oś Standards nie znalazła twardych naruszeń, a `ca-review` gałęzi dał 0/0/0.
 
-Otwarte: F2 i F3 czekają na utworzenie repo przez użytkownika.
+F2 i F3 wykonane tego samego dnia. Template: remote `origin`
+(`https://github.com/MichalHondowicz/clean-architecture-template`, prywatne), wypchnięty `main`. Pierwszy
+przebieg CI (Build #1, `9ba3652`) zakończył się statusem Success w 1m 7s, ze wszystkimi krokami (Restore, Build,
+Test, Publish). Logów kroków agent nie widział (GitHub wymagał ponownego logowania), więc liczby testów z CI są
+niepotwierdzone. Ten sam ciąg w Release lokalnie: build 0/0, testy 34/6/13, publish bez błędów. Repo ma
+Dependabota (NuGet), więc jego PR-y uruchomią CI przez `pull_request`. Fork: remote `backup`
+(`https://github.com/MichalHondowicz/skills-dotnet`, prywatne), wypchnięta gałąź `dotnet` (`2f5489b`); po
+rebase na upstream push do `backup` wymaga `--force-with-lease`. Gałęzie `pilot/archive-todo` i
+`fix/ownership-403` zostają tylko lokalnie.
 
 ## Ryzyka
 
