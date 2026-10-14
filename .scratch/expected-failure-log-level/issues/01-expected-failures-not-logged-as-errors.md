@@ -11,8 +11,18 @@ wymaga ADR-a.
 
 **Blocked by:** None (can start immediately)
 
-**Status:** needs-triage
+**Status:** ready-for-agent
 
-- [ ] Porażka typu innego niż `Failure` jest logowana poniżej poziomu Error.
+- [ ] Porażka typu innego niż `Failure` jest logowana jako Warning (ADR 0007).
 - [ ] Porażka typu `Failure` nadal jest logowana jako Error.
 - [ ] Test sprawdza poziom logu dla obu przypadków i pada na obecnym kodzie (red proof).
+
+## Comments
+
+**Triage (2026-10-14), decyzja użytkownika (bramka T2):** `Failure` → Error, pozostałe typy (`Validation`,
+`Problem`, `NotFound`, `Conflict`, `Forbidden`) → Warning. Decyzja dotyczy wszystkich handlerów, więc jest
+zapisana jako ADR 0007; pierwsze kryterium zawężone z „poniżej Error” do Warning. `ready-for-agent`.
+
+Stan kodu sprawdzony przy triage: `LoggingDecorator` ma trzy warianty (komenda z odpowiedzią, komenda bez
+odpowiedzi, query) i każdy woła `LogError` przy porażce, więc zmiana obejmuje wszystkie trzy. Poziomu logu nie
+widać przez HTTP; seam to test dekoratora.

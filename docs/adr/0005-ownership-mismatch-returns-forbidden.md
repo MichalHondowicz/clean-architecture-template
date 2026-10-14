@@ -11,8 +11,11 @@ klient. Decyzja: dodać `ErrorType.Forbidden` mapowany na 403 i zastąpić ten b
 `UserErrors.Forbidden()` (kod `Users.Forbidden`), bo w HTTP „Unauthorized” znaczy 401. Todo item czytany po
 własnym id dalej filtrujemy po `UserId`, więc cudzy todo item daje 404 i nie ujawnia, że istnieje.
 
-Ten sam błąd zwraca `GetUserByEmailQueryHandler` (bez endpointu), gdy e-mail należy do innego usera. Ryzyko
-enumeracji kont w tym miejscu: `.scratch/user-by-email-enumeration/`. Wdrożenie: `.scratch/ownership-forbidden/`.
+Wyjątek: wyszukiwanie usera po e-mailu (`GetUserByEmailQueryHandler`, bez endpointu). E-mail da się zgadnąć,
+a id (GUID) nie, więc 403 dla cudzego e-maila obok 404 dla nieznanego zdradzałoby, które konta istnieją. Cudzy
+e-mail daje ten sam błąd co nieznany (`UserErrors.NotFoundByEmail`, 404), jak cudzy todo item czytany po
+własnym id. Decyzja z triage 2026-10-14; do czasu wdrożenia (`.scratch/user-by-email-enumeration/`) handler
+zwraca 403. Wdrożenie reszty: `.scratch/ownership-forbidden/`.
 
 ## Considered options
 
