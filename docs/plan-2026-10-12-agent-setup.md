@@ -241,6 +241,13 @@ Dependabota (NuGet), więc jego PR-y uruchomią CI przez `pull_request`. Fork: r
 rebase na upstream push do `backup` wymaga `--force-with-lease`. Gałąź `pilot/archive-todo` wypchnięta do
 `origin` jako kopia dowodu (P1: bez PR-a i bez scalania); scalona `fix/ownership-403` usunięta.
 
+Dependabot po pierwszym pushu: 15 PR-ów (#1–#15) przejrzanych i scalonych tego samego dnia. Każda partia przeszła
+lokalnie jako całość w worktree w scratchpadzie (build 0/0, testy 34/6/13), a zmiany wersji głównej
+(NSubstitute 6, xunit.runner.visualstudio 4) z informacjami o wydaniu zestawionymi z użyciem w kodzie.
+Swashbuckle 10.3.0 sprawdzony sondą: dokument OpenAPI identyczny jak na 10.2.3. W `.github/dependabot.yml`
+grupy `microsoft-dotnet` i `opentelemetry`, bo pojedyncze PR-y rozjeżdżały wersje jednej rodziny. Plan nie ma
+dalszych faz; następny krok: `docs/handoff-2026-10-14-triage.md`.
+
 ## Ryzyka
 
 - Trzy warstwy procesu naraz (Pocock, superpowers, `dotnet-workflow`) dają niedeterministyczny wybór skilli.

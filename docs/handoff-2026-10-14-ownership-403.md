@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-14-triage.md
+
 # Handoff: ticket 403 dla cudzego `userId` (ADR 0005)
 
 Uruchom tę sesję w `D:\Projects\clean-architecture_new`. Wdrażasz decyzję z ADR 0005: niezgodność ownera
