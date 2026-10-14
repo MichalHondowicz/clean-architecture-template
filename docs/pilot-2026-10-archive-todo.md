@@ -270,7 +270,9 @@ Nie wdrożone:
 - **7** (review po ticketach tylko na osi Spec, Standards raz na końcu): zmiana w forku Pococka, czyli
   konfiguracja globalna; czeka na osobną zgodę.
 - **10** (metody domenowe `Archive`/`Unarchive` zamiast surowych porównań `ArchivedAt`; kody błędów w testach
-  HTTP): decyzje projektowe na osobny grill.
+  HTTP): decyzje projektowe na osobny grill. Część o kodach błędów rozstrzygnięta przy triage 2026-10-14
+  (bramka T3): test HTTP ścieżki porażki sprawdza kod w `ProblemDetails.Title`, gdy kryterium nazywa błąd
+  (`AGENTS.md`, Tests; `add-tests`). Metody domenowe czekają; dotyczą tylko gałęzi `pilot/archive-todo`.
 
 Kod archiwizacji, migracja, słownik (Archive, Unarchive, Copy), spec i tickety zostają na gałęzi
 `pilot/archive-todo` jako dowód (P1).
