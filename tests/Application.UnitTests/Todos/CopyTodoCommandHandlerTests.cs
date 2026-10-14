@@ -139,6 +139,8 @@ public sealed class CopyTodoCommandHandlerTests : BaseHandlerTest
         copy.Labels.ShouldBe(["work"]);
         copy.IsCompleted.ShouldBeFalse();
         copy.CreatedAt.ShouldBe(copiedAt);
-        copy.DomainEvents.ShouldContain(domainEvent => domainEvent is TodoItemCreatedDomainEvent);
+        TodoItemCreatedDomainEvent createdEvent =
+            copy.DomainEvents.OfType<TodoItemCreatedDomainEvent>().ShouldHaveSingleItem();
+        createdEvent.TodoItemId.ShouldBe(result.Value);
     }
 }
