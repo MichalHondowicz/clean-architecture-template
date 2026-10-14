@@ -47,7 +47,7 @@ If a ticket or spec file is given, also check acceptance-criteria coverage. Repo
 
 ### Validation & security
 - Every command has a FluentValidation `{Command}Validator`; handlers don't re-check input shape (but do enforce business rules).
-- Handlers acting on user-owned data enforce ownership (ADR 0005): a client-supplied `userId` is compared with `IUserContext.UserId` and a mismatch returns `UserErrors.Forbidden()` (→ 403); an item read by its own id is filtered by `IUserContext.UserId` (→ 404). Never a test or AC expecting 401 for an ownership mismatch.
+- Handlers acting on user-owned data enforce ownership (ADR 0005): a client-supplied `userId` is compared with `IUserContext.UserId` and a mismatch returns `UserErrors.Forbidden()` (→ 403); an item read by its own id is filtered by `IUserContext.UserId` (→ 404); a user looked up by e-mail is filtered the same way, so another user's e-mail answers the 404 of an unknown one. Never a test or AC expecting 401 for an ownership mismatch.
 - New endpoints call `.RequireAuthorization()` (or `.HasPermission(...)`) and `.WithTags(Tags.X)` — only the auth endpoints (register, login, refresh) are anonymous.
 - No `DateTime.UtcNow`/`DateTime.Now` in Application — use `IDateTimeProvider`.
 
