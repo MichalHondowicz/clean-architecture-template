@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-14-ownership-403.md
+
 # Handoff: Faza 5, pilot end-to-end „archiwizacja todo itemu”
 
 Uruchom tę sesję w `D:\Projects\clean-architecture_new`. Pracujesz według planu
