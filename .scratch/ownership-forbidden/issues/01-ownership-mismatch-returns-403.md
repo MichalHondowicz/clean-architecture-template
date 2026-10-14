@@ -6,14 +6,14 @@ nie loguje tego jako awarii. Decyzja: ADR 0005.
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Cudzy `userId` w `POST todos`, `GET todos`, `POST todos/{id}/copy` i `GET users/{userId}` daje 403
+- [x] Cudzy `userId` w `POST todos`, `GET todos`, `POST todos/{id}/copy` i `GET users/{userId}` daje 403
       z kodem i opisem błędu w ProblemDetails.
-- [ ] Pozostałe porażki typu `Failure` nadal dają 500.
-- [ ] Test integracyjny dla każdej z czterech tras oczekuje 403, a testy unit handlerów oczekują nowego typu
+- [x] Pozostałe porażki typu `Failure` nadal dają 500.
+- [x] Test integracyjny dla każdej z czterech tras oczekuje 403, a testy unit handlerów oczekują nowego typu
       błędu.
-- [ ] `AGENTS.md` i skille projektu mówią 403 zamiast 500; ADR 0005 traci akapit o tymczasowym 500.
+- [x] `AGENTS.md` i skille projektu mówią 403 zamiast 500; ADR 0005 traci akapit o tymczasowym 500.
 
 ## Comments
 
@@ -97,3 +97,12 @@ Poprawki z retro Fazy 5 w tym przebiegu:
 - Cykle zaczynały się od testu HTTP: tak, dla czterech tras; cykl 5 od testu unit, bo handler nie ma endpointu.
 - Red proof po jednym mechanizmie: tak, 11 przebiegów po jednym mechanizmie (RP4 i RP9 z dodatkowym `!`, żeby
   złamanie się kompilowało, zgodnie z krokiem 7 `add-tests`).
+- `ca-review` wymagał testów unit dla każdego zmienionego handlera: tak, punkt „New/changed handlers have unit
+  tests covering every `Result.Failure` path plus the happy path” objął wszystkie pięć handlerów i każdy je ma.
+  Inaczej niż w pilocie, ADR 0004 i checklista dały ten sam werdykt.
+
+**`ca-review` gałęzi (2026-10-14), scope `git diff 7d1e78b` (commit `54607ff`), `.agents/` wyłączone:** blockers
+0, convention violations 0, test gaps 0; każde kryterium ma implementację i test. Uwaga bez wagi blokera:
+`CustomResultsTests` w IntegrationTests bez HTTP (wyjątek S3 opisany wyżej). Przebieg na świeżym buildzie
+(Docker 29.8.1): build 0 błędów, 0 ostrzeżeń; UnitTests 34/34, ArchitectureTests 6/6, IntegrationTests 13/13.
+Werdykt: gotowe. Scalenie do `main` czeka na zgodę użytkownika (B1).
