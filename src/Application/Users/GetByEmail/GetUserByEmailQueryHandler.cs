@@ -12,8 +12,9 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context, 
 {
     public async Task<Result<UserResponse>> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
     {
+        // Another user's e-mail answers like an unknown one, so the response doesn't reveal the account (ADR 0005).
         UserResponse? user = await context.Users
-            .Where(u => u.Email == query.Email)
+            .Where(u => u.Email == query.Email && u.Id == userContext.UserId)
             .Select(u => new UserResponse
             {
                 Id = u.Id,
@@ -24,12 +25,6 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context, 
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
-        {
-            return Result.Failure<UserResponse>(UserErrors.NotFoundByEmail);
-        }
-
-        // Another user's e-mail answers like an unknown one, so the response doesn't reveal the account (ADR 0005).
-        if (user.Id != userContext.UserId)
         {
             return Result.Failure<UserResponse>(UserErrors.NotFoundByEmail);
         }

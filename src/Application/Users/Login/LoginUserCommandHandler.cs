@@ -34,13 +34,15 @@ internal sealed class LoginUserCommandHandler(
         string accessToken = tokenProvider.Create(user);
         string refreshToken = tokenProvider.GenerateRefreshToken();
 
+        DateTime now = dateTimeProvider.UtcNow;
+
         var refreshTokenEntity = new RefreshToken
         {
             Id = Guid.NewGuid(),
             Token = refreshToken,
             UserId = user.Id,
-            ExpiresOnUtc = dateTimeProvider.UtcNow.AddDays(RefreshTokenExpirationInDays),
-            LoggedInOnUtc = dateTimeProvider.UtcNow
+            ExpiresOnUtc = now.AddDays(RefreshTokenExpirationInDays),
+            LoggedInOnUtc = now
         };
 
         context.RefreshTokens.Add(refreshTokenEntity);
