@@ -8,7 +8,9 @@ status: accepted
 typu `Failure` to awaria po stronie serwera i zostaje na poziomie Error. Pozostałe typy (`Validation`,
 `Problem`, `NotFound`, `Conflict`, `Forbidden`) to porażki przewidziane w use case'ie (ADR 0002), zawinione
 przez klienta; logujemy je jako Warning. Error w logach znaczy wtedy „do naprawy po stronie serwera”, a porażki
-klienta nadal da się znaleźć i policzyć. Wdrożenie: `.scratch/expected-failure-log-level/`.
+klienta nadal da się znaleźć i policzyć. Nowy `ErrorType` dostaje domyślnie Warning; jeśli oznacza awarię
+serwera, dopisz go obok `Failure` w `LoggingDecorator.FailureLevel` i w jego testach. Wdrożenie:
+`.scratch/expected-failure-log-level/`.
 
 ## Considered options
 

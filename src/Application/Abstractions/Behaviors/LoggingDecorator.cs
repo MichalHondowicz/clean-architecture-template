@@ -7,6 +7,10 @@ namespace Application.Abstractions.Behaviors;
 
 internal static class LoggingDecorator
 {
+    // A Failure is a server fault; every other error type is an expected failure the client caused (ADR 0007).
+    private static LogLevel FailureLevel(Error error) =>
+        error.Type == ErrorType.Failure ? LogLevel.Error : LogLevel.Warning;
+
     internal sealed class CommandHandler<TCommand, TResponse>(
         ICommandHandler<TCommand, TResponse> innerHandler,
         ILogger<CommandHandler<TCommand, TResponse>> logger)
@@ -29,7 +33,10 @@ internal static class LoggingDecorator
             {
                 using (LogContext.PushProperty("Error", result.Error, true))
                 {
-                    logger.LogError("Completed command {Command} with error", commandName);
+                    logger.Log(
+                        FailureLevel(result.Error),
+                        "Completed command {Command} with error",
+                        commandName);
                 }
             }
 
@@ -59,7 +66,10 @@ internal static class LoggingDecorator
             {
                 using (LogContext.PushProperty("Error", result.Error, true))
                 {
-                    logger.LogError("Completed command {Command} with error", commandName);
+                    logger.Log(
+                        FailureLevel(result.Error),
+                        "Completed command {Command} with error",
+                        commandName);
                 }
             }
 
@@ -89,7 +99,10 @@ internal static class LoggingDecorator
             {
                 using (LogContext.PushProperty("Error", result.Error, true))
                 {
-                    logger.LogError("Completed query {Query} with error", queryName);
+                    logger.Log(
+                        FailureLevel(result.Error),
+                        "Completed query {Query} with error",
+                        queryName);
                 }
             }
 
