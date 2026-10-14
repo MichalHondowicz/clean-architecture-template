@@ -71,7 +71,8 @@ Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents
 - `implement`, `tdd`: typechecking is `dotnet build CleanArchitecture.slnx` (analyzers are errors, so
   a warning fails it); a single test file is `dotnet test <test project> --filter
   "FullyQualifiedName~<TestClass>"`; the full suite is `dotnet test CleanArchitecture.slnx`.
-- `code-review`: inside `/implement`, review each ticket on the Spec axis only. The Standards axis runs
+- `code-review` is the plugin skill `mattpocock-skills:code-review` (two axes); Claude Code's built-in
+  `code-review` hunts bugs and is not this step. Inside `/implement`, review each ticket on the Spec axis only. The Standards axis runs
   once per branch, as `ca-review` of the whole branch before the merge. A `code-review` outside `/implement`
   keeps both axes; its Standards sources are this file and the checklist in `.claude/skills/ca-review/SKILL.md`.
 

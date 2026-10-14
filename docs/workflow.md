@@ -51,7 +51,9 @@ nie może ich wywołać sam).
    - cykle red → green (`tdd`), zwykle od testu HTTP; red to padający test, nie błąd kompilacji;
    - testy, które nie były czerwone w cyklu, dostają **red proof**: agent psuje jeden mechanizm, patrzy, jak
      test pada, i przywraca plik (hash przed i po);
-   - review ticketu tylko na osi Spec (czy zrobione to, o co prosił ticket).
+   - review ticketu tylko na osi Spec (czy zrobione to, o co prosił ticket), skillem
+     `mattpocock-skills:code-review`. Wbudowany w Claude Code `/code-review` to inny skill: szuka błędów
+     w diffie i nie ma osi Spec. Sam review Pococka wywołasz jako `/mattpocock-skills:code-review`.
 7. **`ca-review` całej gałęzi** (oś Standards: konwencje z `AGENTS.md` i checklista skilla), z `base <sha>`
    początku gałęzi.
 8. **Zamknięcie ticketu**: odhaczone kryteria, wynik w `## Comments`, `**Status:** done`.
@@ -102,3 +104,8 @@ PostgreSQL). Liczby testów licz lokalnie: CI na GitHubie pokazuje tylko status.
 - Nowa niepusta kolumna `DateTime` w istniejącej tabeli: stare wiersze dostają `'-infinity'`, co kończy się 500
   przy zapisie (`add-entity`, „Existing rows”).
 - Push wpisany zaraz po podsumowaniu agenta, zanim skończy scalanie, nic nie wysyła („Everything up-to-date”).
+- Dwa skille `code-review`: wbudowany (szuka błędów) i Pococka (`mattpocock-skills:code-review`, dwie osie).
+  Workflow używa tego drugiego; fork od wersji `1.3.1-dotnet.3` woła go pełną nazwą.
+- Plugin `superpowers` dubluje skille Pococka (TDD, debugowanie, review). Jest wyłączony globalnie i dodatkowo
+  w `.claude/settings.json` template'u; nie włączaj go obok Pococka.
+- W Git Bash ścieżki piszesz ukośnikami zwykłymi (`cd /d/Projects/skills`); `\` znika jako znak ucieczki.
