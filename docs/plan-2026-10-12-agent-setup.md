@@ -238,8 +238,8 @@ Test, Publish). Logów kroków agent nie widział (GitHub wymagał ponownego log
 niepotwierdzone. Ten sam ciąg w Release lokalnie: build 0/0, testy 34/6/13, publish bez błędów. Repo ma
 Dependabota (NuGet), więc jego PR-y uruchomią CI przez `pull_request`. Fork: remote `backup`
 (`https://github.com/MichalHondowicz/skills-dotnet`, prywatne), wypchnięta gałąź `dotnet` (`2f5489b`); po
-rebase na upstream push do `backup` wymaga `--force-with-lease`. Gałęzie `pilot/archive-todo` i
-`fix/ownership-403` zostają tylko lokalnie.
+rebase na upstream push do `backup` wymaga `--force-with-lease`. Gałąź `pilot/archive-todo` wypchnięta do
+`origin` jako kopia dowodu (P1: bez PR-a i bez scalania); scalona `fix/ownership-403` usunięta.
 
 ## Ryzyka
 
