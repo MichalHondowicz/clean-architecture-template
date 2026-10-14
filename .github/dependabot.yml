@@ -11,3 +11,6 @@ updates:
           - "Microsoft.EntityFrameworkCore*"
           - "Microsoft.Extensions.*"
           - "dotnet-ef"
+      opentelemetry:
+        patterns:
+          - "OpenTelemetry*"
