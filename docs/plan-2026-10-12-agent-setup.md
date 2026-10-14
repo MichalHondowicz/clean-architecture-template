@@ -215,6 +215,24 @@ i poprawki warstwy agentowej z `/retro` (punkty 1–6, 8, 9). Odstępstwa i peł
 - Stary `D:\Projects\clean-architecture`: zostawić jako poligon albo zarchiwizować.
 - Czy `clean-architecture_new` publikować jako własny template (`dotnet new` lub GitHub template repo).
 
+**Wynik (2026-10-14):** przed Fazą 6 domknięty ticket 403 z ADR 0005 (`.scratch/ownership-forbidden/`,
+fast-forward do `main`, `cf8e757`); od tej chwili `AGENTS.md` i skille mówią 403, a nie 500. Bramka F1–F4,
+wszystkie rekomendacje przyjęte:
+
+- **F1:** `dotnet-workflow` zamrożony: notatka „paused” w README (commit `7c27d3f` na
+  `hybrid-clean-architecture`), plugin dalej wyłączony. Stary `D:\Projects\clean-architecture` bez zmian, jako
+  fixture E2E `dotnet-workflow`.
+- **F2:** template trafia do prywatnego repo GitHub oznaczonego jako template. Repo zakłada użytkownik (na tej
+  maszynie nie ma `gh`), agent dodaje remote i pushuje `main`, więc CI rusza pierwszy raz. Publikacja publiczna
+  dopiero po sprawdzeniu licencji upstreamu: w kopii nie ma `LICENSE`, a `README.md` to README Milana Jovanovića.
+- **F3:** gałąź `dotnet` forka Pococka (`D:\Projects\skills`) dostaje kopię w prywatnym repo GitHub (remote
+  `backup`).
+- **F4:** punkt 7 retro jako reguła projektu w `AGENTS.md` („Process skills in this project”): w `/implement`
+  review ticketu tylko na osi Spec, oś Standards raz na gałąź przez `ca-review`. Fork bez zmian. Podstawa: w
+  tickecie 403 oś Standards nie znalazła twardych naruszeń, a `ca-review` gałęzi dał 0/0/0.
+
+Otwarte: F2 i F3 czekają na utworzenie repo przez użytkownika.
+
 ## Ryzyka
 
 - Trzy warstwy procesu naraz (Pocock, superpowers, `dotnet-workflow`) dają niedeterministyczny wybór skilli.
