@@ -31,6 +31,39 @@ Projekt mówi im o sobie przez `AGENTS.md` (np. typecheck to `dotnet build`, jed
    - `GLOSSARY.md` opisuje domenę przykładu; zastępuj go swoimi pojęciami, gdy Twoja domena się wyostrzy
      (robi to `/grill-with-docs`).
 
+## Istniejący projekt
+
+Warstwa procesu jest globalna (plugin z forka Pococka, wyłączony `superpowers`), więc działa w każdym
+projekcie od razu. Per projekt trzeba dołożyć to, z czego skille procesu czytają kontekst:
+
+| Element | Po co |
+|---|---|
+| `docs/agents/` (przez `/setup-matt-pocock-skills`) | gdzie leżą tickety, jakie są statusy, gdzie słownik i ADR-y |
+| sekcja „Process skills in this project” w `AGENTS.md` | komendy build i testów, review ticketu tylko na osi Spec, pełna nazwa `mattpocock-skills:code-review` |
+| `GLOSSARY.md` i `docs/adr/` | słownik domeny i decyzje, których agent nie podważa |
+| `CLAUDE.md` = `@AGENTS.md` plus zdanie, że reguły idą do `AGENTS.md` | jedno źródło reguł |
+| `.claude/settings.json` z allowlistą komend | mniej pytań o zgodę przy buildzie i testach |
+
+Wdrożenie: jedna sesja otwarta w katalogu projektu, na osobnej gałęzi (np. `chore/agent-workflow`).
+
+1. **`/setup-matt-pocock-skills`**: tracker (np. `.scratch/`), etykiety, układ słownika i ADR-ów. Blok
+   „Agent skills”, który skill dopisuje, przenieś do `AGENTS.md`.
+2. **`AGENTS.md`**: dopisz sekcję procesu z tego template'u („Process skills in this project”) i podmień
+   komendy na komendy projektu. Opisz tylko to, co w projekcie naprawdę obowiązuje (np. analizatory jako błędy
+   tylko wtedy, gdy build tak działa).
+3. **Domena**: `domain-modeling` buduje pierwszy `GLOSSARY.md` z kodu, a decyzje, które już zapadły, zapisuje
+   jako ADR-y; potem krótki `/grill-with-docs`, żeby wyostrzyć pojęcia.
+4. **Skille projektu tylko przy tej samej architekturze.** `add-feature`, `add-entity`, `add-tests` i
+   `ca-review` opisują ten template (`Result`, własne handlery, Scrutor, Testcontainers). W projekcie o innej
+   budowie agent pisałby według cudzych wzorców. Tam zacznij bez nich, a skille napisz po kilku funkcjach,
+   gdy widać powtarzalne wzorce (`writing-for-agents`, `skill-creator`).
+5. **Pilot**: jedna mała funkcja przez cały przepływ z sekcji niżej, potem `/retro`. Tak wychodzą rozjazdy
+   między `AGENTS.md` a rzeczywistością projektu.
+
+`AGENTS.md` z template'u nie kopiuj w całości: każdy projekt ma własną konstytucję o swojej architekturze,
+a z template'u przenosisz tylko proces. Długi `AGENTS.md` przytnij przy okazji: agent czyta go w całości na
+starcie każdej sesji, więc każda zbędna linia kosztuje.
+
 ## Funkcja od pomysłu do `main`
 
 Komendy z ukośnikiem wpisujesz Ty, jako osobną wiadomość zaczynającą się od `/` (to skille „user-only”, agent
