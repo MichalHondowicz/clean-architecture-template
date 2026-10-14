@@ -18,7 +18,9 @@ internal sealed class RefreshTokenCommandHandler(
             .Include(rt => rt.User)
             .SingleOrDefaultAsync(rt => rt.Token == command.RefreshToken, cancellationToken);
 
-        if (refreshToken is null || refreshToken.ExpiresOnUtc < dateTimeProvider.UtcNow)
+        if (refreshToken is null ||
+            refreshToken.ExpiresOnUtc < dateTimeProvider.UtcNow ||
+            refreshToken.LoggedInOnUtc.AddDays(MaxDaysSinceLogin) < dateTimeProvider.UtcNow)
         {
             return Result.Failure<AccessTokensResponse>(UserErrors.InvalidRefreshToken);
         }
@@ -27,8 +29,12 @@ internal sealed class RefreshTokenCommandHandler(
         string newRefreshToken = tokenProvider.GenerateRefreshToken();
 
         // Rotate the refresh token so a stolen token can only be used once.
+        // Each rotation extends the expiry, but never past the limit counted from the login.
+        DateTime slidingExpiresOnUtc = dateTimeProvider.UtcNow.AddDays(RefreshTokenExpirationInDays);
+        DateTime loginExpiresOnUtc = refreshToken.LoggedInOnUtc.AddDays(MaxDaysSinceLogin);
+
         refreshToken.Token = newRefreshToken;
-        refreshToken.ExpiresOnUtc = dateTimeProvider.UtcNow.AddDays(RefreshTokenExpirationInDays);
+        refreshToken.ExpiresOnUtc = slidingExpiresOnUtc < loginExpiresOnUtc ? slidingExpiresOnUtc : loginExpiresOnUtc;
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -36,4 +42,6 @@ internal sealed class RefreshTokenCommandHandler(
     }
 
     private const int RefreshTokenExpirationInDays = 7;
+
+    private const int MaxDaysSinceLogin = 30;
 }

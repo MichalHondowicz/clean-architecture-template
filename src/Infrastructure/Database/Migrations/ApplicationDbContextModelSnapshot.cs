@@ -19,7 +19,7 @@ namespace Infrastructure.Database.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -84,6 +84,10 @@ namespace Infrastructure.Database.Migrations
                     b.Property<DateTime>("ExpiresOnUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_on_utc");
+
+                    b.Property<DateTime>("LoggedInOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("logged_in_on_utc");
 
                     b.Property<string>("Token")
                         .IsRequired()

@@ -74,8 +74,9 @@ public sealed class LoginUserCommandHandlerTests : BaseHandlerTest
         tokenProvider.Create(Arg.Any<User>()).Returns("access-token");
         tokenProvider.GenerateRefreshToken().Returns("refresh-token");
 
+        DateTime now = DateTime.UtcNow;
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        dateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
+        dateTimeProvider.UtcNow.Returns(now);
 
         var handler = new LoginUserCommandHandler(context, passwordHasher, tokenProvider, dateTimeProvider);
 
@@ -91,7 +92,8 @@ public sealed class LoginUserCommandHandlerTests : BaseHandlerTest
 
         RefreshToken refreshToken = await context.RefreshTokens.SingleAsync();
         refreshToken.Token.ShouldBe("refresh-token");
-        refreshToken.ExpiresOnUtc.ShouldBeGreaterThan(dateTimeProvider.UtcNow);
+        refreshToken.ExpiresOnUtc.ShouldBe(now.AddDays(7));
+        refreshToken.LoggedInOnUtc.ShouldBe(now);
     }
 
     private static async Task SeedUserAsync(TestDbContext context)

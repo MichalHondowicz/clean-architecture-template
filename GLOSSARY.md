@@ -21,7 +21,8 @@ _Avoid_: JWT (w prozie), Session token
 
 **Refresh token**:
 Długotrwały token wydawany przy logowaniu, wymieniany na nowy access token. Każda wymiana go rotuje:
-stara wartość przestaje działać, a termin ważności przesuwa się od chwili wymiany.
+stara wartość przestaje działać, a termin ważności przesuwa się od chwili wymiany, ale nie dalej niż 30 dni
+od logowania. Potem user loguje się ponownie.
 _Avoid_: Session, Remember-me token
 
 **Rotation**:

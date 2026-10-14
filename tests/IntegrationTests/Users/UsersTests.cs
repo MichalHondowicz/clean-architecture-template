@@ -1,11 +1,24 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
+using Web.Api;
 
 namespace IntegrationTests.Users;
 
-public sealed class UsersTests(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
+public sealed class UsersTests : BaseIntegrationTest
 {
+    private readonly IntegrationTestWebAppFactory _factory;
+
+    public UsersTests(IntegrationTestWebAppFactory factory)
+        : base(factory)
+    {
+        _factory = factory;
+    }
+
     [Fact]
     public async Task Register_Should_ReturnUserId()
     {
@@ -95,5 +108,54 @@ public sealed class UsersTests(IntegrationTestWebAppFactory factory) : BaseInteg
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task RefreshToken_Should_ReturnProblem_WhenLoginIsOlderThan30Days()
+    {
+        // Arrange
+        var loggedInAt = new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Utc);
+        var clock = new TestDateTimeProvider { UtcNow = loggedInAt };
+        await using WebApplicationFactory<Program> clockFactory = _factory.WithWebHostBuilder(builder =>
+            builder.ConfigureTestServices(services => services.AddSingleton<IDateTimeProvider>(clock)));
+        using HttpClient client = clockFactory.CreateClient();
+
+        string email = UniqueEmail();
+        await RegisterUserAsync(email);
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync(
+            "users/login",
+            new { email, password = "Password123" });
+        loginResponse.EnsureSuccessStatusCode();
+        AccessTokens? tokens = await loginResponse.Content.ReadFromJsonAsync<AccessTokens>();
+        string refreshToken = tokens!.RefreshToken;
+
+        // Each refresh comes within 7 days of the previous one, so only the 30-day limit can end the chain.
+        foreach (int day in new[] { 6, 12, 18, 24, 29 })
+        {
+            clock.UtcNow = loggedInAt.AddDays(day);
+            HttpResponseMessage refreshResponse = await client.PostAsJsonAsync(
+                "users/refresh-token",
+                new { refreshToken });
+            refreshResponse.EnsureSuccessStatusCode();
+            AccessTokens? rotated = await refreshResponse.Content.ReadFromJsonAsync<AccessTokens>();
+            refreshToken = rotated!.RefreshToken;
+        }
+
+        clock.UtcNow = loggedInAt.AddDays(30).AddMinutes(1);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            "users/refresh-token",
+            new { refreshToken });
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem!.Title.ShouldBe("Users.InvalidRefreshToken");
+    }
+
+    private sealed class TestDateTimeProvider : IDateTimeProvider
+    {
+        public DateTime UtcNow { get; set; }
     }
 }

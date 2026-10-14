@@ -39,7 +39,8 @@ internal sealed class LoginUserCommandHandler(
             Id = Guid.NewGuid(),
             Token = refreshToken,
             UserId = user.Id,
-            ExpiresOnUtc = dateTimeProvider.UtcNow.AddDays(RefreshTokenExpirationInDays)
+            ExpiresOnUtc = dateTimeProvider.UtcNow.AddDays(RefreshTokenExpirationInDays),
+            LoggedInOnUtc = dateTimeProvider.UtcNow
         };
 
         context.RefreshTokens.Add(refreshTokenEntity);

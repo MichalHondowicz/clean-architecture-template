@@ -36,7 +36,11 @@ public sealed class RefreshTokenCommandHandlerTests : BaseHandlerTest
         // Arrange
         await using TestDbContext context = CreateDbContext();
         DateTime now = DateTime.UtcNow;
-        await SeedRefreshTokenAsync(context, "expired-token", expiresOnUtc: now.AddDays(-1));
+        await SeedRefreshTokenAsync(
+            context,
+            "expired-token",
+            expiresOnUtc: now.AddDays(-1),
+            loggedInOnUtc: now.AddDays(-8));
 
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(now);
@@ -57,12 +61,44 @@ public sealed class RefreshTokenCommandHandlerTests : BaseHandlerTest
     }
 
     [Fact]
+    public async Task Handle_Should_ReturnFailure_WhenLoginIsOlderThan30Days()
+    {
+        // Arrange
+        await using TestDbContext context = CreateDbContext();
+        DateTime now = DateTime.UtcNow;
+        // A row from before the LoggedInOnUtc column reads its login moment as DateTime.MinValue.
+        await SeedRefreshTokenAsync(
+            context,
+            "pre-migration-token",
+            expiresOnUtc: now.AddDays(1),
+            loggedInOnUtc: DateTime.MinValue);
+
+        IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(now);
+
+        var handler = new RefreshTokenCommandHandler(
+            context,
+            Substitute.For<ITokenProvider>(),
+            dateTimeProvider);
+
+        // Act
+        Result<AccessTokensResponse> result = await handler.Handle(
+            new RefreshTokenCommand("pre-migration-token"),
+            CancellationToken.None);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(UserErrors.InvalidRefreshToken);
+    }
+
+    [Fact]
     public async Task Handle_Should_RotateTokenAndReturnNewTokens_WhenValid()
     {
         // Arrange
         await using TestDbContext context = CreateDbContext();
         DateTime now = DateTime.UtcNow;
-        await SeedRefreshTokenAsync(context, "old-token", expiresOnUtc: now.AddDays(1));
+        DateTime loggedInOnUtc = now.AddDays(-6);
+        await SeedRefreshTokenAsync(context, "old-token", expiresOnUtc: now.AddDays(1), loggedInOnUtc);
 
         ITokenProvider tokenProvider = Substitute.For<ITokenProvider>();
         tokenProvider.Create(Arg.Any<User>()).Returns("new-access-token");
@@ -85,10 +121,44 @@ public sealed class RefreshTokenCommandHandlerTests : BaseHandlerTest
 
         RefreshToken stored = await context.RefreshTokens.SingleAsync();
         stored.Token.ShouldBe("new-refresh-token");
-        stored.ExpiresOnUtc.ShouldBeGreaterThan(now);
+        stored.ExpiresOnUtc.ShouldBe(now.AddDays(7));
+        stored.LoggedInOnUtc.ShouldBe(loggedInOnUtc);
     }
 
-    private static async Task SeedRefreshTokenAsync(TestDbContext context, string token, DateTime expiresOnUtc)
+    [Fact]
+    public async Task Handle_Should_CapExpiryAt30DaysFromLogin_WhenLoginIsNearTheLimit()
+    {
+        // Arrange
+        await using TestDbContext context = CreateDbContext();
+        DateTime now = DateTime.UtcNow;
+        DateTime loggedInOnUtc = now.AddDays(-29);
+        await SeedRefreshTokenAsync(context, "old-token", expiresOnUtc: now.AddDays(1), loggedInOnUtc);
+
+        ITokenProvider tokenProvider = Substitute.For<ITokenProvider>();
+        tokenProvider.GenerateRefreshToken().Returns("new-refresh-token");
+
+        IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(now);
+
+        var handler = new RefreshTokenCommandHandler(context, tokenProvider, dateTimeProvider);
+
+        // Act
+        Result<AccessTokensResponse> result = await handler.Handle(
+            new RefreshTokenCommand("old-token"),
+            CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+
+        RefreshToken stored = await context.RefreshTokens.SingleAsync();
+        stored.ExpiresOnUtc.ShouldBe(loggedInOnUtc.AddDays(30));
+    }
+
+    private static async Task SeedRefreshTokenAsync(
+        TestDbContext context,
+        string token,
+        DateTime expiresOnUtc,
+        DateTime loggedInOnUtc)
     {
         var user = new User
         {
@@ -106,6 +176,7 @@ public sealed class RefreshTokenCommandHandlerTests : BaseHandlerTest
             Token = token,
             UserId = user.Id,
             ExpiresOnUtc = expiresOnUtc,
+            LoggedInOnUtc = loggedInOnUtc,
             User = user
         });
 
