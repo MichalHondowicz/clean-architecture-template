@@ -51,6 +51,19 @@
       "PowerShell(git show *--output*)"
     ]
   },
+  "hooks": {
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PROJECT_DIR}/.claude/hooks/dod-gate.ps1\"",
+            "timeout": 1800
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": false
   }

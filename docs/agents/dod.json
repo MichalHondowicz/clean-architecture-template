@@ -1,0 +1,25 @@
+{
+  "implementerAgent": "mattpocock-skills:implementer",
+  "environmentChecks": [
+    { "name": "docker", "run": "docker info" }
+  ],
+  "commands": [
+    { "name": "build", "run": "dotnet build CleanArchitecture.slnx" },
+    { "name": "test", "run": "dotnet test CleanArchitecture.slnx --no-build" }
+  ],
+  "protectedPaths": [
+    ".editorconfig",
+    "Directory.Build.props",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/adr/**",
+    "docs/agents/**",
+    ".claude/**",
+    "tests/ArchitectureTests/**",
+    "tests/HookTests/**"
+  ],
+  "quota": {
+    "weeklyPercent": 80,
+    "fiveHourPercent": 90
+  }
+}
