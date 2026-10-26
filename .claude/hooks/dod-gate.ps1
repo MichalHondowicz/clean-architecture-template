@@ -25,21 +25,21 @@ if ("$($hookInput.last_assistant_message)".TrimStart().StartsWith('STATUS: stuck
 
 Push-Location $root
 try {
-    foreach ($check in $dod.environmentChecks) {
-        $result = Invoke-DodStep $check
-        if ($result.ExitCode -ne 0) {
-            $message = "DoD gate skipped: environment check '$($check.name)' failed (exit $($result.ExitCode)): $($check.run)`n$($result.Output)"
-            @{ systemMessage = $message } | ConvertTo-Json -Compress
-            exit 0
+    $verdict = Invoke-DodExclusive $root {
+        foreach ($check in $dod.environmentChecks) {
+            $result = Invoke-DodStep $check
+            if ($result.ExitCode -ne 0) {
+                $message = "DoD gate skipped: environment check '$($check.name)' failed (exit $($result.ExitCode)): $($check.run)`n$($result.Output)"
+                return @{ systemMessage = $message }
+            }
         }
-    }
 
-    foreach ($command in $dod.commands) {
-        $result = Invoke-DodStep $command
-        if ($result.ExitCode -ne 0) {
-            $reason = "DoD command '$($command.name)' failed (exit $($result.ExitCode)): $($command.run)`n$($result.Output)"
-            @{ decision = 'block'; reason = $reason } | ConvertTo-Json -Compress
-            exit 0
+        foreach ($command in $dod.commands) {
+            $result = Invoke-DodStep $command
+            if ($result.ExitCode -ne 0) {
+                $reason = "DoD command '$($command.name)' failed (exit $($result.ExitCode)): $($command.run)`n$($result.Output)"
+                return @{ decision = 'block'; reason = $reason }
+            }
         }
     }
 }
@@ -47,4 +47,7 @@ finally {
     Pop-Location
 }
 
+if ($verdict) {
+    $verdict | ConvertTo-Json -Compress
+}
 exit 0

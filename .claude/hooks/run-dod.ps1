@@ -26,6 +26,11 @@ catch {
     [Console]::Error.WriteLine("$DodRelativePath is not valid JSON: $_")
     exit 2
 }
+$problems = @(Get-DodProblems $dod)
+if ($problems) {
+    [Console]::Error.WriteLine("$DodRelativePath is incomplete: $($problems -join '; ').")
+    exit 2
+}
 
 $failed = [Collections.Generic.List[object]]::new()
 
@@ -52,11 +57,14 @@ try {
         }
     }
     else {
-        foreach ($command in $dod.commands) {
-            $result = Invoke-DodStep $command
-            if ($result.ExitCode -ne 0) {
-                $failed.Add([ordered]@{ name = $command.name; exitCode = $result.ExitCode; output = $result.Output })
-                break
+        # Waits while the DoD gate (or another run) is building and testing this repository.
+        Invoke-DodExclusive $root {
+            foreach ($command in $dod.commands) {
+                $result = Invoke-DodStep $command
+                if ($result.ExitCode -ne 0) {
+                    $failed.Add([ordered]@{ name = $command.name; exitCode = $result.ExitCode; output = $result.Output })
+                    break
+                }
             }
         }
     }

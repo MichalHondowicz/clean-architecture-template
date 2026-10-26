@@ -28,7 +28,9 @@ From the orchestrator (`/ship`), as pointers, not copies:
 
 - Test at the ticket's seams with `tdd`. They were approved with the ticket: never ask about them, never ask
   the user anything.
-- The DoD in `dod.json` is enforced on stop: the implementer cannot finish while a DoD command fails.
+- The DoD in `dod.json` is enforced on stop: the implementer cannot finish with `STATUS: done` while a DoD
+  command fails. It may stop with `STATUS: stuck` on a red DoD; `/ship` then sets the ticket to `needs-info` and
+  puts the branch back to green.
 - Never write a path listed in `protectedPaths` of `dod.json`, nor anything outside the worktree. Edit and
   Write are refused there; a change made any other way shows up in the verifier's diff check. If the ticket
   cannot be done without such a change, finish with `STATUS: stuck` and say why.

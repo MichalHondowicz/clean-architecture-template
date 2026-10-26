@@ -13,7 +13,7 @@ public sealed class RunDodTests
     {
         // Arrange
         using var repository = DodRepository.Create(
-            [],
+            [DodRepository.Command("build", "exit 0")],
             environmentChecks:
             [
                 DodRepository.Check("docker", "if (Test-Path 'started.txt') { exit 0 } else { exit 1 }", "New-Item 'started.txt'")
@@ -32,7 +32,7 @@ public sealed class RunDodTests
     {
         // Arrange
         using var repository = DodRepository.Create(
-            [],
+            [DodRepository.Command("build", "exit 0")],
             environmentChecks: [DodRepository.Check("docker", "Write-Output ('daemon not ' + 'running'); exit 1", "exit 0")]);
 
         // Act
@@ -91,6 +91,45 @@ public sealed class RunDodTests
         // Assert
         result.ExitCode.ShouldBe(2);
         result.Stderr.ShouldContain("not valid JSON");
+    }
+
+    [Fact]
+    public async Task RunDod_Should_WaitForTheDodGate_WhenBothRunTheCommandsAtOnce()
+    {
+        // Arrange
+        using var repository = DodRepository.Create(
+            [DodRepository.Command("test", "Add-Content run.log \"start $PID\"; Start-Sleep -Seconds 3; Add-Content run.log \"end $PID\"")]);
+
+        // Act
+        await Task.WhenAll(
+            HookProcess.RunAsync("dod-gate.ps1", repository.SubagentStopInput()),
+            HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "commands"));
+
+        // Assert
+        string[] log = await File.ReadAllLinesAsync(repository.PathOf("run.log"));
+        log.Length.ShouldBe(4);
+        log[0].ShouldStartWith("start");
+        log[1].ShouldBe(log[0].Replace("start", "end", StringComparison.Ordinal));
+        log[2].ShouldStartWith("start");
+        log[3].ShouldBe(log[2].Replace("start", "end", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData("{}", "commands")]
+    [InlineData("{\"implementerAgent\":\"x\",\"environmentChecks\":[],\"commands\":[],\"protectedPaths\":[]}", "commands")]
+    [InlineData("{\"environmentChecks\":[],\"commands\":[{\"name\":\"build\",\"run\":\"exit 0\"}],\"protectedPaths\":[]}", "implementerAgent")]
+    [InlineData("{\"implementerAgent\":\"x\",\"commands\":[{\"name\":\"build\",\"run\":\"exit 0\"}]}", "protectedPaths")]
+    public async Task RunDod_Should_ExitWithUsageError_WhenDodFileLacksARequiredField(string dodJson, string missingField)
+    {
+        // Arrange
+        using var repository = DodRepository.CreateWithDodFile(dodJson);
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "commands");
+
+        // Assert
+        result.ExitCode.ShouldBe(2);
+        result.Stderr.ShouldContain(missingField);
     }
 
     private static JsonElement Output(HookResult result) => JsonDocument.Parse(result.Stdout).RootElement.Clone();
