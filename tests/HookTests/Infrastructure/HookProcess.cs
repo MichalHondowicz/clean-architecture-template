@@ -49,7 +49,16 @@ public static class HookProcess
         Task<string> stderr = process.StandardError.ReadToEndAsync();
 
         using var timeout = new CancellationTokenSource(Timeout);
-        await process.WaitForExitAsync(timeout.Token);
+        try
+        {
+            await process.WaitForExitAsync(timeout.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // A script left running holds the test host's pipes open (and wait-for-reset.ps1 holds off sleep).
+            process.Kill(entireProcessTree: true);
+            throw;
+        }
 
         return new HookResult(process.ExitCode, await stdout, await stderr);
     }

@@ -25,6 +25,7 @@ What `/ship` leaves in `.scratch/<feature>/` besides the tickets:
 - `findings/<NN>-round-<r>.md`: the in-scope findings that failed round `r` of ticket `NN`, the next round's input. Their count is how many rounds the ticket has spent.
 - Under a `needs-info` ticket's `## Comments`: a brief in three parts, **Tried**, **Where it stands** (last findings, stash name, reverted commits) and **Needs**.
 - New tickets with `Status: needs-triage` for findings outside the reviewed ticket's change, numbered after the existing ones, saying which ticket and round they came from. They wait for triage and block nothing.
+- `metrics.md`: a table with a row per finished ticket (plan usage of the 5-hour and weekly windows at its start and end, rounds, model of each role, time, result), a `pause` row each time the usage reached a threshold in `dod.json`'s `quota`, and a `**Total**` row when a run ends with no ticket left to pick. A 5-hour pause waits in the same session; a weekly pause ends it, and the user runs `/ship` again after the reset.
 
 ## When a skill says "publish to the issue tracker"
 

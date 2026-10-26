@@ -35,6 +35,14 @@ public sealed class DodRepository : IDisposable
             ["protectedPaths"] = protectedPaths ?? []
         }.ToJsonString();
 
+    /// <summary>A repository whose DoD file carries the plan-usage thresholds /ship pauses at.</summary>
+    public static DodRepository CreateWithQuota(int weeklyPercent, int fiveHourPercent)
+    {
+        JsonObject dod = JsonNode.Parse(DodJson([Command("build", "exit 0")]))!.AsObject();
+        dod["quota"] = new JsonObject { ["weeklyPercent"] = weeklyPercent, ["fiveHourPercent"] = fiveHourPercent };
+        return CreateWithDodFile(dod.ToJsonString());
+    }
+
     public static DodRepository CreateWithDodFile(string dodJson)
     {
         string root = Path.Combine(Path.GetTempPath(), $"dod-{Guid.NewGuid():N}");

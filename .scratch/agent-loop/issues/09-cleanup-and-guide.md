@@ -28,3 +28,5 @@ i `/ship`, a każda decyzja, o którą agent dotąd pytał w trakcie, jest regu�
   wpisuje użytkownik;
 - tryb auto nie pozwala agentowi edytować `.claude/settings.json`, więc wpisy allowlisty dodaje użytkownik;
 - `claude -p` jest nieużywalne, bo samodzielne CLI nie jest zalogowane.
+- `effort` we frontmatterze skilla `ship` (`medium`) obowiązuje, gdy skill jest aktywny; sesję `/ship` warto
+  też uruchamiać z effortem `medium`, bo kolejne tury (powiadomienia o sub-agentach) idą na effortcie sesji.
