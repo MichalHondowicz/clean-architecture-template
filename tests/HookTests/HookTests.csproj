@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <None Include="../../.claude/hooks/*.ps1" Link="hooks/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../docs/agents/dod.json" Link="dod/dod.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

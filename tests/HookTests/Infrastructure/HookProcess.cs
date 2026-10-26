@@ -8,19 +8,36 @@ public static class HookProcess
 {
     private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(2);
 
-    public static async Task<HookResult> RunAsync(string scriptName, string inputJson)
+    /// <summary>Runs a hook script the way Claude Code does: the event JSON on stdin.</summary>
+    public static Task<HookResult> RunAsync(string scriptName, string inputJson) =>
+        RunCoreAsync(scriptName, inputJson, workingDirectory: null, arguments: []);
+
+    /// <summary>Runs a script from the hooks folder as a command in the given directory.</summary>
+    public static Task<HookResult> RunScriptAsync(string scriptName, string workingDirectory, params string[] arguments) =>
+        RunCoreAsync(scriptName, inputJson: string.Empty, workingDirectory, arguments);
+
+    private static async Task<HookResult> RunCoreAsync(
+        string scriptName,
+        string inputJson,
+        string? workingDirectory,
+        string[] arguments)
     {
         var startInfo = new ProcessStartInfo("pwsh")
         {
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            UseShellExecute = false
+            UseShellExecute = false,
+            WorkingDirectory = workingDirectory ?? string.Empty
         };
         startInfo.ArgumentList.Add("-NoProfile");
         startInfo.ArgumentList.Add("-NonInteractive");
         startInfo.ArgumentList.Add("-File");
         startInfo.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "hooks", scriptName));
+        foreach (string argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
 
         using Process process = Process.Start(startInfo)
             ?? throw new InvalidOperationException("pwsh did not start");

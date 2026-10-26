@@ -52,6 +52,17 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-protected-paths.ps1\""
+          }
+        ]
+      }
+    ],
     "SubagentStop": [
       {
         "hooks": [

@@ -3,19 +3,15 @@
 # A failed environment check (e.g. Docker down) is not the implementer's to fix: report it, don't block.
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'dod-common.ps1')
 
 $hookInput = [Console]::In.ReadToEnd() | ConvertFrom-Json
-
-# The repository root is the nearest directory at or above cwd that holds the DoD file.
-$root = $hookInput.cwd
-while ($root -and -not (Test-Path (Join-Path $root 'docs/agents/dod.json'))) {
-    $root = Split-Path -Parent $root
-}
+$root = Find-DodRoot $hookInput.cwd
 if (-not $root) {
     exit 0
 }
 
-$dod = Get-Content -Raw -Path (Join-Path $root 'docs/agents/dod.json') | ConvertFrom-Json
+$dod = Read-Dod $root
 if ($hookInput.agent_type -ne $dod.implementerAgent) {
     exit 0
 }
