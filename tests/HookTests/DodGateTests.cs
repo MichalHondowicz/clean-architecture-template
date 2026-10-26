@@ -46,6 +46,22 @@ public sealed class DodGateTests
     }
 
     [Fact]
+    public async Task SubagentStop_Should_Pass_WhenImplementerReportsStuck()
+    {
+        // Arrange
+        using var repository = DodRepository.Create([DodRepository.Command("test", "exit 1")]);
+
+        // Act
+        HookResult result = await HookProcess.RunAsync(
+            Script,
+            repository.SubagentStopInput(lastAssistantMessage: "STATUS: stuck\nThe ticket needs a change to AGENTS.md."));
+
+        // Assert
+        result.ExitCode.ShouldBe(0);
+        result.Stdout.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task SubagentStop_Should_Pass_WhenAgentIsNotTheImplementer()
     {
         // Arrange

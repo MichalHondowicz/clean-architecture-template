@@ -21,6 +21,10 @@
       "Bash(git merge-base*)",
       "Bash(git ls-files*)",
       "Bash(git show*)",
+      "Bash(git worktree *)",
+      "Bash(git switch *)",
+      "Bash(git merge --ff-only *)",
+      "Bash(pwsh -NoProfile -NonInteractive -File .claude/hooks/run-dod.ps1 *)",
       "PowerShell(dotnet build*)",
       "PowerShell(dotnet test*)",
       "PowerShell(dotnet ef migrations *)",
@@ -40,7 +44,11 @@
       "PowerShell(git rev-parse*)",
       "PowerShell(git merge-base*)",
       "PowerShell(git ls-files*)",
-      "PowerShell(git show*)"
+      "PowerShell(git show*)",
+      "PowerShell(git worktree *)",
+      "PowerShell(git switch *)",
+      "PowerShell(git merge --ff-only *)",
+      "PowerShell(pwsh -NoProfile -NonInteractive -File .claude/hooks/run-dod.ps1 *)"
     ],
     "deny": [
       "Bash(git diff *--output*)",

@@ -1,7 +1,11 @@
 {
   "implementerAgent": "mattpocock-skills:implementer",
   "environmentChecks": [
-    { "name": "docker", "run": "docker info" }
+    {
+      "name": "docker",
+      "run": "docker info",
+      "start": "Start-Process 'C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe'"
+    }
   ],
   "commands": [
     { "name": "build", "run": "dotnet build CleanArchitecture.slnx" },

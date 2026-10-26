@@ -15,6 +15,19 @@ function Read-Dod([string]$root) {
     Get-Content -Raw -Path (Join-Path $root $DodRelativePath) | ConvertFrom-Json
 }
 
+# Output of a DoD step is quoted to an agent, so only its tail is kept.
+$DodOutputTailLines = 100
+
+# Runs one DoD entry ({name, run}) in a child pwsh found on PATH, not the current process path: when pwsh is
+# installed as a dotnet tool, the current process is dotnet.exe.
+function Invoke-DodStep($step) {
+    $lines = & pwsh -NoProfile -NonInteractive -Command $step.run 2>&1
+    [pscustomobject]@{
+        ExitCode = $LASTEXITCODE
+        Output = ($lines | Select-Object -Last $DodOutputTailLines | Out-String)
+    }
+}
+
 # Repository-relative path with forward slashes; '..' segments are resolved first, so they cannot dodge a pattern.
 function Get-RepositoryRelativePath([string]$root, [string]$path) {
     $full = [IO.Path]::GetFullPath($path, $root)

@@ -398,3 +398,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 .containers/
+
+# Feature worktrees created by /ship (Claude Code worktree location)
+.claude/worktrees/

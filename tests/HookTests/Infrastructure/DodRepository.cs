@@ -45,6 +45,9 @@ public sealed class DodRepository : IDisposable
 
     public static JsonObject Command(string name, string run) => new() { ["name"] = name, ["run"] = run };
 
+    public static JsonObject Check(string name, string run, string start) =>
+        new() { ["name"] = name, ["run"] = run, ["start"] = start };
+
     public string PathOf(string relativePath) => Path.Combine(Root, relativePath);
 
     public void WriteFile(string relativePath, string content, bool withBom = false)
@@ -67,13 +70,18 @@ public sealed class DodRepository : IDisposable
         return Git("rev-parse", "HEAD").Trim();
     }
 
-    public string SubagentStopInput(string agentType = ImplementerAgent, bool stopHookActive = false, string? cwd = null) =>
+    public string SubagentStopInput(
+        string agentType = ImplementerAgent,
+        bool stopHookActive = false,
+        string? cwd = null,
+        string lastAssistantMessage = "STATUS: done\nAll criteria proven.") =>
         new JsonObject
         {
             ["hook_event_name"] = "SubagentStop",
             ["agent_type"] = agentType,
             ["stop_hook_active"] = stopHookActive,
-            ["cwd"] = cwd ?? Root
+            ["cwd"] = cwd ?? Root,
+            ["last_assistant_message"] = lastAssistantMessage
         }.ToJsonString();
 
     /// <param name="agentType">The subagent; null for the main session, where the field is absent.</param>

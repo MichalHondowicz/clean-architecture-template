@@ -12,6 +12,6 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
 
-Closing state: `done`, set when `/implement` finishes a ticket (see `issue-tracker.md`). It is not a triage role, so triage never applies it.
+Closing state: `done`, set when `/implement` or `/ship` finishes a ticket (see `issue-tracker.md`). Working state: `in-progress`, set by `/ship` while a ticket is being implemented, so a stopped run resumes from it. Neither is a triage role, so triage never applies them.
 
 Edit the right-hand column to match whatever vocabulary you actually use.
