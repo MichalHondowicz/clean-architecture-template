@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-26-agent-loop-05.md
+
 # Handoff: triage ticketów po zamknięciu planu i pierwszy ticket z nową regułą review
 
 Uruchom tę sesję w `D:\Projects\clean-architecture_new`. Plan `docs/plan-2026-10-12-agent-setup.md` jest
