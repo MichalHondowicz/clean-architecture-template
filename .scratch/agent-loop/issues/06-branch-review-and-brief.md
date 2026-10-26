@@ -17,3 +17,10 @@ i brief, z którego w minutę decyduję o scaleniu.
       na którym wyszła (historia 34).
 - [ ] Push „gotowe do bramki 2” zawiera jedno zdanie i wskazanie briefu (historie 43, 45).
 - [ ] Wersja forka podbita.
+
+## Comments
+
+**2026-10-26, przeniesione z bramki ticketu 05:** `PushNotification` dociera na telefon tylko przy włączonym
+Remote Control, a sesja `/ship` z mini-przebiegu w 03 miała je wyłączone. Bramka 2 i tak wymaga Remote
+Control (historia 35), więc tu zapada decyzja, czy `/ship` włącza je dla siebie
+(`mcp__ccd_session_mgmt__set_session_remote_control`), czy robi to użytkownik przy starcie.

@@ -18,3 +18,13 @@ i `/ship`, a każda decyzja, o którą agent dotąd pytał w trakcie, jest regu�
 - [ ] Każda decyzja z `docs/workflow.md` i z pilota archive-todo, którą dawniej podejmowałem w trakcie
       implementacji, jest regułą w `AGENTS.md` albo w skillu, albo częścią bramki 1 (historia 5).
 - [ ] Build: 0 błędów, 0 ostrzeżeń; pełne testy zielone.
+
+## Comments
+
+**2026-10-26, przeniesione z bramki ticketu 05** (do przewodnika `docs/workflow.md`):
+
+- sesję `/ship` uruchamia się na Sonnecie;
+- po resecie tygodniowym i po restarcie aplikacji w trakcie czekania na okno 5-godzinne `/ship <feature>`
+  wpisuje użytkownik;
+- tryb auto nie pozwala agentowi edytować `.claude/settings.json`, więc wpisy allowlisty dodaje użytkownik;
+- `claude -p` jest nieużywalne, bo samodzielne CLI nie jest zalogowane.

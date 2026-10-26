@@ -32,8 +32,8 @@ idą dalej. Na końcu Opus raz robi `ca-review` i review Spec całej gałęzi, a
 i brief. Na drugiej bramce odpowiadam „OK” (także z telefonu), a agent scala do `main`, wypycha, sprząta
 i sprawdza CI.
 
-Pętla pilnuje limitu: nie zaczyna ticketu powyżej progów, kończy sesję w spójnym stanie i wznawia się
-po resecie przez lokalne zadanie zaplanowane. Dla każdego ticketu zapisuje zużycie limitu, więc po dwóch
+Pętla pilnuje limitu: nie zaczyna ticketu powyżej progów. Przy oknie 5-godzinnym czeka w tej samej sesji
+do resetu i rusza dalej sama, a przy limicie tygodniowym kończy sesję w spójnym stanie i wysyła push. Dla każdego ticketu zapisuje zużycie limitu, więc po dwóch
 pilotach decyzja o Max 5x albo zewnętrznym implementerze wynika z liczb i reguły ustalonej z góry.
 Implementer ma spisany kontrakt egzekwowany hookami, więc podmiana modelu to zmiana jednej definicji.
 
@@ -239,9 +239,15 @@ i pilot, potem MAUI i drugi pilot.
 
 ### Limity i wznawianie
 
-- Przed każdym ticketem odczyt zużycia planu. Powyżej progu: zapis stanu w tickecie, lokalne zadanie
-  zaplanowane na godzinę resetu, które wznawia `/ship <feature>`, i czyste zakończenie sesji.
-- Reset tygodniowy: jeden push. Okno 5-godzinne: bez pusha.
+- Przed każdym ticketem odczyt zużycia planu.
+- Powyżej progu okna 5-godzinnego: zapis stanu w trackerze, a sesja `/ship` czeka do resetu na skrypcie
+  w tle, który trzyma komputer w czuwaniu. Zakończenie skryptu wznawia tę samą sesję. Bez pusha.
+- Powyżej progu tygodniowego: zapis stanu w trackerze, jeden push i czyste zakończenie sesji. Po resecie
+  `/ship <feature>` wpisuję sam.
+- Zmienione na bramce ticketu 05 (2026-10-26): wcześniej lokalne zadanie zaplanowane wznawiało `/ship`
+  w obu przypadkach. Zadanie aplikacji nie rozwija komendy tylko dla człowieka, startuje na modelu sesji,
+  która je utworzyła, i nie trzyma komputera w czuwaniu (szczegóły w `## Comments` ticketu 05). Historia 41
+  obowiązuje w pełni tylko dla okna 5-godzinnego.
 
 ### Powiadomienia
 
