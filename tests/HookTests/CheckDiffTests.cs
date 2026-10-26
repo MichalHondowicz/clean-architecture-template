@@ -163,6 +163,30 @@ public sealed class CheckDiffTests
             ignoreOrder: true);
     }
 
+    [Fact]
+    public async Task CheckDiff_Should_ReportRemovedSolutionProject_WhenRangeDropsOneFromTheSolution()
+    {
+        // Arrange
+        using var repository = DodRepository.Create([]);
+        repository.WriteFile(
+            "CleanArchitecture.slnx",
+            "<Solution>\n  <Project Path=\"src/Domain/Domain.csproj\" />\n  <Project Path=\"tests/IntegrationTests/IntegrationTests.csproj\" />\n</Solution>\n");
+        string baseCommit = repository.CommitAll("base");
+        repository.WriteFile(
+            "CleanArchitecture.slnx",
+            "<Solution>\n  <Project Path=\"src/Domain/Domain.csproj\" />\n  <Project Path=\"src/Mobile.Core/Mobile.Core.csproj\" />\n</Solution>\n");
+        repository.CommitAll("ticket");
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Base", baseCommit);
+
+        // Assert
+        result.ExitCode.ShouldBe(1);
+        List<(string Kind, string Path)> violations = Violations(result);
+        violations.ShouldContain(("solution-project-removed", "CleanArchitecture.slnx"));
+        violations.Count.ShouldBe(1);
+    }
+
     private static List<(string Kind, string Path)> Violations(HookResult result)
     {
         using var output = JsonDocument.Parse(result.Stdout);

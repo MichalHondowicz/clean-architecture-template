@@ -90,12 +90,21 @@ try {
         }
     }
 
-    # Only added lines count (-U0, no context), so suppressions that were already there are not reported.
+    # Only changed lines count (-U0, no context), so suppressions that were already there are not reported.
+    # A file's header runs from `diff --git` to `+++`; its `--- a/...` line is not a removed line.
     $file = $null
+    $inHeader = $false
     foreach ($line in (Invoke-Git diff --no-renames --no-color -U0 $Base $Head)) {
-        if ($line.StartsWith('+++ ')) {
-            # git appends a TAB to header paths that contain a space.
-            $file = $line -eq '+++ /dev/null' ? $null : $line.Substring('+++ b/'.Length).TrimEnd("`t")
+        if ($line.StartsWith('diff --git ')) {
+            $inHeader = $true
+            continue
+        }
+        if ($inHeader) {
+            if ($line.StartsWith('+++ ')) {
+                # git appends a TAB to header paths that contain a space.
+                $file = $line -eq '+++ /dev/null' ? $null : $line.Substring('+++ b/'.Length).TrimEnd("`t")
+                $inHeader = $false
+            }
             continue
         }
         if ($file -and $line.StartsWith('+')) {
@@ -103,6 +112,10 @@ try {
             if ($suppression -and -not (Test-Generated $file)) {
                 $violations.Add([ordered]@{ kind = 'suppression'; path = $file; detail = $suppression })
             }
+        }
+        # A project dropped from the solution drops its tests from the DoD's test run.
+        if ($file -match '\.slnx?$' -and $line.StartsWith('-') -and $line -match 'Project[\s(]') {
+            $violations.Add([ordered]@{ kind = 'solution-project-removed'; path = $file; detail = $line.Substring(1).Trim() })
         }
     }
 

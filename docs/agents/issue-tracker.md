@@ -18,7 +18,13 @@ A ticket that `/ship` can run without asking anything carries, besides the `to-t
 - `**Seams:**` under `**Blocked by:**`: where its tests observe behaviour, following ADR 0004 (HTTP first; handler tests for failure paths and time; one validator test per rule). Approving the ticket approves its seams, so `tdd` does not ask about them again.
 - Acceptance criteria numbered `AC1`, `AC2`, ..., each naming the test planned to prove it: `- [ ] AC1: <criterion> (test: \`<TestClass>.<Method>\`)`. The implementer may rename a test; its `## Comments` entry then gives the real name for that `ACn`.
 
-`/ship` owns the status line while it runs: `in-progress` when it starts a ticket, `done` after the implementer finishes, `needs-info` (with the implementer's note under `## Comments`) when the implementer is stuck. The implementer's own contract is in `implementer-contract.md`.
+`/ship` owns the status line while it runs: `in-progress` when it starts a ticket, `done` once the verifier and the spec reviewer pass it, `needs-info` when it is stuck after three rounds (or the implementer reports itself stuck). The implementer's own contract is in `implementer-contract.md`.
+
+What `/ship` leaves in `.scratch/<feature>/` besides the tickets:
+
+- `findings/<NN>-round-<r>.md`: the in-scope findings that failed round `r` of ticket `NN`, the next round's input. Their count is how many rounds the ticket has spent.
+- Under a `needs-info` ticket's `## Comments`: a brief in three parts, **Tried**, **Where it stands** (last findings, stash name, reverted commits) and **Needs**.
+- New tickets with `Status: needs-triage` for findings outside the reviewed ticket's change, numbered after the existing ones, saying which ticket and round they came from. They wait for triage and block nothing.
 
 ## When a skill says "publish to the issue tracker"
 
