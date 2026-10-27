@@ -80,6 +80,46 @@ public sealed class RunDodTests
     }
 
     [Fact]
+    public async Task RunDod_Should_ReportTheLastLinesOfEachPassingCommand_WhenCheckingCommands()
+    {
+        // Arrange
+        using var repository = DodRepository.Create(
+        [
+            DodRepository.Command("build", "Write-Output 'Build succeeded.'"),
+            DodRepository.Command("test", "1..30 | ForEach-Object { Write-Output \"line $_\" }")
+        ]);
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "commands");
+
+        // Assert
+        result.ExitCode.ShouldBe(0);
+        JsonElement[] passed = [.. Output(result).GetProperty("passed").EnumerateArray()];
+        passed.Select(command => command.GetProperty("name").GetString()).ShouldBe(["build", "test"]);
+        OutputLines(passed[0]).ShouldBe(["Build succeeded."]);
+        OutputLines(passed[1]).ShouldBe([.. Enumerable.Range(11, 20).Select(n => $"line {n}")]);
+    }
+
+    [Fact]
+    public async Task RunDod_Should_ReportOnlyTheCommandsBeforeTheFailureAsPassed_WhenACommandFails()
+    {
+        // Arrange
+        using var repository = DodRepository.Create(
+        [
+            DodRepository.Command("build", "Write-Output 'Build succeeded.'"),
+            DodRepository.Command("test", "Write-Output 'Failed!'; exit 1")
+        ]);
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "commands");
+
+        // Assert
+        result.ExitCode.ShouldBe(1);
+        Output(result).GetProperty("passed").EnumerateArray().Single().GetProperty("name").GetString().ShouldBe("build");
+        Output(result).GetProperty("failed").EnumerateArray().Single().GetProperty("name").GetString().ShouldBe("test");
+    }
+
+    [Fact]
     public async Task RunDod_Should_ExitWithUsageError_WhenDodFileIsNotValidJson()
     {
         // Arrange
@@ -255,6 +295,9 @@ public sealed class RunDodTests
         // Assert
         result.ExitCode.ShouldNotBe(2, result.Stderr);
     }
+
+    private static string[] OutputLines(JsonElement command) =>
+        command.GetProperty("output").GetString()!.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
     private static string FailedNames(HookResult result) =>
         string.Join(',', Output(result).GetProperty("failed").EnumerateArray().Select(w => w.GetProperty("name").GetString()));

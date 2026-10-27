@@ -25,7 +25,13 @@ What `/ship` leaves in `.scratch/<feature>/` besides the tickets:
 - `findings/<NN>-round-<r>.md`: the in-scope findings that failed round `r` of ticket `NN`, the next round's input. Their count is how many rounds the ticket has spent.
 - Under a `needs-info` ticket's `## Comments`: a brief in three parts, **Tried**, **Where it stands** (last findings, stash name, reverted commits) and **Needs**.
 - New tickets with `Status: needs-triage` for findings outside the reviewed ticket's change, numbered after the existing ones, saying which ticket and round they came from. They wait for triage and block nothing.
-- `metrics.md`: a table with a row per finished ticket (plan usage of the 5-hour and weekly windows at its start and end, rounds, model of each role, time, result), a `pause` row each time the usage reached a threshold in `dod.json`'s `quota`, and a `**Total**` row when a run ends with no ticket left to pick. A 5-hour pause waits in the same session; a weekly pause ends it, and the user runs `/ship` again after the reset.
+- `metrics.md`: a table with a row per finished ticket (plan usage of the 5-hour and weekly windows at its start and end, rounds, model of each role, time, result), a `branch` row for the review of the whole branch, a `pause` row each time the usage reached a threshold in `dod.json`'s `quota`, and a `**Total**` row when a run ends with nothing left that it can do. A 5-hour pause waits in the same session; a weekly pause ends it, and the user runs `/ship` again after the reset.
+
+Once every ticket is `done`, `/ship` reviews the whole branch on Opus (the project's standards skill named in `dod.json`'s `standardsSkill`, and the Spec axis against `spec.md` and all tickets) and leaves:
+
+- `findings/branch-review.md`: a `Started` line with the plan usage, then both reviewers' reports as they came, with findings, notes and convention proposals.
+- `findings/branch-round-<r>.md`: the in-scope findings that fix round `r` of the branch addresses (round 1 from the review, rounds 2 and 3 from the re-check of the previous fix). The implementer appends a `## Resolution`, and `/ship` ends the file with a `## Result`: `resolved`, the next round, or `open` with the commit the code went back to when the last round was not verified. Their count is how many fix rounds the branch has spent, three at most.
+- `brief.md`: the readiness brief for gate 2. It lists what was done, the test counts, the review findings (resolved and open), what is uncertain, the changed screens when `dod.json` names `screenPaths`, the convention proposals (each with its rule, rationale and the ticket it came from), and whether Remote Control was on. It is committed as `ship: brief`, and a push points at it.
 
 ## When a skill says "publish to the issue tracker"
 

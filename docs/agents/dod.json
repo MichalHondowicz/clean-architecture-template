@@ -1,5 +1,6 @@
 {
   "implementerAgent": "mattpocock-skills:implementer",
+  "standardsSkill": "ca-review",
   "environmentChecks": [
     {
       "name": "docker",

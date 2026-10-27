@@ -3,7 +3,8 @@
 #                               pwsh -File run-dod.ps1 -Check quota -FiveHourPercent <n> -WeeklyPercent <n>
 #   environment: every environment check; a failing check with a `start` command is started, then re-checked
 #                until it passes or the timeout runs out.
-#   commands:    the DoD commands in order, stopping at the first failure.
+#   commands:    the DoD commands in order, stopping at the first failure; also prints "passed":[{"name","output"}]
+#                with the last 20 lines of each command that passed.
 #   quota:       the plan usage /ship read, against the thresholds in `quota`, all percentages from 0 to 100;
 #                a window at or above its threshold fails as {"name":"weekly"|"fiveHour","used","threshold"}.
 # Prints {"ok":bool,"failed":[{"name","exitCode","output"}]}; exits 1 when something failed, 2 when the DoD
@@ -38,6 +39,10 @@ if ($problems) {
 }
 
 $failed = [Collections.Generic.List[object]]::new()
+$passed = [Collections.Generic.List[object]]::new()
+
+# /ship copies a passing command's summary (the test counts) from its last lines into the feature's brief.
+$PassedOutputTailLines = 20
 
 # A usage argument as a number from 0 to 100, decimals kept; nothing when it is anything else.
 function ConvertTo-Percentage([string]$text) {
@@ -113,6 +118,8 @@ try {
                     $failed.Add([ordered]@{ name = $command.name; exitCode = $result.ExitCode; output = $result.Output })
                     break
                 }
+                $tail = $result.Output.TrimEnd() -split '\r?\n' | Select-Object -Last $PassedOutputTailLines
+                $passed.Add([ordered]@{ name = $command.name; output = $tail -join "`n" })
             }
         }
     }
@@ -121,5 +128,9 @@ finally {
     Pop-Location
 }
 
-[ordered]@{ ok = $failed.Count -eq 0; failed = @($failed) } | ConvertTo-Json -Depth 5 -Compress
+$report = [ordered]@{ ok = $failed.Count -eq 0; failed = @($failed) }
+if ($Check -eq 'commands') {
+    $report.passed = @($passed)
+}
+$report | ConvertTo-Json -Depth 5 -Compress
 exit ($failed.Count -eq 0 ? 0 : 1)
