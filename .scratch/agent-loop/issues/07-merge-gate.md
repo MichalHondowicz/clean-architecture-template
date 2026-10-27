@@ -98,3 +98,72 @@ a przyjęte trafiają do repozytorium osobnym commitem.
    - Krok CI: raport „brak CI dla tego remote”.
    - Checkout sandboksa stoi na `chore/agent-loop`, więc przebieg sprawdza ścieżkę `git fetch . feat/<f>:main`.
      Ścieżkę `git merge --ff-only` sprawdzi pilot 10.
+
+**2026-10-27, implementacja (`/implement`):**
+
+- **Fork, `/ship`, nowa sekcja `## Gate 2`** (kroki 1–10):
+  - pytanie po raporcie i `## Decision` w `brief.md` (czas, `merge: OK|no`, propozycje accepted, rejected albo
+    dropped, odpowiedź dosłownie);
+  - przyjęte reguły trafiają tym samym commitem: `ship: gate 2, conventions <n>` albo `ship: gate 2 decision`;
+  - scalenie przepisem z decyzji 4 i 5, a CI odczytem strony Actions (decyzja 6);
+  - stop w krokach 5–8 zostawia zapisaną decyzję i nic do cofania.
+- **Wznawianie** opiera się na trackerze i refach git (*Start or resume*, krok 3):
+  - gałęzi brak, a `main` ma brief: tylko CI i koniec;
+  - gałąź jest w `main`, a ostatni wpis to `merge: OK`: dalej od kroku 6 bez wchodzenia do worktree, więc
+    zapisane i zastosowane „OK” obejmuje push i sprzątanie;
+  - zapisane „OK”, którego nie ma w `main`: pytanie jeszcze raz.
+- **Zabezpieczenia dopisane w review:**
+  - przed pushem `main` musi równać się końcowi gałęzi, więc cudze commity nie wychodzą;
+  - gdy remote już ma ficzer, push jest pomijany;
+  - gałąź znika dopiero po usunięciu worktree, przez `update-ref -d` z jej własnym końcem sprawdzonym względem
+    `origin/main`;
+  - sesja uruchomiona w worktree ficzera kończy przed pytaniem;
+  - `git status --porcelain --untracked-files=no`, żeby nieśledzone `.agents/` i `.codex/` nie blokowały
+    scalenia.
+- **„Never”:** wyjątki tylko dla pytania bramki, scalenia i sprzątania po „OK” oraz wpisu przyjętej reguły.
+- **`standards-reviewer`:** każda propozycja podaje plik i sekcję docelową oraz regułę gotową do wklejenia,
+  w języku pliku docelowego.
+  - **Doprecyzowanie decyzji 3:** „dosłownie z briefu” wymaga, żeby reguła dla angielskiego `AGENTS.md` była
+    po angielsku. Brief cytuje ją bez tłumaczenia, a uzasadnienie zostaje po polsku.
+- **Dokumentacja:**
+  - fork: `docs/engineering/ship.md` (sekcja Gate 2, FAQ), README, `ask-matt`;
+  - template: `docs/agents/issue-tracker.md` (`## Decision` i commity bramki).
+- **Odstępstwo od decyzji 2:** odpowiedź bez jasnego słowa o scaleniu nie zapisuje niczego, także decyzji
+  o propozycjach. Sesja pyta jeszcze raz.
+
+**Dowody:**
+
+- **Testy:** brak cyklu `tdd`. Seam to pilot, a ticket nie dodaje skryptu, więc `tests/HookTests` bez zmian.
+- **Przepisy git:** sprawdzone na repozytorium tymczasowym przed bramką, z wynikami w faktach powyżej.
+- **Pełny build i testy, łańcuchowo:** 0 ostrzeżeń, 6 + 54 + 14 + 83 = 157 testów zielonych.
+- **Review na osi Spec (Sonnet), dwie rundy, z przejściem przez każdy stan wznowienia:**
+  - **Runda 1, `fail`, 7 uwag:**
+    - CI pomijane przy wznowieniu;
+    - kolejność sprzątania;
+    - niepotrzebne odtwarzanie worktree;
+    - częściowa odpowiedź;
+    - niezapisana reguła o zapisanym „OK”;
+    - cudze commity w pushu;
+    - nieudany fetch.
+
+    Wszystkie poprawione.
+  - **Runda 2, `pass`, 4 uwagi:**
+    - sprzątanie blokowało się, gdy `main` poszedł dalej po pushu;
+    - `ExitWorktree` bez wejścia;
+    - sesja w worktree pytała przed stopem;
+    - ponowne pytanie przy zapisanym „OK”.
+
+    Wszystkie poprawione.
+
+**Commity:** fork `2db5c3d` (plugin `1.3.1-dotnet.16`, zainstalowany).
+
+**Do zamknięcia ticketu:**
+
+- **Allowlista** (decyzja 7). Linie dopisuje użytkownik w `.claude/settings.json` template'u i sandboksa:
+  - `Bash(git push origin main)` i `PowerShell(git push origin main)`;
+  - `Bash(git fetch origin)` i `PowerShell(git fetch origin)`;
+  - `Bash(git fetch . feat/*:main)` i `PowerShell(git fetch . feat/*:main)`;
+  - `Bash(git update-ref -d refs/heads/feat/*)` i `PowerShell(git update-ref -d refs/heads/feat/*)`.
+
+  `git merge --ff-only *`, `git worktree *`, `git merge-base*` i `git rev-parse*` już na niej są.
+- **Żywy przebieg w sandboksie** (decyzja 8).
