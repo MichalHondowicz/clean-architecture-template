@@ -172,6 +172,7 @@ public sealed class RunDodTests
     [InlineData(80, 90, 1, "weekly")]
     [InlineData(90, 80, 1, "fiveHour")]
     [InlineData(90, 90, 0, "")]
+    [InlineData(80, 80, 1, "weekly,fiveHour")]
     public async Task RunDod_Should_FollowTheThresholdsInTheDodFile_WhenTheFileChangesThem(
         int weeklyThreshold,
         int fiveHourThreshold,
@@ -238,16 +239,10 @@ public sealed class RunDodTests
         result.Stderr.ShouldContain("quota.weeklyPercent");
     }
 
-    [Theory]
-    [InlineData(79, 89, 0, "")]
-    [InlineData(80, 89, 1, "weekly")]
-    [InlineData(79, 90, 1, "fiveHour")]
-    [InlineData(95, 95, 1, "weekly,fiveHour")]
-    public async Task RunDod_Should_StopAtTheProjectThresholds_WhenReadingTheProjectDodFile(
-        int weeklyUsed,
-        int fiveHourUsed,
-        int expectedExitCode,
-        string expectedFailed)
+    // The threshold values are the project's to change (a pilot sets one just above the current usage), so only
+    // that the project's DoD file has usable ones is checked here, never which.
+    [Fact]
+    public async Task RunDod_Should_AcceptTheThresholdsOfTheProjectDodFile_WhenCheckingQuota()
     {
         // Arrange
         string projectDod = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "dod", "dod.json"));
@@ -255,18 +250,10 @@ public sealed class RunDodTests
 
         // Act
         HookResult result = await HookProcess.RunScriptAsync(
-            Script,
-            repository.Root,
-            "-Check",
-            "quota",
-            "-FiveHourPercent",
-            $"{fiveHourUsed}",
-            "-WeeklyPercent",
-            $"{weeklyUsed}");
+            Script, repository.Root, "-Check", "quota", "-FiveHourPercent", "0", "-WeeklyPercent", "0");
 
         // Assert
-        result.ExitCode.ShouldBe(expectedExitCode);
-        FailedNames(result).ShouldBe(expectedFailed);
+        result.ExitCode.ShouldNotBe(2, result.Stderr);
     }
 
     private static string FailedNames(HookResult result) =>
