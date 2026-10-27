@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-27-agent-loop-07.md
+
 # Handoff: pętla bez nadzoru, ticket 05 (limity, wznawianie, pomiar)
 
 ## 1. Stan wejściowy
