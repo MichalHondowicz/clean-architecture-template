@@ -29,4 +29,4 @@ gałęzi i otrzymane powiadomienia.
 **2026-10-27, z ticketu 06:** pushe proaktywne z sesji z Remote Control `on` już nie docierają. Narzędzie
 odpowiada „Mobile push requested”, ale na telefon nie przyszedł żaden z czterech testów, także po wyłączeniu i
 włączeniu Remote Control (szczegóły w Comments ticketu 06). Ticket na fallback (hook `Notification` i ntfy)
-jest więc prawie pewny. Można go założyć przed pilotem.
+założony przed pilotem jako 12 (`needs-triage`).
