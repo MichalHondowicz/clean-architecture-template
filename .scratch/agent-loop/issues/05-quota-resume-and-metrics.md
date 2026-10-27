@@ -189,3 +189,14 @@ Commity:
 - szablon: `974fb60`, `3cc9572`, `96c0b70` i commit zamykający;
 - fork: `94e93c5`, `58d2d2f`, `dcd742e`, `cadbf78`;
 - sandbox: `feat/toy-quota` od `afb53e7` do `f6910fe`.
+
+**2026-10-27, uzupełnienie: czy czuwanie skryptu działa.**
+
+- **Skrypt:** `CallNtPowerInformation(SystemExecutionState)` bez czekania pokazuje `0x0`, a w trakcie
+  `wait-for-reset.ps1` `0x1` (`ES_SYSTEM_REQUIRED`). Żądanie skryptu działa w całym systemie, co zastępuje
+  słabszy dowód z B2.
+- **Aplikacja:** `powercfg /requests` pokazuje `claude.exe` w EXECUTION. Ten komputer ma tylko S3, bez Modern
+  Standby, a wtedy według dokumentacji Microsoftu EXECUTION też powstrzymuje usypianie. Odczyty były jednak
+  robione w ciągu kilku minut po pracy sesji. Nie wiadomo, czy aplikacja trzyma komputer, gdy sesja tylko
+  czeka na proces w tle, a opis ustawienia mówi, że zwalnia go „shortly after the work ends”.
+- **Decyzja:** skrypt zostaje, bo nie zależy od ustawienia ani od zachowania aplikacji.
