@@ -198,3 +198,19 @@ przyjęte):
 
 **Commity:** szablon `6ea4afa` (bramka) i `990da05` (implementacja); fork `cadbf78` i `ff82e81` (`.14`) oraz
 `52969e4` (`.15`).
+
+**2026-10-27, dopisek: dostarczanie pusha.** Kryterium pusha jest odhaczone za treść i wysłanie. Dostarczenie na
+telefon nie działa.
+
+- **Ustawienia:** po przebiegu C użytkownik zalogował samodzielne CLI kontem claude.ai i włączył w `/config` oba
+  przełączniki: **Push when Claude decides** i **Push when actions required** (`agentPushNotifEnabled` i
+  `inputNeededNotifEnabled` w `~/.claude/settings.json`).
+- **Testy z sesji testowej** (Haiku, Remote Control `on` z ustawienia aplikacji):
+  - przy aktywnej aplikacji narzędzie pomija push („Not sent — this terminal is active”);
+  - po 3 minutach czekania, z zablokowanym ekranem, narzędzie odpowiada „Mobile push requested”.
+- **Wynik:** cztery takie pushe (2–5, w tym ostatni po wyłączeniu i włączeniu Remote Control) nie dotarły na
+  telefon, choć telefon był zalogowany na to samo konto, miał zgodę na powiadomienia, a aplikację otwarto.
+- **Zgłoszenia publiczne:** opisują ten sam objaw, np. anthropics/claude-code#60383 oraz zgłoszenia o pushach
+  ginących po cichu.
+- **Wniosek:** przy obecnej wersji push nie jest wiarygodnym sygnałem. Fallback przewiduje ticket 10 (hook
+  `Notification` i ntfy).
