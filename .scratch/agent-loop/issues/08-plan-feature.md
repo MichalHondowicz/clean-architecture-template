@@ -92,3 +92,47 @@ proponuje start pętli.
    - propozycja `/ship`.
 
    Samego `/ship` nie uruchamiać. Przebieg tylko na wyraźne słowa użytkownika.
+
+**2026-10-28, decyzja w trakcie implementacji:** `.agents/invocation.md` forka zabrania odwołań
+`../skill/SKILL.md` i mówi, że skill tylko dla człowieka nie sięga do innego takiego. Użytkownik wybrał
+2(a) z nazwanym wyjątkiem w `invocation.md` zamiast wspólnego skilla z szablonami albo kopii.
+
+**2026-10-28, implementacja** (fork `D:\Projects\skills`, gałąź `dotnet`, commit `86e03d9`, plugin
+`1.3.1-dotnet.18`, zainstalowany):
+
+- **`skills/engineering/plan-feature/SKILL.md`:**
+  - user-only, bez `model:` i `effort:`;
+  - kroki: sprawdzenie projektu, bramka Opusa (model sesji, ponownie przed specem i przed ponownym
+    pokazaniem pakietu), szkice przerwanego przebiegu, grill, spec, tickety, pakiet, commit, propozycja
+    `/ship`.
+- **Szkic:** katalog `.scratch/<feature>/` bez śledzonych plików. Wznowienie zaczyna od pierwszego
+  brakującego elementu i sprawdza, czy każda historia speca trafiła do kryteriów któregoś ticketu.
+- **Commit:** `git commit -m "plan: <feature>" -- <ścieżki>`. Próba na repozytorium tymczasowym: commit bierze
+  tylko pliki pakietu, a plik wcześniej dodany do indeksu przez użytkownika zostaje w indeksie. Przy błędzie
+  `git reset -q -- <ścieżki>` i powrót do `needs-triage`.
+- **Dokumentacja:**
+  - nowa strona `docs/engineering/plan-feature.md`;
+  - wpisy w `README.md` i README kubełka, `plugin.json`, `agents/openai.yaml`;
+  - łańcuch `plan-feature → ship → retro` w `ship.md`;
+  - zdanie w `ask-matt`;
+  - wyjątek w `invocation.md` i odnośnik do niego w README.
+- **Pliki `to-spec`, `to-tickets` i `grill-with-docs`:** bez zmian.
+- **`claude plugin validate . --strict`:** te same dwa stare ostrzeżenia (`CLAUDE.md` w korzeniu, brak
+  ikony), nowych nie ma.
+- **Template:** bez zmian w kodzie. Pełny build bez ostrzeżeń, testy zielone (ArchitectureTests 6,
+  Application.UnitTests 54, IntegrationTests 14, HookTests 83).
+- **Review Spec (Sonnet), dwie rundy:**
+  - runda 1: 8 uwag w zakresie (wznawianie, kolizja sluga, commit zgarniający indeks użytkownika,
+    sprzeczność przy `OK` poza `main`, format statusu speca, dziury bramki modelu, brak plików
+    sąsiednich skilli, lista pozostałości przy porzuceniu);
+  - runda 2: 7 uwag w zakresie (sprawdzanie modelu przed commitem gubiło `OK`, za szeroka definicja szkicu,
+    pliki poprzedniego przebiegu przy wznowieniu, niepełny zestaw ticketów, nieaktualna gałąź przy
+    odpowiedzi, stan po nieudanym commicie, brak ponownej propozycji `/ship`) i drobiazgi w dokumentacji.
+  - Wszystkie naniesione. Poza zakresem zostały: stara strona `docs/engineering/ask-matt.md` bez `ship`,
+    sesja w worktree nigdy nie stoi na `main` (wtedy zawsze `OK here`), a pytania na stronie dokumentacji
+    nie pochodzą z obserwacji.
+- **Seam (pilot) jeszcze nie sprawdzony na żywo:**
+  - model w drugiej turze;
+  - format ticketów w praktyce;
+  - jeden commit `plan: <feature>`;
+  - karta `/ship`: czy `start_session` rozwija polecenie z ukośnikiem.
