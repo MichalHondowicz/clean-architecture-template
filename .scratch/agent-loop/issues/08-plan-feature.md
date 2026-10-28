@@ -8,18 +8,18 @@ proponuje start pętli.
 
 **Seams:** pilot (ticket 10): planowanie ficzera pilota.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `/plan-feature` jest tylko dla człowieka i łączy w jednej sesji grill (z zapisem do `GLOSSARY.md`
+- [x] `/plan-feature` jest tylko dla człowieka i łączy w jednej sesji grill (z zapisem do `GLOSSARY.md`
       i ADR-ów), spec i tickety (historia 1).
-- [ ] Planowanie działa na Opusie (historia 6).
-- [ ] Każdy ticket ma sekcję `Seams:` wyprowadzoną z ADR 0004 i kryteria `AC1…n` z planowaną nazwą testu
+- [x] Planowanie działa na Opusie (historia 6).
+- [x] Każdy ticket ma sekcję `Seams:` wyprowadzoną z ADR 0004 i kryteria `AC1…n` z planowaną nazwą testu
       (historie 3, 4).
-- [ ] Jedna decyzja zatwierdza cały pakiet (spec, tickety, seamy, kryteria, DoD), a po niej tickety mają
+- [x] Jedna decyzja zatwierdza cały pakiet (spec, tickety, seamy, kryteria, DoD), a po niej tickety mają
       `ready-for-agent` (historia 2).
-- [ ] Po zatwierdzeniu agent proponuje uruchomienie `/ship <feature>` (historia 7).
-- [ ] `grill-with-docs`, `to-spec` i `to-tickets` dalej działają osobno.
-- [ ] Wersja forka podbita.
+- [x] Po zatwierdzeniu agent proponuje uruchomienie `/ship <feature>` (historia 7).
+- [x] `grill-with-docs`, `to-spec` i `to-tickets` dalej działają osobno.
+- [x] Wersja forka podbita.
 
 ## Comments
 
@@ -136,3 +136,37 @@ proponuje start pętli.
   - format ticketów w praktyce;
   - jeden commit `plan: <feature>`;
   - karta `/ship`: czy `start_session` rozwija polecenie z ukośnikiem.
+
+**2026-10-28, żywy przebieg** (sandbox `D:\Projects\ship-sandbox` na `main`, sesja „Przebieg plan-feature:
+toy-open-count”, start na Sonnecie, ficzer `todo-open-count`; odpowiadał użytkownik):
+
+- **Bramka modelu:**
+  - na Sonnecie skill sprawdził projekt (tracker, `dod.json`, skille sąsiednie, brak szkiców), poprosił
+    o przełączenie i skończył turę bez zmian w repozytorium;
+  - po `/model claude-opus-5-5` każda następna tura szła na Opusie, co potwierdza pole `model` w transkrypcie;
+  - model sprawdzał z system promptu, nie przez `get_session` (narzędzie było odroczone). Bez `model:`
+    we frontmatterze to ten sam model.
+- **Składanie skilli:**
+  - Skill tool wywołał tylko `grilling` i `domain-modeling`;
+  - `to-spec/SKILL.md` i `to-tickets/SKILL.md` przeczytał jako pliki;
+  - żadnej odmowy narzędzia ani błędu w transkrypcie.
+- **Grill:** jedna runda (6 pytań, slug `todo-open-count`), hasło „Open todo item” w `GLOSSARY.md`, bez ADR.
+- **Pakiet:**
+  - jeden ticket z `Seams:` według ADR 0004 (HTTP i handler; bez walidatora, bo query nie ma pól) i z `AC1–AC7`
+    z nazwami testów w formacie `issue-tracker.md`;
+  - DoD z poleceniami, `protectedPaths` i progami;
+  - lista plików commita;
+  - pytanie dla gałęzi `main`.
+- **Commit:** jedna odpowiedź „OK” i jeden commit `289416c plan: todo-open-count` na `main`. W commicie spec,
+  ticket i `GLOSSARY.md`, oba ze statusem `ready-for-agent`. Nieśledzone `.agents/` i `.codex/` zostały poza
+  nim.
+- **Propozycja `/ship`:**
+  - dokładne polecenie w czacie i karta `start_session` (Sonnet, effort `medium`, tryb auto);
+  - sesji skill sam nie uruchomił; użytkownik wystartował ją z karty;
+  - polecenie z ukośnikiem z karty zadziałało: sesja `/ship todo-open-count` ruszyła z implementerem na
+    tickecie 01, ma Remote Control `on`.
+- **Do przewodnika (09):**
+  - przełączenie modelu przez `/model` w sesji;
+  - jeden `ECONNRESET` po przełączeniu wymagał „Try again”.
+- **Przebieg `/ship todo-open-count`** w sandboksie zaczął się poza zakresem tego ticketu. Jego wynik należy do
+  pilota (10).
