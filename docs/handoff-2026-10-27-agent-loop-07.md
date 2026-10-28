@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-28-agent-loop-08.md
+
 # Handoff: pętla bez nadzoru, ticket 07 (bramka 2: scalenie po „OK”)
 
 ## 1. Stan wejściowy
