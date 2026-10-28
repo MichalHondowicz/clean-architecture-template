@@ -8,9 +8,9 @@ a przyjęte trafiają do repozytorium osobnym commitem.
 
 **Seams:** pilot (ticket 10).
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Po briefie sesja czeka na odpowiedź. Odpowiedź przez Remote Control działa tak samo jak z komputera
+- [x] Po briefie sesja czeka na odpowiedź. Odpowiedź przez Remote Control działa tak samo jak z komputera
       (historia 35).
 - [x] Po „OK”: fast-forward do `main`, `git push origin main`, usunięcie gałęzi i worktree, status CI
       sprawdzony w przeglądarce i raport z wynikiem (historia 36).
@@ -184,7 +184,8 @@ a przyjęte trafiają do repozytorium osobnym commitem.
   - `/ship toy-brief` w checkoucie głównym (`chore/agent-loop`) wszedł do worktree, odczytał Remote Control
     (`on`), pominął limit, środowisko i baseline, raportował i zadał jedno pytanie. Pusha nie wysłał, zgodnie
     ze skillem;
-  - odpowiedź `Ok, 1 tak, 2 nie`;
+  - odpowiedź `Ok, 1 tak, 2 nie`, wysłana z telefonu przez Remote Control (potwierdzenie użytkownika
+    2026-10-28); sesja potraktowała ją tak samo jak odpowiedź z komputera, co zamyka kryterium 1;
   - commit `ship: gate 2, conventions 1` (`87b0b81`) z wpisem `## Decision` i regułą „Domain logic” dosłownie
     w `AGENTS.md` po **Entities**. Propozycja 2 odrzucona, w `AGENTS.md` jej nie ma;
   - `ExitWorktree keep`, `git fetch . feat/toy-brief:main` (checkout na innej gałęzi), `main` równy końcowi
