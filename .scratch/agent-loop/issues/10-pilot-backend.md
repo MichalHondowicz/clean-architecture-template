@@ -30,3 +30,17 @@ gałęzi i otrzymane powiadomienia.
 odpowiada „Mobile push requested”, ale na telefon nie przyszedł żaden z czterech testów, także po wyłączeniu i
 włączeniu Remote Control (szczegóły w Comments ticketu 06). Ticket na fallback (hook `Notification` i ntfy)
 założony przed pilotem jako 12 (`needs-triage`).
+
+**2026-10-28, z ticketu 08: pierwszy pełny przebieg `/plan-feature` → `/ship` → bramka 2** (sandbox, ficzer
+zabawkowy `todo-open-count`, jeden ticket). To nie jest pilot, tylko dowód, że łańcuch działa bez interwencji
+poza bramkami:
+
+- plan: grill na Opusie, jeden commit `plan: todo-open-count`, sesja `/ship` z karty na Sonnecie;
+- `/ship`: ticket 01 w jednej rundzie, review gałęzi na Opusie bez uwag w zakresie, uwaga spoza zakresu jako
+  ticket 02 (`needs-triage`), brief, odpowiedź na bramce 2, fast-forward i push do gołego origin, gałąź
+  i worktree usunięte;
+- pomiar: ticket 5 minut i +10% okna 5-godzinnego, review gałęzi 2 minuty i +3%, tydzień +2% łącznie;
+- odpowiedź „OK, 1 tak, 2 tak” była pomyłką (zamierzone „2 nie”); konwencję 2 cofnięto ręcznie osobnym
+  commitem `b493a0f`. Skill nie ma ścieżki korekty decyzji po scaleniu; do rozważenia w przewodniku (09).
+
+Pilot nadal musi przejść scenariusze (b)–(d) ze spec i ficzer z kilkoma ticketami.
