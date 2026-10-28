@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-28-agent-loop-10.md
+
 # Handoff: pętla bez nadzoru, ticket 09 (porządki i przewodnik)
 
 ## 1. Stan wejściowy
