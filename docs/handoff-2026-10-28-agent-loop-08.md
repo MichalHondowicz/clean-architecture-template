@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-10-28-agent-loop-09.md
+
 # Handoff: pętla bez nadzoru, ticket 08 (`/plan-feature`: planowanie z jednym zatwierdzeniem)
 
 ## 1. Stan wejściowy
