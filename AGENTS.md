@@ -64,13 +64,19 @@ Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents
 
 ### Process skills in this project
 
-- `to-tickets`: one ticket per use case, implemented with `add-feature`; a ticket that needs a new
-  entity runs `add-entity` first. Changes to existing use cases that the new one needs go into its
-  ticket. Every user story of the spec lands in some ticket's acceptance criteria, including a story the
-  existing code already satisfies: its criterion is a regression test.
-- `implement`, `tdd`: typechecking is `dotnet build CleanArchitecture.slnx` (analyzers are errors, so
-  a warning fails it); a single test file is `dotnet test <test project> --filter
-  "FullyQualifiedName~<TestClass>"`; the full suite is `dotnet test CleanArchitecture.slnx`.
+- `/plan-feature` plans a feature for `/ship`, which builds it unattended; both are user-invoked. They read
+  the definition of done in `docs/agents/dod.json`, and `/ship`'s implementer follows
+  `docs/agents/implementer-contract.md`. Planning runs on Opus, `/ship` on Sonnet; each subagent role's default
+  model is the `model:` of its definition in the plugin, and `/ship` raises round 3 and the branch Spec
+  review to Opus.
+- `to-tickets` (also when `/plan-feature` follows it): one ticket per use case, implemented with
+  `add-feature`; a ticket that needs a new entity runs `add-entity` first. Changes to existing use cases
+  that the new one needs go into its ticket. Every user story of the spec lands in some ticket's
+  acceptance criteria, including a story the existing code already satisfies: its criterion is a
+  regression test.
+- `implement`, `tdd` and `/ship`'s implementer: typechecking is `dotnet build CleanArchitecture.slnx`
+  (analyzers are errors, so a warning fails it); a single test file is `dotnet test <test project>
+  --filter "FullyQualifiedName~<TestClass>"`; the full suite is `dotnet test CleanArchitecture.slnx`.
 - `code-review` is the plugin skill `mattpocock-skills:code-review` (two axes); Claude Code's built-in
   `code-review` hunts bugs and is not this step. Inside `/implement`, review each ticket on the Spec axis only. The Standards axis runs
   once per branch, as `ca-review` of the whole branch before the merge. A `code-review` outside `/implement`

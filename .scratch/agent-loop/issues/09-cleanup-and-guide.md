@@ -8,16 +8,16 @@ i `/ship`, a każda decyzja, o którą agent dotąd pytał w trakcie, jest regu�
 
 **Seams:** brak testów automatycznych. Sprawdzenie w review Spec i w pilocie (ticket 10).
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Nieśledzony katalog `.agents/skills/` jest usunięty (historia 60).
-- [ ] `docs/workflow.md` opisuje przepływ `/plan-feature` → bramka 1 → `/ship` → push → bramka 2, tabelę
+- [x] Nieśledzony katalog `.agents/skills/` jest usunięty (historia 60).
+- [x] `docs/workflow.md` opisuje przepływ `/plan-feature` → bramka 1 → `/ship` → push → bramka 2, tabelę
       „Ty / agent”, powiadomienia, limity i regułę decyzji po pilotach (historie 48, 61).
-- [ ] Sekcja procesu w `AGENTS.md` wskazuje `/plan-feature`, `/ship`, role i modele, plik DoD i kontrakt
+- [x] Sekcja procesu w `AGENTS.md` wskazuje `/plan-feature`, `/ship`, role i modele, plik DoD i kontrakt
       implementera, bez powtarzania treści skilli.
-- [ ] Każda decyzja z `docs/workflow.md` i z pilota archive-todo, którą dawniej podejmowałem w trakcie
+- [x] Każda decyzja z `docs/workflow.md` i z pilota archive-todo, którą dawniej podejmowałem w trakcie
       implementacji, jest regułą w `AGENTS.md` albo w skillu, albo częścią bramki 1 (historia 5).
-- [ ] Build: 0 błędów, 0 ostrzeżeń; pełne testy zielone.
+- [x] Build: 0 błędów, 0 ostrzeżeń; pełne testy zielone.
 
 ## Comments
 
@@ -82,6 +82,7 @@ Inwentarz decyzji:
 |---|---|---|
 | Zatwierdzenie seamów przed pierwszym testem | `workflow.md`, krok 6 | bramka 1 (`Seams:` w tickecie), `tdd` |
 | Status ticketu z uwagi z review | `workflow.md`, krok 4; pilot, kroki 4–5 („odłożone do 03”) | `/ship`: uwaga spoza zakresu to ticket `needs-triage`, `/triage` po fakcie |
+| Decyzja z triage dotycząca wielu use case'ów idzie do ADR-a | `workflow.md`, krok 4 | przewodnik `docs/workflow.md` („Po ficzerze”, „Przy komputerze”): `/triage` należy do użytkownika i nie leży między bramkami (dopisane po review Spec, runda 1) |
 | ADR-y i pojęcia słownika | `workflow.md`, krok 1 | bramka 1 (grill w `/plan-feature`) |
 | Nowe konwencje (`/retro`, zmiana konwencji przez bramkę) | `workflow.md`, „Utrzymanie”; pilot, `/retro` | bramka 2, decyzja per propozycja |
 | Gałąź `feat/<slug>` | `workflow.md`, krok 5 | `/ship` (worktree) |
@@ -98,3 +99,34 @@ Inwentarz decyzji:
 | Test unit dla każdego zmienionego handlera | pilot, obserwacja 9 | ADR 0004 |
 | Metody domenowe `Archive`/`Unarchive` | pilot, retro #10 | nie dotyczy: decyzja projektowa tylko na gałęzi pilota; jeśli wróci, rozstrzyga ją grill na bramce 1 |
 | P1, P2 (dowód pilota, kolejność przebiegów) | pilot, „Decyzje przed pilotem” | nie dotyczy: jednorazowe |
+
+**2026-10-28, wynik implementacji** (`/implement`, bez `tdd`: ticket nie ma seamów kodu):
+
+- **Kryterium 1:** nieśledzony `.agents/` usunięty w całości (miał tylko `skills/`). `.codex/` został.
+- **Kryterium 2:** `docs/workflow.md` przepisany:
+  - główny przepływ `/plan-feature` → bramka 1 → `/ship` → bramka 2, stary jako „Przy komputerze”;
+  - nowa tabela „Ty / agent”;
+  - sekcje „Ustawienia sesji”, „Powiadomienia”, „Limity”, „Wznawianie i stany pośrednie”, „Reguła decyzji po
+    pilotach”, „Korekta decyzji z bramki 2 po scaleniu”;
+  - „Istniejący projekt” z elementami pętli; nowe pułapki;
+  - skille opisane odsyłaczami do `plan-feature.md` i `ship.md` forka.
+- **Kryterium 3:** w `AGENTS.md` nowy wpis o `/plan-feature` i `/ship` (DoD, kontrakt, modele) oraz dopiski
+  w `to-tickets` i `implement`, `tdd`. Odstępstwo od decyzji 4: zamiast odsyłacza do tabeli w spec jedno
+  zdanie o modelach i wskazanie definicji ról w pluginie, bo w projekcie z template'u `.scratch/agent-loop/`
+  się usuwa (uwaga review, runda 1).
+- **Kryterium 4:** inwentarz wyżej, z wierszem o regule ADR-a z triage dopisanym po review. Nowych reguł
+  w `AGENTS.md` nie było trzeba.
+- **Kryterium 5:** build 0 błędów, 0 ostrzeżeń; ArchitectureTests 6, Application.UnitTests 54,
+  IntegrationTests 14, HookTests 83, wszystkie zielone. Po pomiarze zmieniały się tylko pliki `.md`.
+- **Fork** (`D:\Projects\skills`, gałąź `dotnet`): strona `docs/engineering/ask-matt.md` zna `/ship`
+  i `/plan-feature` jako trzeci sposób pracy nad ticketami; `ask-matt/SKILL.md` bez zmian; plugin
+  `1.3.1-dotnet.19`. `claude plugin validate . --strict`: tylko dwa stare ostrzeżenia.
+- **Review Spec** (subagent na Sonnecie):
+  - runda 1: 8 uwag w zakresie, wszystkie poprawione: piąty push (czerwone CI), brakujące wpisy allowlisty
+    bramki 2, `dod-common.ps1`, reguła ADR-a z triage, wiszący odsyłacz do spec, stany bramki 2, rundy
+    poprawek i trzecie czekanie w limitach, „trzy gałęzie” na stronie `ask-matt`;
+  - runda 2: zdanie o modelach w `AGENTS.md` i luka wznawiania (miejsce stanu w worktree, droga po
+    `needs-info`, wznowienie `in-progress`, przerwana bramka 2, ponowne review gałęzi, przerwane planowanie),
+    poprawione nową sekcją; krótka kontrola poprawek dała jeszcze dwie drobne nieścisłości, poprawione;
+  - poza zakresem: ticket po trzech rundach ma trzy pliki findings, więc po odblokowaniu `/ship` od razu uzna
+    go znowu za `stuck`. Założony ticket 13 (`needs-triage`).
