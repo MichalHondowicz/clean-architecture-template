@@ -12,15 +12,15 @@ a przyjęte trafiają do repozytorium osobnym commitem.
 
 - [ ] Po briefie sesja czeka na odpowiedź. Odpowiedź przez Remote Control działa tak samo jak z komputera
       (historia 35).
-- [ ] Po „OK”: fast-forward do `main`, `git push origin main`, usunięcie gałęzi i worktree, status CI
+- [x] Po „OK”: fast-forward do `main`, `git push origin main`, usunięcie gałęzi i worktree, status CI
       sprawdzony w przeglądarce i raport z wynikiem (historia 36).
-- [ ] Allowlista zawiera dokładnie `git push origin main`, bez gwiazdki. Push innej gałęzi albo z `--force`
+- [x] Allowlista zawiera dokładnie `git push origin main`, bez gwiazdki. Push innej gałęzi albo z `--force`
       nadal wymaga zgody (historia 37).
-- [ ] Każda propozycja konwencji ma osobną decyzję, niezależną od zgody na scalenie (historia 38).
-- [ ] Przyjęte propozycje trafiają osobnym commitem orkiestratora na gałąź ficzera przed scaleniem.
+- [x] Każda propozycja konwencji ma osobną decyzję, niezależną od zgody na scalenie (historia 38).
+- [x] Przyjęte propozycje trafiają osobnym commitem orkiestratora na gałąź ficzera przed scaleniem.
       Odrzucone wypadają (historia 39).
-- [ ] Bez „OK” nic nie trafia do `main`.
-- [ ] Wersja forka podbita.
+- [x] Bez „OK” nic nie trafia do `main`.
+- [x] Wersja forka podbita.
 
 ## Comments
 
@@ -167,3 +167,46 @@ a przyjęte trafiają do repozytorium osobnym commitem.
 
   `git merge --ff-only *`, `git worktree *`, `git merge-base*` i `git rev-parse*` już na niej są.
 - **Żywy przebieg w sandboksie** (decyzja 8).
+
+**2026-10-28, allowlista i żywy przebieg D w sandboksie:**
+
+- **Allowlista:** osiem linii z decyzji 7 dopisane przez użytkownika.
+  - Template: commit `b6c3898`.
+  - Sandbox: commit `36d3411` na `chore/agent-loop` i `8a2a3e3` na `feat/toy-brief`, bo sesja w worktree
+    czyta ustawienia z gałęzi ficzera.
+- **Konfiguracja:**
+  - goły origin `D:\Projects\ship-sandbox-origin.git`, a jego `main` na `53439c4`;
+  - brief `toy-brief` uzupełniony ręcznie o pliki docelowe, angielskie reguły i blok pytania (commit
+    `9844a38`), bo powstał na wersji `.15`;
+  - plugin `.16`, Sonnet z effortem medium, tryb auto;
+  - limit na starcie: okno 5-godzinne 9%, tydzień 45%.
+- **Przebieg:**
+  - `/ship toy-brief` w checkoucie głównym (`chore/agent-loop`) wszedł do worktree, odczytał Remote Control
+    (`on`), pominął limit, środowisko i baseline, raportował i zadał jedno pytanie. Pusha nie wysłał, zgodnie
+    ze skillem;
+  - odpowiedź `Ok, 1 tak, 2 nie`;
+  - commit `ship: gate 2, conventions 1` (`87b0b81`) z wpisem `## Decision` i regułą „Domain logic” dosłownie
+    w `AGENTS.md` po **Entities**. Propozycja 2 odrzucona, w `AGENTS.md` jej nie ma;
+  - `ExitWorktree keep`, `git fetch . feat/toy-brief:main` (checkout na innej gałęzi), `main` równy końcowi
+    gałęzi, `git push origin main`: lokalny i zdalny `main` na `87b0b81`;
+  - gałąź `feat/toy-brief` usunięta;
+  - CI: `no CI for this remote`.
+  - Bez żadnego pytania o zgodę: tryb auto przepuścił push. Nie wiadomo, czy zadziałała reguła z allowlisty, czy
+    klasyfikator, bo polecenie było łańcuchem (niżej).
+- **Znaleziska → fork `e47e934`, plugin `1.3.1-dotnet.17`:**
+  - **Łańcuchy poleceń.** W checkoucie głównym, który nie jest izolowany, sesja łączyła polecenia `;`, a push
+    i sprzątanie szły w jednym łańcuchu z warunkami. Wynik był poprawny, ale decyzja o pushu i usunięciu gałęzi
+    zależała od kolejności w łańcuchu, a nie od odczytanego kodu wyjścia. Gate 2 każe teraz jedno polecenie na
+    wywołanie, także w checkoucie głównym.
+  - **Worktree trzymany przez proces.** `git worktree remove` zwrócił `Permission denied`, ale git wyrejestrował
+    worktree i został pusty folder trzymany przez powłokę sesji. Gałąź poszła mimo `rm=255`, bo łańcuch tego nie
+    pilnował. Skill mówi teraz: worktree jest usunięty, gdy nie pokazuje go `git worktree list`; pusty folder
+    zgłasza się użytkownikowi.
+- **Niesprawdzone na żywo** (do pilota 10):
+  - ścieżka `git merge --ff-only` przy checkoucie na `main`;
+  - krok CI w przeglądarce sesji w tle;
+  - wznawianie przerwanej bramki;
+  - odpowiedź niejasna i odpowiedź „nie”;
+  - push innej gałęzi albo z `--force` przy obecnej allowliście.
+- **Do sprzątnięcia przez użytkownika:** pusty folder `D:\Projects\ship-sandbox\.claude\worktrees\toy-brief`
+  po zamknięciu sesji przebiegu.
