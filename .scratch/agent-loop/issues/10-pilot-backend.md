@@ -153,3 +153,18 @@ z planu. Przygotowanie według decyzji 3, tym razem w tej kolejności:
 3. Ticket niemożliwy jako 02 i przesunięcie ticketu planu, a także próg `fiveHourPercent`: osobne commity na
    `main` sandboksu, przed `/ship`.
 4. `/ship` ręcznie w nowej sesji. Próg 90% wraca commitem na gałęzi w trakcie pierwszego czekania.
+
+**2026-10-29 22:42, przebieg 2 przygotowany** (decyzja użytkownika: tickety ręcznie, bez `/plan-feature`, bo
+tę ścieżkę sprawdził przebieg 1):
+
+- **Ficzer `todo-comment-count`**, commit `48bf7eb` na `main` sandboksu:
+  - 01: `commentCount` w `GET todos/{id}` z unieważnieniem cache przy dodaniu i usunięciu commentu;
+  - 02: test architektury w `tests/ArchitectureTests` (ścieżka chroniona), niezależny, scenariusz (d);
+  - 03: `commentCount` w `GET todos`, zależny od 01.
+- **Próg** `fiveHourPercent` 49 przy zużyciu 45% (okno resetuje się o 23:50), commit `8fbd78b`.
+- **Docker** zatrzymany przez `docker desktop stop` (exit 0, brak procesów Docker Desktop).
+- **Oczekiwany przebieg:**
+  - Docker startuje w `-Check environment`;
+  - 01 kończy się `done`, potem pauza 5-godzinna do ok. 23:52 i próg 90% przywrócony commitem na gałęzi;
+  - 02 `needs-info` w rundzie 1, 03 `done`;
+  - koniec bez briefu, potem `wontfix` dla 02 i drugi `/ship`.
