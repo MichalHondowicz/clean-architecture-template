@@ -10,9 +10,9 @@ gałęzi i otrzymane powiadomienia.
 
 **Status:** ready-for-human
 
-- [ ] Wybrany ficzer backendowy (najlepiej 3 tickety) przechodzi od `/plan-feature` do scalenia w `main`
+- [x] Wybrany ficzer backendowy (najlepiej 3 tickety) przechodzi od `/plan-feature` do scalenia w `main`
       (historie 1–8, 57).
-- [ ] Scenariusz (a): między bramkami nie pada żadne pytanie o zgodę. Każde pytanie, które się pojawiło,
+- [x] Scenariusz (a): między bramkami nie pada żadne pytanie o zgodę. Każde pytanie, które się pojawiło,
       zostaje dopisane do allowlisty (historia 12).
 - [ ] Scenariusz (b): Docker zatrzymany przed startem, pętla uruchamia go sama (historia 11).
 - [ ] Scenariusz (c): próg w pliku DoD tuż nad bieżącym zużyciem daje pauzę i wznowienie bez mojego udziału
@@ -21,8 +21,8 @@ gałęzi i otrzymane powiadomienia.
       tickety idą dalej (historie 28, 29).
 - [ ] Push przy pytaniu o zgodę w sesji w tle dociera na telefon. Jeśli nie dociera, powstaje ticket na
       fallback (hook `Notification` i ntfy) (historia 46).
-- [ ] Tabela pomiaru jest pełna, a zużycie ficzera zapisane jako pomiar nr 1 (historia 47).
-- [ ] Propozycje konwencji z briefu są rozstrzygnięte, a rozjazdy pętli zapisane jako tickety `needs-triage`.
+- [x] Tabela pomiaru jest pełna, a zużycie ficzera zapisane jako pomiar nr 1 (historia 47).
+- [x] Propozycje konwencji z briefu są rozstrzygnięte, a rozjazdy pętli zapisane jako tickety `needs-triage`.
 
 ## Comments
 
@@ -90,3 +90,64 @@ Pilot nadal musi przejść scenariusze (b)–(d) ze spec i ficzer z kilkoma tick
    sesji przebiegów tylko na osobne słowo użytkownika.
 6. **`.agents/` zostaje nieśledzony.** Nie wpływa na pilota: nowy worktree go nie ma, a bramka 2 używa
    `--untracked-files=no`.
+
+**2026-10-29, przebieg 1 pilota: `todo-comments`** (sandbox, plugin `1.3.1-dotnet.19`). Sesję `/ship`
+uruchomiono z karty `/plan-feature` od razu po bramce 1, więc ticketu do scenariusza (d) ani obniżonego progu
+do scenariusza (c) w nim nie było. Dla scenariusza (a), pomiaru i bramki 2 przebieg jest pełny.
+
+- **Plan:** sesja na Opusie, grill i pakiet, bramka 1 „OK”. O 21:28 commit `plan: todo-comments` (`840888d`)
+  ze spec (19 historii), trzema ticketami i `GLOSSARY.md` (termin **Comment**, poprawiony **Copy**). ADR nie
+  powstał. Zużycie planowania razem z tą sesją: okno 5-godzinne z 2% do 15%, tydzień z 57% do 59%.
+- **`/ship`:** sesja z karty na Sonnecie, tryb auto, Remote Control `on`. Wszystkie 210 tur szło na
+  `claude-sonnet-5-5`.
+  - **Start:** keep-awake, worktree `.claude/worktrees/todo-comments`, limit, środowisko i baseline zielone.
+  - **01:** 2 rundy. Runda 1 odpadła, bo zabrakło dowodu czerwieni dla AC2, AC3, AC5 i AC8. Runda 2 dopisała
+    dowody bez zmian w kodzie. Stash `ship: 01 round 2 leftovers` zawiera tylko różnice końców linii.
+  - **02 i 03:** po 1 rundzie.
+  - **Review gałęzi (Opus):** 2 uwagi w zakresie, obie naprawione w rundzie 1. Endpointy przeniesione do
+    `Endpoints/TodoComments/`, encja do `Domain/Todos`. Uwaga o domain eventach została otwarta, a rozstrzyga
+    ją propozycja 1. Nowych ticketów `needs-triage` brak.
+  - **Testy na gałęzi:** ArchitectureTests 6, Application.UnitTests 85, IntegrationTests 31, HookTests 83,
+    wszystkie zielone. Build: 0 ostrzeżeń.
+- **Bramka 2:** o 22:12 odpowiedź „OK, 1-4 tak” z komputera. Zakres „1-4” został odczytany poprawnie.
+  - Commit `ship: gate 2, conventions 1, 2, 3, 4` (`b38e40e`): propozycja 1 w `ca-review`, propozycje 2–4
+    w `AGENTS.md`.
+  - **Pierwsza ścieżka `git merge --ff-only` na żywo,** bo checkout stał na `main`. Każde polecenie szło
+    osobno. Przed pushem sesja porównała `main` z końcem gałęzi, a potem wysłała dokładnie
+    `git push origin main` (`b493a0f..b38e40e`).
+  - **Sprzątanie:** `git worktree remove` się udał (w 07 kończył się `Permission denied`), gałąź usunął
+    `update-ref -d` z jej końcem.
+  - **CI:** `no CI for this remote`, zgodnie z decyzją 1.
+  - **Build po commicie konwencji** nie był powtórzony. Commit zmienił tylko pliki `.md`.
+- **Scenariusz (a):** w transkrypcie brak pytania o zgodę między bramkami, więc allowlista nie potrzebuje
+  dopisków. Jedyna odmowa to polecenie złożone w worktree („too complex to verify”). Sesja sama je rozdzieliła.
+- **Scenariusz (b) niesprawdzony:** Docker Desktop wystartował o 21:32:18, 40 s przed utworzeniem sesji
+  `/ship` (20:33:00 UTC), więc `-Check environment` zastał go działającego. Uruchomił go użytkownik po
+  komunikacie `/plan-feature` „Testy integracyjne potrzebują działającego Dockera” (ticket 14).
+- **Push o bramce 2:** narzędzie odpowiedziało „Mobile push requested”. Nie wiadomo, czy push dotarł na
+  telefon (ticket 12).
+- **Konwencja 4 przyjęta na fałszywym fakcie.** Brief twierdził, że wszystkie dotychczasowe walidatory są
+  `internal sealed`. `CreateTodoCommandValidator` i `CopyTodoCommandValidator` są `public class`, a nowe
+  `AddTodoCommentCommandValidator` i `DeleteTodoCommentCommandValidator` weszły do `main` także jako
+  `public class`. `main` sandboksu łamie więc regułę przyjętą na tej samej bramce (ticket 15).
+- **Pomiar nr 1** (`.scratch/todo-comments/metrics.md` w sandboksie):
+
+  | Etap | Rundy | Minuty | Okno 5h | Tydzień |
+  |---|---|---|---|---|
+  | 01 | 2 | 12 | 15% → 22% | 59% → 60% |
+  | 02 | 1 | 8 | 22% → 26% | 60% → 60% |
+  | 03 | 1 | 7 | 26% → 30% | 60% → 61% |
+  | review gałęzi | 1 | 7 | 30% → 37% | 61% → 62% |
+  | **suma** | 5 | 34 | +22 | +3 |
+
+  Ficzer z 3 ticketami kosztuje ok. 3% tygodnia, razem z planowaniem ok. 5%. Okno 5-godzinne mieści ok. 4
+  takie ficzery. Reguła decyzji wymaga też pilota MAUI.
+
+**Do zrobienia w tym tickecie: przebieg 2 dla scenariuszy (b)–(d).** Mały ficzer w sandboksie, 2 tickety
+z planu. Przygotowanie według decyzji 3, tym razem w tej kolejności:
+
+1. Docker zatrzymany i nieuruchamiany ręcznie, niezależnie od komunikatów `/plan-feature`.
+2. Po bramce 1 karty `/ship` nie klikać.
+3. Ticket niemożliwy jako 02 i przesunięcie ticketu planu, a także próg `fiveHourPercent`: osobne commity na
+   `main` sandboksu, przed `/ship`.
+4. `/ship` ręcznie w nowej sesji. Próg 90% wraca commitem na gałęzi w trakcie pierwszego czekania.
