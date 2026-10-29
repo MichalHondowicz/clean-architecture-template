@@ -44,3 +44,49 @@ poza bramkami:
   commitem `b493a0f`. Skill nie ma ścieżki korekty decyzji po scaleniu; do rozważenia w przewodniku (09).
 
 Pilot nadal musi przejść scenariusze (b)–(d) ze spec i ficzer z kilkoma ticketami.
+
+**2026-10-29, decyzje przed pilotem** (bramka w sesji po handoffie
+`docs/handoff-2026-10-28-agent-loop-10.md`; wszystkie rekomendacje przyjęte):
+
+**Fakty sprawdzone przed bramką:**
+
+- **Limit na starcie sesji:** okno 5-godzinne 2% (reset 2026-10-29 23:49), tydzień 57% (reset 2026-10-30
+  07:00). Przy progu 80% na pilota zostaje 23 punkty tygodnia; ficzer z 08 zużył +2%.
+- **Tagi dublują istniejący kod.** `TodoItem` ma już `List<string> Labels`, a `toy-quota` dodał `HasLabel`.
+- **`needs-info` zatrzymuje ficzer przed bramką 2.** `ship/SKILL.md`, koniec „Work the tickets”: review gałęzi
+  rusza tylko wtedy, gdy każdy ticket jest `done` (`needs-triage` i `wontfix` się nie liczą). Ticket ze
+  scenariusza (d) kończy więc przebieg bez briefu i scalenia.
+- **`dod.json` czyta worktree.** `run-dod.ps1` szuka pliku od bieżącego katalogu (`Find-DodRoot`), a worktree
+  powstaje z HEAD. Zmiana progu musi być zacommitowana na `main` przed `/ship`. Commit przywracający próg na
+  `main` po utworzeniu gałęzi rozjechałby historię i fast-forward na bramce 2 by się nie udał.
+- **Docker** był zatrzymany (`docker info` bez połączenia z silnikiem), a ścieżka startu z `environmentChecks`
+  istnieje. `/plan-feature` Dockera nie potrzebuje.
+- **`.agents/`** w template'cie pojawił się znowu 2026-10-29 o 20:46, choć usunięto go w 09. To kopia
+  `.claude/skills` bez `README.md`. W sandboksie leży od 2026-10-26.
+- **Sandbox:** zarejestrowane worktree `toy-overdue` i `toy-quota` były czyste, a ich gałęzie równe kopiom
+  na gołym origin. Puste foldery `todo-open-count` i `toy-brief` zostały po przebiegach.
+
+**Decyzje:**
+
+1. **Miejsce: sandbox.** Krok CI po scaleniu zostaje niesprawdzony; sprawdzi go pierwszy ficzer w template'cie
+   po scaleniu `chore/agent-loop`.
+2. **Ficzer: komentarze do todo itemu.** Nowa encja `TodoComment` z migracją, trzy tickety: dodanie
+   komentarza, lista komentarzy itemu, usunięcie komentarza. Własność przez item: cudzy item odpowiada 404.
+3. **Scenariusze (b)–(d) w jednym przebiegu, wieczorem 2026-10-29:**
+   - **(b):** Docker zostaje wyłączony do startu `/ship`.
+   - **(c):** po bramce 1, tuż przed `/ship`, commit na `main` sandboksu z `fiveHourPercent` równym bieżącemu
+     zużyciu plus 4. Ticket 01 rusza, pauza wypada przed następnym. Próg wraca do 90% commitem na gałęzi
+     `feat/<feature>` w worktree w trakcie pierwszego czekania, przed następnym `ship: start`, żeby nie
+     wszedł w diff żadnego ticketu.
+   - **(d):** ticket niemożliwy pisany ręcznie po bramce 1, nie przez grill, żeby `/plan-feature` nie
+     „naprawił” go zmianą `protectedPaths`. Wymaga nowej reguły w `tests/ArchitectureTests`, jest niezależny
+     i wchodzi jako 02, a tickety planu 02–03 przechodzą na 03–04. Oczekiwane: `STATUS: stuck` w rundzie 1,
+     `needs-info`, revert, push, tickety 03–04 idą dalej. Potem użytkownik oznacza go `wontfix` commitem na
+     gałęzi i wpisuje `/ship` ponownie: review gałęzi, brief i bramka 2, przy okazji test wznawiania.
+   - Pomiar liczy się mimo pauz.
+4. **Ticket 13 po pilocie.** `wontfix` omija lukę, a ponowne `ready-for-agent` to droga ticketu 13.
+5. **Sprzątanie sandboksu:** usunięte worktree `toy-overdue` i `toy-quota`, lokalne gałęzie `feat/toy-*`
+   i puste foldery `todo-open-count` i `toy-brief`. Gałęzie na gołym origin zostają. Archiwizacja starych
+   sesji przebiegów tylko na osobne słowo użytkownika.
+6. **`.agents/` zostaje nieśledzony.** Nie wpływa na pilota: nowy worktree go nie ma, a bramka 2 używa
+   `--untracked-files=no`.
