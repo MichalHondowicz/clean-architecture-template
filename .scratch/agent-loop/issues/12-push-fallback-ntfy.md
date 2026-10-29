@@ -49,6 +49,6 @@ Rejestrację hooka i wywołania w `/ship` sprawdza pilot (ticket 10).
 ## Comments
 
 **2026-10-29, z pilota 10 (przebieg 1, `todo-comments`):** push `PushNotification` o bramce 2 z sesji `/ship`
-z Remote Control `on` dotarł na telefon. To pierwszy taki push po czterech nieudanych testach z 06. Przy triage
-rozważyć, czy problem z 06 był przejściowy i czy fallback jest jeszcze potrzebny, czy tylko dla pytań o zgodę
-(hook `Notification`).
+z Remote Control `on` znowu nie przyszedł jako powiadomienie systemowe. Narzędzie odpowiedziało „Mobile push
+requested”, a wiadomość była widoczna dopiero po otwarciu aplikacji Claude na telefonie. Piąty push z rzędu bez
+powiadomienia, więc fallback jest nadal potrzebny.
