@@ -124,8 +124,9 @@ do scenariusza (c) w nim nie było. Dla scenariusza (a), pomiaru i bramki 2 prze
 - **Scenariusz (b) niesprawdzony:** Docker Desktop wystartował o 21:32:18, 40 s przed utworzeniem sesji
   `/ship` (20:33:00 UTC), więc `-Check environment` zastał go działającego. Uruchomił go użytkownik po
   komunikacie `/plan-feature` „Testy integracyjne potrzebują działającego Dockera” (ticket 14).
-- **Push o bramce 2:** narzędzie odpowiedziało „Mobile push requested”. Nie wiadomo, czy push dotarł na
-  telefon (ticket 12).
+- **Push o bramce 2 dotarł na telefon** (potwierdzenie użytkownika 2026-10-29). Narzędzie odpowiedziało
+  „Mobile push requested”, tak jak przy czterech nieudanych testach z 06. To pierwszy push pętli, który
+  dotarł. Kryterium pusha przy pytaniu o zgodę zostaje otwarte, bo żadne pytanie o zgodę nie padło.
 - **Konwencja 4 przyjęta na fałszywym fakcie.** Brief twierdził, że wszystkie dotychczasowe walidatory są
   `internal sealed`. `CreateTodoCommandValidator` i `CopyTodoCommandValidator` są `public class`, a nowe
   `AddTodoCommentCommandValidator` i `DeleteTodoCommentCommandValidator` weszły do `main` także jako

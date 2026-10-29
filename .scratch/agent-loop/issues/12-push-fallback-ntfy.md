@@ -45,3 +45,10 @@ Rejestrację hooka i wywołania w `/ship` sprawdza pilot (ticket 10).
    ekranie. Trzeba też sprawdzić, czy ten hook w ogóle uruchamia się w sesjach aplikacji desktopowej.
 5. **Treść:** tylko jedno zdanie i ścieżka briefu, bez kodu i danych z repozytorium, bo treść trafia do usługi
    zewnętrznej.
+
+## Comments
+
+**2026-10-29, z pilota 10 (przebieg 1, `todo-comments`):** push `PushNotification` o bramce 2 z sesji `/ship`
+z Remote Control `on` dotarł na telefon. To pierwszy taki push po czterech nieudanych testach z 06. Przy triage
+rozważyć, czy problem z 06 był przejściowy i czy fallback jest jeszcze potrzebny, czy tylko dla pytań o zgodę
+(hook `Notification`).

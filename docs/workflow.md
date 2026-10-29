@@ -175,9 +175,9 @@ zmian.
 - Push dociera tylko z sesji z Remote Control `on` i przy włączonych powiadomieniach mobilnych w ustawieniach
   Claude Code (`/config` w terminalowym `claude`). Odpowiedź na bramce 2 przez Remote Control z telefonu
   działa.
-- **Znany problem:** od 2026-10-27 pushe z sesji z Remote Control `on` nie dochodzą na telefon, choć narzędzie
-  odpowiada „Mobile push requested”. Fallback (hook `Notification` i ntfy) czeka jako ticket 12
-  (`needs-triage`); do tego czasu zaglądaj do aplikacji.
+- **Niepewna dostawa:** 2026-10-27 cztery pushe z sesji z Remote Control `on` nie doszły na telefon, choć
+  narzędzie odpowiedziało „Mobile push requested”. 2026-10-29 push o bramce 2 z pilota doszedł. Fallback (hook
+  `Notification` i ntfy) czeka jako ticket 12 (`needs-triage`). Gdy push się spóźnia, zajrzyj do aplikacji.
 - **Pytanie o zgodę w sesji w tle**: aplikacja oznacza sesję jako wymagającą uwagi. Czy to dociera na telefon,
   sprawdzi pilot (ticket 10). Każde takie pytanie to kandydat do allowlisty.
 
