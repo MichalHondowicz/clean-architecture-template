@@ -168,3 +168,20 @@ tę ścieżkę sprawdził przebieg 1):
   - 01 kończy się `done`, potem pauza 5-godzinna do ok. 23:52 i próg 90% przywrócony commitem na gałęzi;
   - 02 `needs-info` w rundzie 1, 03 `done`;
   - koniec bez briefu, potem `wontfix` dla 02 i drugi `/ship`.
+
+**2026-10-29/30, przebieg 2, część 1** (sesja `/ship` na Sonnecie, uruchomiona przez użytkownika o 22:46):
+
+- **Scenariusz (b) przeszedł.** `-Check environment` zaczął się o 22:46:05, Docker Desktop wystartował
+  o 22:46:08, wynik `ok`. Dockera uruchomiła pętla.
+- **01:** `done` w 2 rundach w 9 minut, okno 5-godzinne z 47% do 52%, tydzień z 63% do 64%. Runda 1 znowu
+  odpadła na brakującym dowodzie czerwieni (AC3), tak jak 01 przebiegu 1. Wygląda to na wzorzec rundy 1.
+- **Scenariusz (c), pierwsza połowa przeszła.** Sprawdzenie przed 02: `fiveHour` 52 ≥ 49, więc commit
+  `ship: pause, 5-hour limit`, wiersz pauzy „5-hour until 2026-10-29 23:50” i od 22:56:57
+  `wait-for-reset.ps1` w tle, bez pusha. Próg 90% przywrócony commitem `472370b` na gałęzi o 23:07.
+- **Wznowienie się nie odbyło.** O 23:47:47 Windows Update zrestartował komputer („Operating System: Upgrade
+  (Planned)”), a o 23:48:27 go wyłączył, 3 minuty przed końcem czekania. Komputer wstał o 08:22. Sesja
+  i skrypt zginęły bez pusha. Tracker był spójny: 01 `done`, 02 i 03 `ready-for-agent`, wiersz pauzy
+  (ticket 16). Wznowienie bez udziału użytkownika pozostaje niesprawdzone.
+- **Część 2:** ponowny `/ship todo-comment-count` w checkoucie głównym o 2026-10-30 rano. Sprawdza
+  wznowienie po przerwanym przebiegu i drugi raz scenariusz (b), bo Docker po restarcie nie działa.
+  Limit na starcie: okno 5-godzinne 11%, tydzień 2% (reset tygodniowy 2026-10-30 07:00).
