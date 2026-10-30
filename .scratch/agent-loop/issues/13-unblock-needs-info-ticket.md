@@ -21,3 +21,12 @@ pośrednie”) opisuje to jako lukę.
 - [ ] Opisana i działająca droga od `needs-info` do ponownego `ready-for-agent`: co robi użytkownik (decyzja,
       zmiana statusu, commit na gałęzi w worktree) i od której rundy rusza ticket.
 - [ ] Przewodnik `docs/workflow.md` opisuje tę drogę zamiast luki.
+
+## Comments
+
+**2026-10-30, z pilota 10 (przebieg 2):** pierwsza obserwacja na żywo. Ticket 02 stanął na `needs-info`
+w rundzie 1 (chroniona ścieżka, bez plików rund). Użytkownik odpowiedział w tej samej sesji `/ship`
+„Odblokuj ścieżkę”, bez zmiany statusu i bez nowego `/ship`. Pętla zdjęła ochronę commitem i wysłała
+implementera „Implement ticket 02 retry” znowu jako rundę 1. Ticket wrócił do `needs-info` z innego powodu
+(ticket 18). Działa więc droga „odpowiedź w sesji, która jeszcze żyje”. Droga przez zmianę statusu
+i ponowny `/ship` po trzech rundach pozostaje niesprawdzona.

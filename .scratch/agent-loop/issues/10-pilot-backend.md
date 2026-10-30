@@ -14,10 +14,10 @@ gałęzi i otrzymane powiadomienia.
       (historie 1–8, 57).
 - [x] Scenariusz (a): między bramkami nie pada żadne pytanie o zgodę. Każde pytanie, które się pojawiło,
       zostaje dopisane do allowlisty (historia 12).
-- [ ] Scenariusz (b): Docker zatrzymany przed startem, pętla uruchamia go sama (historia 11).
+- [x] Scenariusz (b): Docker zatrzymany przed startem, pętla uruchamia go sama (historia 11).
 - [ ] Scenariusz (c): próg w pliku DoD tuż nad bieżącym zużyciem daje pauzę i wznowienie bez mojego udziału
       (historie 40, 41).
-- [ ] Scenariusz (d): ticket niemożliwy do zrobienia kończy się `needs-info`, briefem i pushem, a niezależne
+- [x] Scenariusz (d): ticket niemożliwy do zrobienia kończy się `needs-info`, briefem i pushem, a niezależne
       tickety idą dalej (historie 28, 29).
 - [ ] Push przy pytaniu o zgodę w sesji w tle dociera na telefon. Jeśli nie dociera, powstaje ticket na
       fallback (hook `Notification` i ntfy) (historia 46).
@@ -185,3 +185,36 @@ tę ścieżkę sprawdził przebieg 1):
 - **Część 2:** ponowny `/ship todo-comment-count` w checkoucie głównym o 2026-10-30 rano. Sprawdza
   wznowienie po przerwanym przebiegu i drugi raz scenariusz (b), bo Docker po restarcie nie działa.
   Limit na starcie: okno 5-godzinne 11%, tydzień 2% (reset tygodniowy 2026-10-30 07:00).
+
+**2026-10-30, przebieg 2, część 2** (ta sama sesja `/ship`, nie nowa; log
+`63929aae-d4c3-411d-b7d1-3875dc710b35.jsonl` w projekcie sandboxa):
+
+- **Wznowienie.** Po starcie aplikacji sesja dostała o 08:41:53 powiadomienie, że `wait-for-reset.ps1` „didn't
+  finish before the previous session ended”. Pętla ruszyła dalej dopiero po pytaniu użytkownika „jak status?”
+  o 08:42:06: sprawdziła limit (11%, 2%) i od razu wysłała implementera 02. Sama się nie wznowiła, a `/ship`
+  nie trzeba było uruchamiać od nowa: wystarczyła wiadomość w starej sesji (ticket 16).
+- **Scenariusz (d) przeszedł.** 02: hook odrzucił zapis w `tests/ArchitectureTests`, implementer zgłosił
+  `stuck` w rundzie 1, a pętla od razu ustawiła `needs-info` bez rund 2 i 3 (08:42–08:43). Brief jest dobry:
+  gotowy kod testu, plan dowodu red i trzy opcje. Push „ticket 02 needs info (protected path …)” poszedł
+  o 08:43:16. Nie wiadomo, czy dotarł jako powiadomienie (ticket 12). Niezależny 03 poszedł dalej.
+- **03:** `done` w 7 minut, okno 5-godzinne z 14% do 20%. Po wznowieniu pętla nie sprawdziła środowiska
+  i implementer rundy 1 pracował bez Dockera: 33 z 34 testów integracyjnych padło, więc zgłosił `stuck`.
+  Zgodnie z regułą „`STATUS: stuck` w rundzie 1 lub 2 → od razu runda 3 na Opusie” poprawkę zrobił Opus.
+  Dopiero sprawdzenie po raporcie (08:46:05) uruchomiło Dockera (start 08:46:08). Scenariusz (b) z części 1
+  działa na starcie przebiegu, ale nie po wznowieniu: problem środowiska kosztował rundę na Opusie (ticket 17).
+- **Koniec bez briefu** (2 `done`, 1 `needs-info`), tak jak zakładał plan. Suma: 16 minut, okno +14%,
+  tydzień +2%.
+- **Odejście od planu: „Odblokuj ścieżkę” (10:55).** Zamiast `wontfix` użytkownik wybrał w sesji `/ship`
+  opcję z briefu. Pętla zdjęła `tests/ArchitectureTests/**` z `protectedPaths` (`ebae9d9`), a implementer
+  dopisał test z dowodem red (`caed067`). Definicja done była jednak czerwona, bo
+  `HookTests.ProtectedPathsGuardTests` sprawdza, że guard blokuje właśnie `LayerTests.cs` (82/83).
+  Po przywróceniu ochrony `check-diff` oznaczyłby zmianę chronionej ścieżki. Pętla przywróciła `dod.json`
+  (`5e9b92a`), cofnęła test (`aff5857`), wróciła do `needs-info` i wysłała push (10:59:59). Brief z rana
+  proponował więc opcję, która w tym repozytorium nie może przejść (ticket 18). Ponowna próba ruszyła od
+  rundy 1 (ticket 13). W metrykach jest to wiersz „02 needs-info, resumed”: 3 minuty, okno z 29% do 33%,
+  tydzień z 4% do 5%. Suma całego przebiegu 2: 19 minut, okno +18%, tydzień +3%.
+- **Decyzja użytkownika: 02 `wontfix`** (commit `52661c4` na `feat/todo-comment-count`). Netto gałąź
+  zmienia tylko `dod.json` z 49% na 90% względem `main`. Przegląd brancha nie uruchamia `check-diff`.
+- **Scenariusz (c) zostaje otwarty:** pauza zadziałała, ale wznowienie bez udziału użytkownika nie zostało
+  sprawdzone.
+- **Następny krok:** drugi `/ship todo-comment-count` sprawdzi przegląd brancha, brief i bramkę 2.

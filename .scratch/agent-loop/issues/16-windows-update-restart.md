@@ -22,3 +22,12 @@ nie chroni przed restartem aktualizacji.
       restartu przed startem albo w czekaniu) albo świadoma decyzja, że jej nie ma.
 - [ ] Przewodnik `docs/workflow.md` mówi, że restart systemu, tak jak restart aplikacji, wymaga ponownego
       `/ship <feature>`, i jak go rozpoznać rano.
+
+## Comments
+
+**2026-10-30, wznowienie po restarcie:** ponowny `/ship` nie był potrzebny. Po starcie aplikacji stara sesja
+dostała o 08:41:53 powiadomienie „Background shell command didn't finish before the previous session ended”
+o `wait-for-reset.ps1`, ale sama nic nie zrobiła. Ruszyła dopiero po wiadomości użytkownika „jak status?”
+(08:42:06): sprawdziła limit i wróciła do kolejnego ticketu. Przy wznowieniu pominęła sprawdzenie
+środowiska (ticket 17). Drugie kryterium powinno więc opisywać obie drogi: wiadomość w starej sesji albo
+`/ship <feature>` w nowej.
