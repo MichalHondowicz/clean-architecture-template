@@ -2,7 +2,8 @@
 # Usage, inside the repository: pwsh -File run-dod.ps1 -Check environment|commands [-TimeoutSeconds 300]
 #                               pwsh -File run-dod.ps1 -Check quota -FiveHourPercent <n> -WeeklyPercent <n>
 #   environment: every environment check; a failing check with a `start` command is started, then re-checked
-#                until it passes or the timeout runs out.
+#                until it passes or the timeout runs out. Also prints "started":[name] with the checks it started,
+#                so /ship knows the environment was down before this check.
 #   commands:    the DoD commands in order, stopping at the first failure; also prints "passed":[{"name","output"}]
 #                with the last 20 lines of each command that passed.
 #   quota:       the plan usage /ship read, against the thresholds in `quota`, all percentages from 0 to 100;
@@ -40,6 +41,7 @@ if ($problems) {
 
 $failed = [Collections.Generic.List[object]]::new()
 $passed = [Collections.Generic.List[object]]::new()
+$started = [Collections.Generic.List[string]]::new()
 
 # /ship copies a passing command's summary (the test counts) from its last lines into the feature's brief.
 $PassedOutputTailLines = 20
@@ -95,6 +97,7 @@ try {
             $result = Invoke-DodStep $environmentCheck
             if ($result.ExitCode -ne 0 -and $environmentCheck.start) {
                 Invoke-DodStep ([pscustomobject]@{ run = $environmentCheck.start }) | Out-Null
+                $started.Add($environmentCheck.name)
                 $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
                 do {
                     $result = Invoke-DodStep $environmentCheck
@@ -131,6 +134,9 @@ finally {
 $report = [ordered]@{ ok = $failed.Count -eq 0; failed = @($failed) }
 if ($Check -eq 'commands') {
     $report.passed = @($passed)
+}
+else {
+    $report.started = @($started)
 }
 $report | ConvertTo-Json -Depth 5 -Compress
 exit ($failed.Count -eq 0 ? 0 : 1)

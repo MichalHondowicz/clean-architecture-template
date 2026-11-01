@@ -28,6 +28,43 @@ public sealed class RunDodTests
     }
 
     [Fact]
+    public async Task RunDod_Should_ReportTheStartedCheck_WhenItHadToBeStarted()
+    {
+        // Arrange
+        using var repository = DodRepository.Create(
+            [DodRepository.Command("build", "exit 0")],
+            environmentChecks:
+            [
+                DodRepository.Check("docker", "if (Test-Path 'started.txt') { exit 0 } else { exit 1 }", "New-Item 'started.txt'"),
+                DodRepository.Check("database", "exit 0", "New-Item 'database-started.txt'")
+            ]);
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "environment", "-TimeoutSeconds", "20");
+
+        // Assert
+        result.ExitCode.ShouldBe(0);
+        Output(result).GetProperty("started").EnumerateArray().Select(name => name.GetString()).ShouldBe(["docker"]);
+    }
+
+    [Fact]
+    public async Task RunDod_Should_ReportNothingStarted_WhenEveryCheckAlreadyPasses()
+    {
+        // Arrange
+        using var repository = DodRepository.Create(
+            [DodRepository.Command("build", "exit 0")],
+            environmentChecks: [DodRepository.Check("docker", "exit 0", "New-Item 'started.txt'")]);
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "environment");
+
+        // Assert
+        result.ExitCode.ShouldBe(0);
+        Output(result).GetProperty("started").GetArrayLength().ShouldBe(0);
+        File.Exists(repository.PathOf("started.txt")).ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task RunDod_Should_ReportEnvironmentFailure_WhenCheckStillFailsAfterStart()
     {
         // Arrange
