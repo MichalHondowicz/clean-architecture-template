@@ -227,6 +227,12 @@ zmian.
   na gałęzi w worktree, bo niezacommitowaną zmianę `/ship` zestashuje) nie jest jeszcze opisane w skillu.
   Ticket po trzech rundach ma trzy pliki findings, więc `/ship` uzna go od razu znowu za `stuck`. Drogę ustali
   pilot (ticket 10) albo ticket 13.
+- **Ticket na chronionej ścieżce** (`protectedPaths` w `dod.json`, np. `tests/ArchitectureTests/**`): pętla
+  takiej zmiany nie zrobi, a zdjęcie ochrony na czas ticketu nie działa, bo `HookTests` przypinają ścieżki
+  do guarda, a `check-diff` i tak oznaczy zmianę (pilot 10, ticket 18). Brief `needs-info` daje dwie drogi:
+  zrób zmianę ręcznie w worktree ficzera (planowana zmiana jest w briefie), zacommituj ją, ustaw ticket
+  na `done` i wpisz `/ship <feature>` jeszcze raz; albo ustaw `wontfix` i zrób zmianę poza ficzerem, przed
+  `/ship` albo po scaleniu.
 - **Ponowne review gałęzi**: usuń w commicie na gałęzi `brief.md` i `findings/branch-*.md`, potem `/ship`.
 - **Przerwana bramka 2**: decyzja jest zapisana w briefie. Dopóki `main` nie zawiera gałęzi, kolejny `/ship`
   pyta jeszcze raz („OK” liczy się tylko w sesji, która scala). Gdy `main` już ją zawiera, `/ship <feature>`
