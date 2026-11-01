@@ -5,11 +5,10 @@ i po wznowieniu przerwanego przebiegu. Problem środowiska nie zużywa rundy ani
 
 **Blocked by:** None
 
-**Seams:** do ustalenia przy triage (możliwe: `ship/SKILL.md` w forku, krok „Check environment” przed każdym
-wysłaniem implementera albo po każdym wznowieniu; reguła rund, która `stuck` z powodu środowiska liczy
-inaczej niż `stuck` z powodu kodu; obserwacja w kolejnym przebiegu z zatrzymanym Dockerem).
+**Seams:** `ship/SKILL.md` w forku (krok „Check environment” przed każdym wysłaniem implementera; reguła rund
+dla `stuck` z powodu środowiska); obserwacja w kolejnym przebiegu z zatrzymanym Dockerem (ticket 19).
 
-**Status:** needs-triage
+**Status:** ready-for-agent
 
 **Skąd:** pilot 10, przebieg 2, część 2 (`todo-comment-count`, 2026-10-30). `/ship` sprawdził środowisko
 na starcie przebiegu (22:46, Docker uruchomiony przez pętlę) oraz po każdym raporcie implementera. Po
@@ -19,6 +18,14 @@ testów integracyjnych padło, więc zgłosił `STATUS: stuck`. Reguła „`stuc
 runda 3 na Opusie” wysłała poprawkę do Opusa. Dopiero sprawdzenie po raporcie (08:46:05) uruchomiło
 Dockera. Ticket skończył się `done`, ale problem środowiska kosztował rundę 3 na Opusie.
 
-- [ ] Przed każdym wysłaniem implementera (albo przynajmniej po każdej pauzie i wznowieniu) `/ship` sprawdza
-      środowisko i uruchamia to, czego brakuje.
-- [ ] Implementer, który zgłasza `stuck` tylko z powodu środowiska, nie zużywa rundy i nie podnosi modelu.
+- [ ] Przed każdym wysłaniem implementera `/ship` sprawdza środowisko i uruchamia to, czego brakuje.
+- [ ] Gdy sprawdzenie po raporcie implementera musiało coś uruchomić, `/ship` powtarza tę samą rundę na tym
+      samym modelu. Ta powtórka nie liczy się do trzech rund i nie podnosi modelu do Opusa.
+- [ ] Wersja forka podbita.
+
+## Comments
+
+**2026-11-01, triage (decyzja użytkownika):** `ready-for-agent`, pierwszy w kolejce 17 → 16 → 14 → 18 → 13 → 15
+→ 12. Sprawdzenie przed każdym implementerem zamiast „tylko po wznowieniu”, bo jest prostsze i pokrywa oba
+przypadki. Tickety 17, 14, 18 i 13 zmieniają ten sam `ship/SKILL.md` (14: `plan-feature/SKILL.md`), więc idą
+po kolei.

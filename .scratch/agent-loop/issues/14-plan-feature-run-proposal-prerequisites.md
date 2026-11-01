@@ -5,10 +5,9 @@ uruchamiać ani włączać, co `/ship` robi sam albo co aplikacja ustawia sama.
 
 **Blocked by:** None
 
-**Seams:** do ustalenia przy triage (zmiana w forku: `plan-feature/SKILL.md`, krok 9; obserwacja w kolejnym
-przebiegu `/plan-feature`).
+**Seams:** `plan-feature/SKILL.md` w forku, krok 9; obserwacja w kolejnym przebiegu `/plan-feature`.
 
-**Status:** needs-triage
+**Status:** ready-for-agent
 
 **Skąd:** pilot 10, przebieg 1 (`todo-comments`, 2026-10-29). Na koniec `/plan-feature` napisał „Testy
 integracyjne potrzebują działającego Dockera” i „Remote Control włącz w niej sam”. Krok 9 skilla żadnego z tych
@@ -19,5 +18,12 @@ Zdanie o Remote Control przeczy przewodnikowi: ustawienie aplikacji „Connect n
 
 - [ ] Krok 9 `plan-feature/SKILL.md` mówi, że środowisko (`environmentChecks`) przygotowuje `/ship`, i nie
       każe go przygotowywać użytkownikowi.
-- [ ] Remote Control: komunikat podaje tylko, że sesja `/ship` potrzebuje go włączonego, bez polecenia
-      włączenia, gdy aplikacja robi to sama. Treść do ustalenia przy triage.
+- [ ] Remote Control: komunikat mówi, że aplikacja łączy nową sesję sama (ustawienie „Connect new sessions to
+      Remote Control”), a użytkownik sprawdza tylko plakietkę Remote Control w sesji `/ship`. Bez polecenia
+      włączenia.
+- [ ] Wersja forka podbita.
+
+## Comments
+
+**2026-11-01, triage (decyzja użytkownika):** `ready-for-agent`, trzeci w kolejce. Treść zdania o Remote
+Control ustalona jak w drugim kryterium.

@@ -5,10 +5,10 @@ mogą się skończyć `done`, albo mówi, że zmiana jest możliwa wyłącznie r
 
 **Blocked by:** None
 
-**Seams:** do ustalenia przy triage (możliwe: `ship/SKILL.md` w forku, sekcja briefu `needs-info`; opis
-w `docs/workflow.md`; związek z ticketem 13).
+**Seams:** `ship/SKILL.md` w forku (brief `needs-info`); przewodnik `docs/workflow.md`; obserwacja przy
+następnym tickecie zatrzymanym na chronionej ścieżce.
 
-**Status:** needs-triage
+**Status:** ready-for-agent
 
 **Skąd:** pilot 10, przebieg 2, część 2 (`todo-comment-count`, 2026-10-30). Ticket 02 (test architektury
 w `tests/ArchitectureTests`) dostał `needs-info` z trzema opcjami: użytkownik dopisuje test sam, zdejmuje
@@ -20,7 +20,15 @@ ochronie `check-diff.ps1` oznaczyłby zmianę chronionej ścieżki, a takiego we
 Obie drogi przez pętlę są zamknięte, więc druga i trzecia opcja z briefu nie mogły zadziałać. Kosztowało
 to jeden przebieg implementera (3 minuty, okno 5-godzinne z 29% do 33%) i trzy commity do cofnięcia.
 
-- [ ] Brief `needs-info` z powodu chronionej ścieżki nie proponuje zdjęcia ochrony, dopóki testy repozytorium
-      (tu `HookTests`) przypinają tę ścieżkę do guarda. Albo wymienia tę zależność wprost.
+- [ ] Brief `needs-info` z powodu chronionej ścieżki nie proponuje zdjęcia ochrony ani dopuszczenia zmiany
+      tej ścieżki przez pętlę. Podaje dwie drogi: zmiana ręcznie, poza pętlą (z planowaną zmianą w briefie),
+      albo `wontfix`.
 - [ ] Przewodnik `docs/workflow.md` mówi, jak zrobić zmianę chronionej ścieżki: ręcznie, poza pętlą, przed
       albo po `/ship`, albo przez `wontfix`.
+- [ ] Wersja forka podbita.
+
+## Comments
+
+**2026-11-01, triage (decyzja użytkownika):** `ready-for-agent`, czwarty w kolejce. Ochrona chronionych ścieżek
+w pętli się nie zmienia. Zdjęcie ochrony na czas ticketu nie jest drogą, bo `HookTests` przypinają ścieżki
+do guarda, a `check-diff` i tak oznaczy zmianę.

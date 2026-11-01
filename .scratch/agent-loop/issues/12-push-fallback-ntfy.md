@@ -8,9 +8,9 @@
 **Blocked by:** None
 
 **Seams:** skrypt `notify.ps1` testowany jako proces w `tests/HookTests`, z lokalnym serwerem HTTP zamiast ntfy.
-Rejestrację hooka i wywołania w `/ship` sprawdza pilot (ticket 10).
+Rejestrację hooka i wywołania w `/ship` sprawdza następny prawdziwy przebieg (ticket 19).
 
-**Status:** needs-triage
+**Status:** ready-for-agent
 
 **Skąd:**
 - Ticket 06: testy pusha po przebiegu C, 2026-10-27. Narzędzie cztery razy odpowiedziało „Mobile push requested”,
@@ -52,3 +52,17 @@ Rejestrację hooka i wywołania w `/ship` sprawdza pilot (ticket 10).
 z Remote Control `on` znowu nie przyszedł jako powiadomienie systemowe. Narzędzie odpowiedziało „Mobile push
 requested”, a wiadomość była widoczna dopiero po otwarciu aplikacji Claude na telefonie. Piąty push z rzędu bez
 powiadomienia, więc fallback jest nadal potrzebny.
+
+**2026-11-01, triage (decyzja użytkownika):** `ready-for-agent`, ostatni w kolejce (największy). Odpowiedzi na
+pytania z „Do rozstrzygnięcia przy triage”:
+
+1. **Serwer:** publiczny ntfy.sh z losowym tematem o długości co najmniej 24 znaków. Treść to jedno zdanie bez
+   kodu, więc własny serwer na Dokploy nie jest potrzebny.
+2. **Adres:** pełny adres tematu w zmiennej środowiskowej użytkownika `CLAUDE_NTFY_URL`, poza repozytorium.
+   Bez zmiennej skrypt nic nie wysyła (AC2).
+3. **`PushNotification`:** zostaje obok ntfy. Dwa powiadomienia, gdy oba działają, są akceptowalne.
+4. **Hook `Notification`:** tylko matcher `permission_prompt`. Bramkę 2, `needs-info`, limit tygodniowy
+   i awarię środowiska pokrywa `/ship`, który sam woła `notify.ps1` (AC4). Pierwszy krok ticketu: sprawdzić,
+   czy hook `Notification` w ogóle uruchamia się w sesjach aplikacji desktopowej. Jeśli nie, AC5 przechodzi
+   do ticketu 19 jako obserwacja, a reszta ticketu idzie bez niego.
+5. **Treść:** jedno zdanie i ścieżka briefu, bez kodu i danych z repozytorium.
