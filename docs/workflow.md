@@ -48,7 +48,7 @@ projekcie od razu. Per projekt trzeba dołożyć to, z czego skille procesu czyt
 | `.claude/settings.json` z allowlistą komend | mniej pytań o zgodę przy buildzie i testach |
 | tylko dla pętli: `docs/agents/dod.json` | DoD projektu: sprawdzenia środowiska, komendy buildu i testów, chronione ścieżki, nazwa roli implementera, progi limitu, skill standardów |
 | tylko dla pętli: `docs/agents/implementer-contract.md` | wejście, wyjście i zakazy implementera, niezależne od modelu |
-| tylko dla pętli: `.claude/hooks/` i ich rejestracja w `.claude/settings.json` | `run-dod.ps1`, `check-diff.ps1`, `wait-for-reset.ps1`, `check-reboot.ps1`, `dod-gate.ps1` (`SubagentStop`), `guard-protected-paths.ps1` (`PreToolUse`) i wspólny `dod-common.ps1`, który cztery z nich wczytują; hooki rejestruje projekt, bo Claude Code ignoruje hooki we frontmatterze agentów z pluginu |
+| tylko dla pętli: `.claude/hooks/` i ich rejestracja w `.claude/settings.json` | `run-dod.ps1`, `check-diff.ps1`, `wait-for-reset.ps1`, `check-reboot.ps1`, `notify.ps1` (też hook `Notification`), `dod-gate.ps1` (`SubagentStop`), `guard-protected-paths.ps1` (`PreToolUse`) i wspólny `dod-common.ps1`, który cztery z nich wczytują; hooki rejestruje projekt, bo Claude Code ignoruje hooki we frontmatterze agentów z pluginu |
 | tylko dla pętli: wpisy allowlisty `/ship` | `git worktree`, `git switch`, `git merge --ff-only`, dokładnie `git push origin main`, a dla bramki 2 także `git fetch origin`, `git fetch . feat/*:main` i `git update-ref -d refs/heads/feat/*`; do tego skrypty z `.claude/hooks/`. Pełny wzór (Bash i PowerShell) w `.claude/settings.json` tego template'u |
 
 Wdrożenie: jedna sesja otwarta w katalogu projektu, na osobnej gałęzi (np. `chore/agent-workflow`).
@@ -168,19 +168,32 @@ zmian.
 
 ## Powiadomienia
 
-- **Push na telefon** z aplikacji Claude przy pięciu zdarzeniach: ficzer gotowy do bramki 2, ticket
-  `needs-info`, awaria środowiska (Docker, build bazowy), pauza do resetu tygodniowego i czerwone CI po
-  scaleniu (bez cofania czegokolwiek). Treść to jedno zdanie i wskazanie briefu; pełny brief leży
-  w `.scratch/<feature>/`.
+- **Push na telefon** z aplikacji Claude przy sześciu zdarzeniach: ficzer gotowy do bramki 2, ticket
+  `needs-info`, awaria środowiska (Docker, build bazowy), pauza do resetu tygodniowego, oczekujący restart
+  Windows i czerwone CI po scaleniu (bez cofania czegokolwiek). Treść to jedno zdanie i wskazanie briefu;
+  pełny brief leży w `.scratch/<feature>/`. Każdy taki push idzie też przez ntfy (niżej), jeśli go ustawisz.
 - Push dociera tylko z sesji z Remote Control `on` i przy włączonych powiadomieniach mobilnych w ustawieniach
   Claude Code (`/config` w terminalowym `claude`). Odpowiedź na bramce 2 przez Remote Control z telefonu
   działa.
 - **Znany problem:** od 2026-10-27 pushe z sesji z Remote Control `on` nie przychodzą jako powiadomienie
   na telefonie, choć narzędzie odpowiada „Mobile push requested”. Wiadomość widać dopiero po otwarciu aplikacji
-  Claude (pilot 10, 2026-10-29). Fallback (hook `Notification` i ntfy) czeka jako ticket 12 (`needs-triage`);
-  do tego czasu zaglądaj do aplikacji.
-- **Pytanie o zgodę w sesji w tle**: aplikacja oznacza sesję jako wymagającą uwagi. Czy to dociera na telefon,
-  sprawdzi pilot (ticket 10). Każde takie pytanie to kandydat do allowlisty.
+  Claude (pilot 10, 2026-10-29). Dlatego jest fallback przez ntfy.
+- **Fallback ntfy** (`.claude/hooks/notify.ps1`): `/ship` wysyła tę samą linię do Twojego tematu ntfy, a hook
+  `Notification` wysyła tam pytanie o zgodę z sesji. Ustawienie, raz na komputer:
+  1. Wymyśl losowy temat o długości co najmniej 24 znaków. Na publicznym ntfy.sh temat jest sekretem tylko
+     przez swoją nazwę: kto ją zna, czyta treść. Dlatego treść to jedno zdanie bez kodu.
+  2. Zapisz pełny adres w zmiennej użytkownika (poza repozytorium), np.
+     `[Environment]::SetEnvironmentVariable('CLAUDE_NTFY_URL', 'https://ntfy.sh/<temat>', 'User')`, i uruchom
+     aplikację Claude od nowa, żeby sesje ją widziały. Bez zmiennej skrypt nic nie wysyła i nie przeszkadza.
+  3. W aplikacji ntfy na telefonie zasubskrybuj ten temat na serwerze `ntfy.sh`.
+  4. Sprawdź: `pwsh -NoProfile -File .claude/hooks/notify.ps1 -Message "test"` powinien dać `{"sent":true}`
+     i powiadomienie na telefonie.
+  5. W `.claude/settings.json` dopisz sam (tryb auto blokuje agentowi edycję tego pliku) hook i allowlistę,
+     tak jak w tickecie 12 `.scratch/agent-loop/issues/12-push-fallback-ntfy.md`.
+- **Pytanie o zgodę w sesji w tle**: aplikacja oznacza sesję jako wymagającą uwagi, a hook `Notification`
+  z matcherem `permission_prompt` wysyła je przez ntfy po około 6 sekundach (aplikacja desktopowa od Claude
+  Code v2.1.233). Czy dociera, sprawdzi następny przebieg (ticket 19). Każde takie pytanie to kandydat do
+  allowlisty.
 
 ## Limity
 

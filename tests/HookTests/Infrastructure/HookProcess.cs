@@ -16,11 +16,23 @@ public static class HookProcess
     public static Task<HookResult> RunScriptAsync(string scriptName, string workingDirectory, params string[] arguments) =>
         RunCoreAsync(scriptName, inputJson: string.Empty, workingDirectory, arguments);
 
+    /// <summary>
+    /// Runs a script with the given environment variables set, or removed where the value is null, and the
+    /// given stdin, so a test never depends on what the machine running it has set.
+    /// </summary>
+    public static Task<HookResult> RunWithEnvironmentAsync(
+        string scriptName,
+        IReadOnlyDictionary<string, string?> environment,
+        string inputJson,
+        params string[] arguments) =>
+        RunCoreAsync(scriptName, inputJson, Path.GetTempPath(), arguments, environment);
+
     private static async Task<HookResult> RunCoreAsync(
         string scriptName,
         string inputJson,
         string? workingDirectory,
-        string[] arguments)
+        string[] arguments,
+        IReadOnlyDictionary<string, string?>? environment = null)
     {
         var startInfo = new ProcessStartInfo("pwsh")
         {
@@ -37,6 +49,17 @@ public static class HookProcess
         foreach (string argument in arguments)
         {
             startInfo.ArgumentList.Add(argument);
+        }
+        foreach ((string name, string? value) in environment ?? new Dictionary<string, string?>())
+        {
+            if (value is null)
+            {
+                startInfo.Environment.Remove(name);
+            }
+            else
+            {
+                startInfo.Environment[name] = value;
+            }
         }
 
         using Process process = Process.Start(startInfo)
