@@ -218,3 +218,31 @@ tę ścieżkę sprawdził przebieg 1):
 - **Scenariusz (c) zostaje otwarty:** pauza zadziałała, ale wznowienie bez udziału użytkownika nie zostało
   sprawdzone.
 - **Następny krok:** drugi `/ship todo-comment-count` sprawdzi przegląd brancha, brief i bramkę 2.
+
+**2026-10-30, przebieg 2, część 3: przegląd brancha i bramka 2** (znowu ta sama sesja `/ship`: użytkownik
+odpowiedział w niej „Odrzuć ticket 02” o 11:26, gdy `wontfix` był już zacommitowany):
+
+- **Przegląd brancha** (11:26–11:33, 7 minut). Limit 39% / 6%, Standards i Spec na Opusie równolegle.
+  Spec: pass, 6 user stories pokryte. Standards: 2 nazwy testów handlerów bez `_When{Condition}`. Runda
+  brancha 1: implementer zmienił nazwy, ship poprawił odwołania w ticketach 01 i 03 (kontrakt zabrania tego
+  implementerowi), sprawdzenie środowiska, weryfikator i re-review Standards: pass. Finding poza zakresem
+  trafił do nowego ticketu sandboxa 04 (`needs-triage`).
+- **Brief** (`bbf1f99`) jest rzetelny: testy 6/91/34/83, `wontfix` dla 02, a w „Uncertain” zdjęcie ochrony
+  z revertem (netto zero), różnica progu w `dod.json` (opisana jako commity pilota, nie ship), runda 3
+  na Opusie przy 03 z powodu środowiska, pauza. Dwie propozycje konwencji: (1) skorelowane podzapytanie
+  `Count(...)` w projekcji zostaje inline; (2) checklista `ca-review` wymaga `_When{Condition}` w nazwach
+  testów handlerów.
+- **Bramka 2.** Push „ready for gate 2” o 11:33:58, odpowiedź „OK, 1 tak, 2 tak” o 11:34:33. Potem
+  `git fetch`, sprawdzenie przodka, `git merge --ff-only` (checkout był na `main`), `git push origin main`
+  (11:35:16), usunięcie worktree i `git update-ref -d` gałęzi. Commit `d64be66` „ship: gate 2,
+  conventions 1, 2” dopisał obie reguły dosłownie jak w briefie. `main` i `origin/main` = `d64be66`.
+  Między bramkami nie było pytania o zgodę.
+- **Pomiar przebiegu 2 w całości** (z `metrics.md`): 26 minut pracy, 7 rund (z próbą „resumed” dla 02),
+  tydzień +4%. Okno 5-godzinne zresetowało się w trakcie przeglądu brancha (39% → 4%), więc suma okna
+  „+18%*” nie obejmuje przeglądu.
+- **Powtórny `/ship` po merge** (nowa sesja, 13:34): pętla rozpoznała, że gałęzi już nie ma, a brief
+  z `## Decision` jest na `main`. Nic nie budowała, tylko zgłosiła stan. Ponowne uruchomienie po merge
+  jest więc bezpieczne.
+- **Zostaje otwarte:** scenariusz (c), czyli wznowienie bez udziału użytkownika (w obu przebiegach ruszało
+  po wiadomości użytkownika), oraz punkt o pushu przy pytaniu o zgodę (w trzech przebiegach pilota nie padło
+  ani jedno takie pytanie).
