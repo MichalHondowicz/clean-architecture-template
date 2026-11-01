@@ -48,7 +48,7 @@ projekcie od razu. Per projekt trzeba dołożyć to, z czego skille procesu czyt
 | `.claude/settings.json` z allowlistą komend | mniej pytań o zgodę przy buildzie i testach |
 | tylko dla pętli: `docs/agents/dod.json` | DoD projektu: sprawdzenia środowiska, komendy buildu i testów, chronione ścieżki, nazwa roli implementera, progi limitu, skill standardów |
 | tylko dla pętli: `docs/agents/implementer-contract.md` | wejście, wyjście i zakazy implementera, niezależne od modelu |
-| tylko dla pętli: `.claude/hooks/` i ich rejestracja w `.claude/settings.json` | `run-dod.ps1`, `check-diff.ps1`, `wait-for-reset.ps1`, `dod-gate.ps1` (`SubagentStop`), `guard-protected-paths.ps1` (`PreToolUse`) i wspólny `dod-common.ps1`, który cztery z nich wczytują; hooki rejestruje projekt, bo Claude Code ignoruje hooki we frontmatterze agentów z pluginu |
+| tylko dla pętli: `.claude/hooks/` i ich rejestracja w `.claude/settings.json` | `run-dod.ps1`, `check-diff.ps1`, `wait-for-reset.ps1`, `check-reboot.ps1`, `dod-gate.ps1` (`SubagentStop`), `guard-protected-paths.ps1` (`PreToolUse`) i wspólny `dod-common.ps1`, który cztery z nich wczytują; hooki rejestruje projekt, bo Claude Code ignoruje hooki we frontmatterze agentów z pluginu |
 | tylko dla pętli: wpisy allowlisty `/ship` | `git worktree`, `git switch`, `git merge --ff-only`, dokładnie `git push origin main`, a dla bramki 2 także `git fetch origin`, `git fetch . feat/*:main` i `git update-ref -d refs/heads/feat/*`; do tego skrypty z `.claude/hooks/`. Pełny wzór (Bash i PowerShell) w `.claude/settings.json` tego template'u |
 
 Wdrożenie: jedna sesja otwarta w katalogu projektu, na osobnej gałęzi (np. `chore/agent-workflow`).
@@ -192,8 +192,9 @@ zmian.
   sama, bez pusha. Wyjątek: gdy dwa czekania z rzędu nie zwolniły okna, trzeciego nie ma. To awaria
   środowiska (`5-hour window`) z pushem.
 - **Limit tygodniowy**: pauza w `metrics.md`, jeden push z godziną resetu i czyste zakończenie sesji. Po
-  resecie wpisujesz `/ship <feature>` sam. To samo po restarcie aplikacji w trakcie czekania na okno
-  5-godzinne: czekająca sesja nie przeżywa restartu.
+  resecie wpisujesz `/ship <feature>` sam.
+- **Restart w trakcie czekania** (aplikacji albo systemu): czekanie na okno 5-godzinne nie przeżywa restartu.
+  Jak wznowić, opisuje „Wznawianie i stany pośrednie”.
 - Wznawianie przez zadania zaplanowane aplikacji nie działa: zadanie nie rozwija komendy tylko dla
   człowieka, startuje na modelu sesji, która je utworzyła, i nie trzyma komputera w czuwaniu.
 - **Pomiar**: `.scratch/<feature>/metrics.md`, wiersz na ticket (zużycie obu okien na starcie i końcu, rundy,
@@ -205,10 +206,21 @@ zmian.
 - **Gdzie jest stan.** Do scalenia tickety, ich `## Comments`, `brief.md`, `metrics.md` i pliki findings leżą
   w commitach gałęzi `feat/<feature>`, w worktree `.claude/worktrees/<feature>`. W głównym checkoucie
   `.scratch/<feature>/` ich nie ma: przy komputerze zaglądasz do worktree.
-- **Przerwany przebieg** (zamknięty laptop, restart aplikacji, limit tygodniowy): `/ship <feature>` w głównym
+- **Przerwany przebieg** (zamknięty laptop, restart aplikacji lub systemu, limit tygodniowy): `/ship <feature>` w głównym
   checkoucie. Ticket `in-progress` idzie pierwszy, od następnej rundy (rundy liczą pliki findings), na bazie
   z commita `ship: start <NN>`. Niezacommitowane resztki w worktree bez ticketu `in-progress` idą do stasha
   `ship: leftovers`, nazwanego w raporcie.
+- **Restart systemu w nocy** (aktualizacja Windows). Utrzymywanie komputera w czuwaniu nie chroni przed
+  restartem po aktualizacji, a godziny aktywne też nie: w pilocie 10 restart „Upgrade (Planned)” przyszedł
+  o 23:47, w godzinach aktywnych 18:00–0:00. Dlatego `/ship` na starcie i przed czekaniem na okno uruchamia
+  `check-reboot.ps1`, a gdy Windows czeka na restart, wysyła push z ostrzeżeniem i pracuje dalej. Po takim
+  pushu przed dłuższym przebiegiem lepiej zrestartować komputer samemu.
+  - **Jak to rozpoznać rano:** sesja `/ship` ma komunikat „Background shell command didn't finish before the
+    previous session ended”, ostatni wiersz `metrics.md` w worktree to pauza bez kolejnego ticketu, a log
+    systemu pokazuje restart: `Get-WinEvent -FilterHashtable @{LogName='System'; Id=1074} -MaxEvents 3`.
+  - **Jak wznowić:** napisz dowolną wiadomość w tej samej sesji `/ship` (np. „jak status?”). Pętla sprawdzi
+    limit i środowisko i pójdzie dalej (pilot 10). Albo wpisz `/ship <feature>` w nowej sesji w głównym
+    checkoucie. Obie drogi wznawiają z trackera.
 - **Po `needs-info`**: gdy choć jeden ticket ficzera nie jest `done` (nie liczą się `needs-triage`
   i `wontfix`), przebieg kończy się bez review gałęzi, briefu i bramki 2. Ticket zachowuje swoje cofnięte
   commity w historii i stash nazwany w briefie. Odblokowanie (decyzja, przywrócenie `ready-for-agent`, commit
