@@ -3,7 +3,8 @@
 # before it starts and before it waits instead of relying on them.
 # Usage: pwsh -File check-reboot.ps1 [-KeysRoot <path>]
 #   -KeysRoot: where the restart keys live; the registry by default, a folder in the tests.
-# Prints {"pending":bool,"keys":[key]}; exits 1 when a restart is pending, 0 otherwise (also off Windows).
+# Prints {"pending":bool,"keys":[key]}; exits 1 when a restart is pending, 0 otherwise (also off Windows), and 2
+# when the check itself failed, so a failure never reads as a pending restart.
 
 param(
     [string]$KeysRoot = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion'
@@ -18,10 +19,16 @@ $restartKeys = @(
 
 # Not Join-Path: off Windows it throws on the missing HKLM drive, where Test-Path just answers false.
 $separator = [IO.Path]::DirectorySeparatorChar
-$pendingKeys = @($restartKeys | Where-Object {
-        $path = (@($KeysRoot.TrimEnd('\', '/')) + ($_ -split '\\')) -join $separator
-        Test-Path -LiteralPath $path
-    })
+try {
+    $pendingKeys = @($restartKeys | Where-Object {
+            $path = (@($KeysRoot.TrimEnd('\', '/')) + ($_ -split '\\')) -join $separator
+            Test-Path -LiteralPath $path
+        })
+}
+catch {
+    [Console]::Error.WriteLine("Cannot read the restart keys under ${KeysRoot}: $_")
+    exit 2
+}
 
 [ordered]@{ pending = $pendingKeys.Count -gt 0; keys = $pendingKeys } | ConvertTo-Json -Compress
 exit ($pendingKeys.Count -gt 0 ? 1 : 0)
