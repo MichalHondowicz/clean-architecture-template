@@ -8,7 +8,7 @@ bez mojego udziału poza bramkami. Pilot sprawdza też ścieżki awaryjne i daje
 **Seams:** seam 1 ze speca. Obserwacja przez statusy ticketów, `## Comments`, tabelę pomiaru, brief, historię
 gałęzi i otrzymane powiadomienia.
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] Wybrany ficzer backendowy (najlepiej 3 tickety) przechodzi od `/plan-feature` do scalenia w `main`
       (historie 1–8, 57).
@@ -16,11 +16,11 @@ gałęzi i otrzymane powiadomienia.
       zostaje dopisane do allowlisty (historia 12).
 - [x] Scenariusz (b): Docker zatrzymany przed startem, pętla uruchamia go sama (historia 11).
 - [ ] Scenariusz (c): próg w pliku DoD tuż nad bieżącym zużyciem daje pauzę i wznowienie bez mojego udziału
-      (historie 40, 41).
+      (historie 40, 41). Przeniesione do ticketu 19.
 - [x] Scenariusz (d): ticket niemożliwy do zrobienia kończy się `needs-info`, briefem i pushem, a niezależne
       tickety idą dalej (historie 28, 29).
 - [ ] Push przy pytaniu o zgodę w sesji w tle dociera na telefon. Jeśli nie dociera, powstaje ticket na
-      fallback (hook `Notification` i ntfy) (historia 46).
+      fallback (hook `Notification` i ntfy) (historia 46). Przeniesione do ticketu 19.
 - [x] Tabela pomiaru jest pełna, a zużycie ficzera zapisane jako pomiar nr 1 (historia 47).
 - [x] Propozycje konwencji z briefu są rozstrzygnięte, a rozjazdy pętli zapisane jako tickety `needs-triage`.
 
@@ -246,3 +246,8 @@ odpowiedział w niej „Odrzuć ticket 02” o 11:26, gdy `wontfix` był już za
 - **Zostaje otwarte:** scenariusz (c), czyli wznowienie bez udziału użytkownika (w obu przebiegach ruszało
   po wiadomości użytkownika), oraz punkt o pushu przy pytaniu o zgodę (w trzech przebiegach pilota nie padło
   ani jedno takie pytanie).
+
+**2026-11-01, zamknięcie (decyzja użytkownika):** ticket `done`. Dwa ficzery przeszły pętlę do `main`,
+scenariusze (a), (b) i (d) przeszły, pomiar nr 1 jest zapisany. Scenariusz (c) i push przy pytaniu
+o zgodę przeszły do ticketu 19, do sprawdzenia przy następnym prawdziwym ficzerze, bez osobnego
+kilkugodzinnego przebiegu. Rozjazdy pętli z pilota: tickety 12–18 (`needs-triage`).
