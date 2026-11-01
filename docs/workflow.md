@@ -229,10 +229,14 @@ zmian.
   pilot (ticket 10) albo ticket 13.
 - **Ticket na chronionej ścieżce** (`protectedPaths` w `dod.json`, np. `tests/ArchitectureTests/**`): pętla
   takiej zmiany nie zrobi, a zdjęcie ochrony na czas ticketu nie działa, bo `HookTests` przypinają ścieżki
-  do guarda, a `check-diff` i tak oznaczy zmianę (pilot 10, ticket 18). Brief `needs-info` daje dwie drogi:
-  zrób zmianę ręcznie w worktree ficzera (planowana zmiana jest w briefie), zacommituj ją, ustaw ticket
-  na `done` i wpisz `/ship <feature>` jeszcze raz; albo ustaw `wontfix` i zrób zmianę poza ficzerem, przed
-  `/ship` albo po scaleniu.
+  do guarda, a `check-diff` i tak oznaczy zmianę (pilot 10, ticket 18). Brief `needs-info` daje dwie drogi,
+  obie jako commit w worktree ficzera, na `feat/<feature>`: tam leży tracker, a niezacommitowaną zmianę
+  statusu kolejny `/ship` zestashuje.
+  - Zrób zmianę ręcznie (planowana zmiana jest w briefie) i zacommituj ją razem z ticketem ustawionym
+    na `done`, potem `/ship <feature>` jeszcze raz.
+  - Albo zacommituj ticket ustawiony na `wontfix` i zrób zmianę poza ficzerem, przed `/ship` albo po
+    scaleniu. Ticket, który ma go w `Blocked by`, nie ruszy, dopóki w tym samym commicie nie usuniesz tej
+    zależności; brief wymienia takie tickety.
 - **Ponowne review gałęzi**: usuń w commicie na gałęzi `brief.md` i `findings/branch-*.md`, potem `/ship`.
 - **Przerwana bramka 2**: decyzja jest zapisana w briefie. Dopóki `main` nie zawiera gałęzi, kolejny `/ship`
   pyta jeszcze raz („OK” liczy się tylko w sesji, która scala). Gdy `main` już ją zawiera, `/ship <feature>`
