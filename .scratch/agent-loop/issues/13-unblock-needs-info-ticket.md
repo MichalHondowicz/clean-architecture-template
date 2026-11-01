@@ -18,13 +18,13 @@ go znowu za `stuck`. Ticket zatrzymany wcześniej (decyzja użytkownika, chronio
 w rundzie 1) ruszyłby od następnej rundy. Przewodnik (`docs/workflow.md`, „Wznawianie i stany
 pośrednie”) opisuje to jako lukę.
 
-- [ ] Droga od `needs-info` do ponownego `ready-for-agent`: użytkownik dopisuje w `## Comments` ticketu
+- [x] Droga od `needs-info` do ponownego `ready-for-agent`: użytkownik dopisuje w `## Comments` ticketu
       `**Decision:** …` i ustawia `**Status:** ready-for-agent` (commit na gałęzi w worktree). `/ship` przy
       wyborze takiego ticketu przenosi jego pliki `findings/<NN>-round-<r>.md` do `findings/<NN>-attempt-<k>/`
       i zaczyna od rundy 1, z pełnymi trzema rundami.
-- [ ] Odpowiedź na `needs-info` w żywej sesji `/ship` też rusza od rundy 1 (tak było w pilocie 10).
-- [ ] Przewodnik `docs/workflow.md` opisuje tę drogę zamiast luki.
-- [ ] Wersja forka podbita.
+- [x] Odpowiedź na `needs-info` w żywej sesji `/ship` też rusza od rundy 1 (tak było w pilocie 10).
+- [x] Przewodnik `docs/workflow.md` opisuje tę drogę zamiast luki.
+- [x] Wersja forka podbita.
 
 ## Comments
 
@@ -38,3 +38,23 @@ i ponowny `/ship` po trzech rundach pozostaje niesprawdzona.
 **2026-11-01, triage (decyzja użytkownika):** `ready-for-agent`, piąty w kolejce. Droga jak w pierwszym
 kryterium: decyzja w `## Comments`, zmiana statusu, stare pliki rund do `findings/<NN>-attempt-<k>/`, start
 od rundy 1.
+
+**2026-11-01, wynik:** fork `486a300`, `c6ee3cf` (plugin `1.3.1-dotnet.25`, zainstalowany), template `0540d60`.
+
+- **„Work the tickets”**, nowy akapit „A ticket back from `needs-info`”: ticket `ready-for-agent`, który ma pliki
+  `findings/<NN>-round-<r>.md`, wraca z `needs-info`. To nowa próba z trzema rundami: `mkdir -p` folderu
+  `findings/<NN>-attempt-<k>/`, `git mv` każdego pliku do niego, w tym samym commicie co start
+  (`ship: start <NN> (…, attempt <k+1>)`). Implementer rundy 1 dostaje najnowszą `**Decision:**`. „Rounds” nie
+  liczy plików z folderów prób, a recenzent Spec dostaje je jako wcześniejsze findings.
+- **Akapit „A decision given in the session”:** odpowiedź użytkownika w sesji po końcu przebiegu `/ship`
+  wpisuje dosłownie jako `**Decision:**`, ustawia `ready-for-agent`, commituje (`ship: <NN> decision`) i wraca
+  do *Start or resume*. Obie drogi są więc tą samą ścieżką. Prośba o zdjęcie ochrony dostaje odpowiedź
+  z „Stuck” (ticket 18).
+- **„Stuck”, Needs:** mówi, jak dać decyzję, z wyjątkiem ticketu na chronionej ścieżce, który ma swoje dwie
+  drogi.
+- **Przewodnik:** „Po `needs-info`” opisuje obie drogi zamiast luki.
+- **Review Spec** (Sonnet), runda 1: `fail` z 2 findings. (1) `git mv` do nieistniejącego folderu kończy się
+  `fatal: destination directory does not exist`, recenzent to odtworzył. (2) Needs otwierał trzecią drogę dla
+  ticketu na chronionej ścieżce. Oba poprawione w `c6ee3cf`, re-review `pass`.
+- **Niesprawdzone na żywo:** droga przez zmianę statusu po trzech rundach. Do obserwacji przy pierwszym takim
+  tickecie.
