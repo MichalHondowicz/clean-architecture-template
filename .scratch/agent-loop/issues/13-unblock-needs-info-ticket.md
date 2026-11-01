@@ -8,7 +8,7 @@ ponownie, a `/ship` nie uzna go od razu znowu za `stuck`.
 **Seams:** `ship/SKILL.md` w forku („Rounds”, wybór ticketu); przewodnik `docs/workflow.md`; obserwacja przy
 następnym tickecie odblokowanym po `needs-info`.
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Skąd:** review Spec ticketu 09, runda 2 (2026-10-28). `ship/SKILL.md`, „Rounds”: pliki
 `.scratch/<feature>/findings/<NN>-round-<r>.md` liczą zużyte rundy, a ticket, który ma już trzy, jest `stuck`.
