@@ -223,10 +223,16 @@ zmian.
     checkoucie. Obie drogi wznawiają z trackera.
 - **Po `needs-info`**: gdy choć jeden ticket ficzera nie jest `done` (nie liczą się `needs-triage`
   i `wontfix`), przebieg kończy się bez review gałęzi, briefu i bramki 2. Ticket zachowuje swoje cofnięte
-  commity w historii i stash nazwany w briefie. Odblokowanie (decyzja, przywrócenie `ready-for-agent`, commit
-  na gałęzi w worktree, bo niezacommitowaną zmianę `/ship` zestashuje) nie jest jeszcze opisane w skillu.
-  Ticket po trzech rundach ma trzy pliki findings, więc `/ship` uzna go od razu znowu za `stuck`. Drogę ustali
-  pilot (ticket 10) albo ticket 13.
+  commity w historii i stash nazwany w briefie. Odblokowanie, dwie równoważne drogi:
+  - **Odpowiedź w tej samej sesji `/ship`**, dopóki ją masz: pętla wpisuje Twoją odpowiedź do `## Comments`
+    ticketu jako `**Decision:**`, ustawia `ready-for-agent`, commituje i rusza od nowa.
+  - **Ręcznie, w worktree ficzera:** dopisz w `## Comments` `**Decision:** …`, ustaw
+    `**Status:** ready-for-agent`, zacommituj na `feat/<feature>` (niezacommitowaną zmianę `/ship` zestashuje)
+    i wpisz `/ship <feature>`.
+
+  W obu przypadkach ticket dostaje nową próbę z trzema rundami od rundy 1. Stare pliki findings trafiają do
+  `findings/<NN>-attempt-<k>/`, więc nie liczą się jako zużyte rundy. Ticket na chronionej ścieżce ma swoje
+  dwie drogi (punkt niżej).
 - **Ticket na chronionej ścieżce** (`protectedPaths` w `dod.json`, np. `tests/ArchitectureTests/**`): pętla
   takiej zmiany nie zrobi, a zdjęcie ochrony na czas ticketu nie działa, bo `HookTests` przypinają ścieżki
   do guarda, a `check-diff` i tak oznaczy zmianę (pilot 10, ticket 18). Brief `needs-info` daje dwie drogi,
