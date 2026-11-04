@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-11-04-agent-loop-23.md
+
 # Handoff: pętla bez nadzoru, pilot 10 (przygotowanie)
 
 ## 1. Stan wejściowy
