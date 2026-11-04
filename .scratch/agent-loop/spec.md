@@ -350,6 +350,9 @@ i pilot, potem MAUI i drugi pilot.
   aktualizacja pluginu i restart sesji według `docs/workflow.md`, sekcja „Utrzymanie”) oraz ten template.
 - Etap 1 to tickety teraz. Etap 2 (MAUI, CI Androida) dostaje tickety po pilocie 1, bo pilot może
   zmienić kształt pętli.
+- Zmienione 2026-11-04 (bramka ticketu 11): etap 2 zaczyna się od przeniesienia Koszyka (tickety 20–27),
+  a pilot 2 to mały ficzer Koszyka. Warstwa MAUI template'u (tickety 28–30) powstaje po nim, ze sprawdzonej
+  konfiguracji Koszyka. `Contracts` jest nowym elementem template'u: Koszyk go nie ma.
 - Stan limitu w chwili planowania: plan Pro, sesja planująca zużyła około 7% okna 5-godzinnego. Pomiar
   z pilotów zastąpi tę anegdotę liczbami.
 - Lekcja z `dotnet-workflow`: im więcej własnego kodu sterującego, tym więcej kontraktów do utrzymania.
