@@ -8,20 +8,20 @@ z `x:DataType` w `Koszyk.Mobile`, typowany klient HTTP, rejestracja w `MauiProgr
 
 **Seams:** tekst skilla sprawdza pilot (ticket 26); przykłady w skillu zgodne z kodem (`git grep` na wzorcach).
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Skąd:** ticket 11, decyzja 7 z bramki 2026-11-04 (historia 52). Wiedza z
 `D:\Projects\dotnet-workflow\plugins\dotnet-workflow\skills\implementing-maui-mvvm\SKILL.md` i z pułapek
 w `AGENTS.md` Koszyka.
 
-- [ ] AC1: `.claude/skills/add-screen/SKILL.md` opisuje kroki od ViewModelu do rejestracji i testów, z
+- [x] AC1: `.claude/skills/add-screen/SKILL.md` opisuje kroki od ViewModelu do rejestracji i testów, z
       przykładami wziętymi z istniejącego ekranu Koszyka (nie z pluginu), napisany według `writing-for-agents`.
-- [ ] AC2: Skill zawiera pułapki potwierdzone w E2E Koszyka (`TapGestureRecognizer.Tapped`, `CheckBox` przy
+- [x] AC2: Skill zawiera pułapki potwierdzone w E2E Koszyka (`TapGestureRecognizer.Tapped`, `CheckBox` przy
       recyklingu, `RefreshView`, transient `DelegatingHandler` i `AppShell`, realny `IMessenger` w testach),
       bez kopiowania całego `AGENTS.md`.
-- [ ] AC3: Każdy wzorzec w przykładach ma odpowiednik w kodzie (`git grep`), a rozjazd wzorca pluginu
+- [x] AC3: Każdy wzorzec w przykładach ma odpowiednik w kodzie (`git grep`), a rozjazd wzorca pluginu
       z Koszykiem rozstrzyga kod Koszyka.
-- [ ] AC4: `AGENTS.md` Koszyka wskazuje `add-screen` dla każdego nowego ekranu.
+- [x] AC4: `AGENTS.md` Koszyka wskazuje `add-screen` dla każdego nowego ekranu.
 
 ## Comments
 
@@ -52,3 +52,8 @@ w `AGENTS.md` Koszyka.
 - Zmiana dotyczy tylko dokumentów (skill i `AGENTS.md`), bez kodu, więc buildu i testów nie powtarzałem;
   ostatni przebieg na `0ccbedb`: 0 ostrzeżeń, 99/5/130/587. `.claude/**` jest w `protectedPaths`, więc
   implementer skilla nie zmieni. Tekst skilla sprawdzi pilot (ticket 26).
+
+**2026-11-04, review Spec** (`mattpocock-skills:spec-reviewer`), runda 1 `fail` z dwoma drobnymi findings:
+(1) krok 7 „Done” wymieniał tylko build `Koszyk.Mobile.sln`, bez `Koszyk.sln` i flag DoD; (2) krok 2 podawał tylko
+`Given_..._When_..._Then_`, a `MembersViewModelTests` używa też `When_..._Then_` bez stanu początkowego. Poprawione
+w `354a639`: „Done” to wszystkie `commands` z `dod.json`, nazwy w obu formach. Re-review `pass`.
