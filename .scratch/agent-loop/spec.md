@@ -134,6 +134,7 @@ i pilot, potem MAUI i drugi pilot.
 60. Jako właściciel projektu chcę usunąć starą kopię `.agents/skills/`, żeby żadne narzędzie nie czytało nieaktualnych reguł.
 61. Jako właściciel projektu chcę, żeby `docs/workflow.md` opisywał nowy przepływ z dwiema bramkami, żeby mój przewodnik zgadzał się z rzeczywistością.
 62. Jako właściciel projektu chcę, żeby `implement` i `implement-spec` zostały bez zmian do pracy przy komputerze, żeby tryb interaktywny dalej działał.
+63. Jako właściciel projektu chcę, żeby Koszyk przeszedł na tę pętlę po pilocie 2 (plik DoD, hooki, konwencje, sprawdzenie na małym ficzerze), żeby jego kolejne moduły, od modułu 15, szły przez `/plan-feature` i `/ship` zamiast przez wyłączony plugin `dotnet-workflow` (dopisane 2026-11-04).
 
 ## Implementation Decisions
 
@@ -330,7 +331,7 @@ i pilot, potem MAUI i drugi pilot.
 - Wariant template'u tylko z MAUI (bez backendu, jak Radio).
 - Automatyczne scalanie bez bramki 2.
 - Ponowne włączenie pluginu `dotnet-workflow`.
-- Przeniesienie istniejących aplikacji (Gym, Koszyk) na pętlę.
+- Przeniesienie Gym na pętlę. Koszyk wszedł do zakresu 2026-11-04 (historia 63).
 - Zmiany konwencji backendu poza tym, czego wymaga pętla.
 
 ## Further Notes
