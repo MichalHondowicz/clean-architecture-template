@@ -307,6 +307,13 @@ GitHubie pokazuje tylko status.
   `claude plugin marketplace update mattpocock`, `claude plugin update mattpocock-skills@mattpocock` i restart
   sesji (bieżąca sesja nowej wersji nie widzi). Fork musi zostać na gałęzi `dotnet`, bo plugin czyta jego
   katalog roboczy. Kopia zapasowa: remote `backup`.
+- **Kopie hooków w innych projektach** (Koszyk `D:\Projects\Koszyk`, sandbox `D:\Projects\ship-sandbox`): źródłem
+  jest `.claude/hooks/` tego template'u, jedyne miejsce z testami (`tests/HookTests`). Zmiana hooka idzie tutaj,
+  z testem. Potem kopiujesz wszystkie skrypty z `.claude/hooks/` do projektu, a w jego commicie zapisujesz commit
+  template'u, z którego pochodzą. Kopię sprawdzasz porównaniem identyfikatorów blobów
+  (`git rev-parse HEAD:.claude/hooks/<plik>` w obu repozytoriach) i przebiegiem `run-dod.ps1 -Check commands`
+  w projekcie. Nowy skrypt albo nowy hook wymaga też wpisu w `.claude/settings.json` projektu (rejestracja albo
+  allowlista), który dopisujesz sam. Koszyk ma kopie z `7629132`.
 - **Zmiana konwencji**: zawsze przez Twoją decyzję (bramka 2, `/retro`), nigdy „przy okazji” innej pracy.
 
 ## Pułapki, które już kosztowały czas
