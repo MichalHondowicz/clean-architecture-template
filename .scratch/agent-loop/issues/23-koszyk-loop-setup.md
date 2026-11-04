@@ -9,7 +9,7 @@ template'u, „Istniejący projekt”, krok 5.
 **Seams:** `run-dod.ps1 -Check environment` i `-Check commands` w Koszyku jako proces; rejestracja hooków
 sprawdzana w pilocie (ticket 26).
 
-**Status:** ready-for-human
+**Status:** done
 
 **Skąd:** ticket 11, decyzje 4 i 6 z bramki 2026-11-04 (historie 53, 54, 63).
 
@@ -27,7 +27,7 @@ sprawdzana w pilocie (ticket 26).
 - [x] AC6: `.claude/hooks/` to kopie skryptów z template'u (`dod-common`, `dod-gate`, `guard-protected-paths`,
       `run-dod`, `check-diff`, `wait-for-reset`, `check-reboot`, `notify`) z commitem template'u, z którego
       pochodzą, zapisanym w `## Comments`. `docs/workflow.md` template'u, „Utrzymanie”, opisuje synchronizację.
-- [ ] AC7: Rejestracja hooków (`PreToolUse`, `SubagentStop`, `Notification`) i allowlista `/ship` w
+- [x] AC7: Rejestracja hooków (`PreToolUse`, `SubagentStop`, `Notification`) i allowlista `/ship` w
       `.claude/settings.json` Koszyka: dopisuje użytkownik (tryb auto blokuje edycję), według gotowego wzoru
       w `## Comments` tego ticketu.
 
@@ -210,3 +210,9 @@ twierdzenia kontraktu w kodzie Koszyka, wzór `settings.json` względem template
 gałęzi względem `main`. Dwie uwagi poniżej progu bez zmian: kontrakt wymienia wyciszanie przez `.editorconfig`,
 którego Koszyk nie ma (reguła zostaje na wypadek, gdyby plik doszedł); typecheck w `AGENTS.md` to zwykły build,
 a `--no-incremental` dokłada dopiero DoD, co kontrakt wyjaśnia. Status `ready-for-human` do czasu AC7.
+
+**2026-11-04, AC7:** użytkownik utworzył `D:\Projects\Koszyk\.claude\settings.json` z wzoru wyżej. Sprawdzone na
+dysku: poprawny JSON, 60 wpisów `allow`, 6 `deny`, hooki `PreToolUse`, `SubagentStop`, `Notification`; hash równy
+przygotowanemu plikowi. Commit w Koszyku `968d9fb`. Potem `main` Koszyka przesunięty fast-forwardem na
+`chore/agent-loop` (`968d9fb`, tickety 21–25 i ten plik) i wybrany w checkoucie, bo `/plan-feature` startuje
+z `main`. Rejestrację hooków w działaniu sprawdzi pilot (ticket 26).
