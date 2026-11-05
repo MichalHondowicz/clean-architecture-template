@@ -60,3 +60,8 @@ oba pomiary mówią to samo: ok. 2–3% tygodnia na ficzer z 3 ticketami. Czego 
 ficzera MAUI nikt nie zmierzył) i ewentualnej równoległej pracy w innych sesjach w tym samym oknie. Wniosek
 do reguły z historii 48 (`docs/workflow.md`, „Reguła decyzji po pilotach”) należy do decyzji z ticketu 11:
 przy ok. 5% tygodnia na ficzer razem z planem (plan z pomiaru nr 1) próg 2 ficzerów tygodniowo jest daleko.
+
+**2026-11-05, rozjazdy pętli z przeglądu stanu (AC5):** trzy luki `/ship` (CI bez workflow, otwarte tickety
+scalonego ficzera, niewidoczny brak tematu ntfy) i błąd Git Bash przy wznowieniu po scaleniu poprawione od
+razu w tickecie 31 (plugin `1.3.1-dotnet.30`). Rozjazdy Koszyka z przebiegu 1 to jego tickety 04 i 05,
+po triage'u 04 `ready-for-agent`, 05 `wontfix` (Koszyk `fbc74b3`). AC5 zostaje otwarte do końca pilota.

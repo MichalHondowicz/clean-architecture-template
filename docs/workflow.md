@@ -104,12 +104,15 @@ opisują strony forka: `D:\Projects\skills\docs\engineering\plan-feature.md` i
    - decyzję agent zapisuje pod `## Decision` w briefie i commituje razem z przyjętymi konwencjami na gałęzi
      ficzera, także przy „nie” (wtedy nic nie idzie do `main`);
    - po „OK” robi fast-forward `main`, `git push origin main`, usuwa worktree i gałąź i sprawdza CI
-     w przeglądarce aplikacji. Projekt bez remote `origin` (np. Koszyk przed ticketem 20) dostaje tylko
-     fast-forward lokalnego `main` i sprzątanie, bez pushu i CI. Zatrzymuje się, gdy `main` (zdalny, a bez
-     remote lokalny) poszedł dalej niż baza gałęzi: rebase należy
-     do Ciebie.
+     w przeglądarce aplikacji. Repozytorium bez plików w `.github/workflows` dostaje od razu wynik
+     `no CI: no workflow`, bez czekania na przebieg. Projekt bez remote `origin` (np. Koszyk przed ticketem 20)
+     dostaje tylko fast-forward lokalnego `main` i sprzątanie, bez pushu i CI. Zatrzymuje się, gdy `main`
+     (zdalny, a bez remote lokalny) poszedł dalej niż baza gałęzi: rebase należy do Ciebie.
 6. **Po ficzerze**: `/triage` dla nowych ticketów `needs-triage` (decyzja dotycząca wielu use case'ów idzie do
-   ADR-a), a po większej porcji pracy `/retro`.
+   ADR-a), a po większej porcji pracy `/retro`. Scalony ficzer jest dla `/ship` zamknięty: `/ship <feature>`
+   na nim tylko wymienia otwarte tickety i drogę dla każdego. Ticket, który po triage'u dostał
+   `ready-for-agent`, zrób przy komputerze przez `/implement` (sekcja „Przy komputerze”), a większą porcję
+   zaplanuj jako nowy ficzer przez `/plan-feature`.
 
 Na koniec sesji „kończymy” albo „zapisz stan”: skill `handoff` zapisuje w repo stan i prompt startowy dla
 następnej sesji.
@@ -186,7 +189,8 @@ zmian.
      przez swoją nazwę: kto ją zna, czyta treść. Dlatego treść to jedno zdanie bez kodu.
   2. Zapisz pełny adres w zmiennej użytkownika (poza repozytorium), np.
      `[Environment]::SetEnvironmentVariable('CLAUDE_NTFY_URL', 'https://ntfy.sh/<temat>', 'User')`, i uruchom
-     aplikację Claude od nowa, żeby sesje ją widziały. Bez zmiennej skrypt nic nie wysyła i nie przeszkadza.
+     aplikację Claude od nowa, żeby sesje ją widziały. Bez zmiennej skrypt nic nie wysyła i nie zatrzymuje
+     pętli, a raport `/ship` raz mówi, że temat nie jest ustawiony.
   3. W aplikacji ntfy na telefonie zasubskrybuj ten temat na serwerze `ntfy.sh`.
   4. Sprawdź: `pwsh -NoProfile -File .claude/hooks/notify.ps1 -Message "test"` powinien dać `{"sent":true}`
      i powiadomienie na telefonie.
