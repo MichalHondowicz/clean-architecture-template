@@ -41,8 +41,9 @@ bez tematu).
 - **Poza punktami 4–6, znalezione przy pracy** (`9ccb947`): Git Bash przepisuje argument
   `feat/<feature>:.scratch/<feature>/brief.md` na `feat\<feature>;.scratch\<feature>\brief.md`, więc
   `git show` w kroku 3 startu (gałąź istnieje, `main` ją zawiera, decyzja `merge: OK`) kończył się kodem 128.
-  Wznowienie po przerwanej bramce 2 mogło przez to nie zobaczyć zapisanego `OK`. Teraz ta komenda idzie przez
-  narzędzie PowerShell. Rewizja bez ukośnika (`main:.scratch/...`) przechodzi bez zmian, a nowe sprawdzenie
+  Wznowienie po przerwanej bramce 2 mogło przez to nie zobaczyć zapisanego `OK`. Najpierw komenda poszła przez
+  narzędzie PowerShell, a po review brief czytany jest z `main` (`git show main:.scratch/<feature>/brief.md`),
+  bo w tym punkcie `main` zawiera gałąź. Rewizja bez ukośnika przechodzi Git Bash bez zmian, a nowe sprawdzenie
   workflow podaje rewizję i ścieżkę jako osobne argumenty.
 - **Sprawdzone:** `git ls-tree --name-only origin/main .github/workflows/` w template'cie wypisuje
   `.github/workflows/build.yml`, a w Koszyku nic (kod 0 w obu, w Git Bash i PowerShell). `claude plugin
@@ -50,5 +51,19 @@ bez tematu).
   ikony), takich samych przy `9dceb0e`.
 - **Niesprawdzone w przebiegu:** wszystkie trzy zachowania sprawdzi pierwszy przebieg `/ship`, który na nie
   trafi. Najbliżej jest bramka 2 następnego ficzera Koszyka przed ticketem 24.
-- **Review Spec:** nie było. Komendy są sprawdzone na prawdziwych repozytoriach, nowy tekst skilla tylko
-  przeczytany.
+- **Review Spec** (Sonnet, na prośbę użytkownika): runda 1 `fail` z 5 findings, wszystkie in-scope:
+  1. lista otwartych ticketów była tylko w jednej z dwóch ścieżek scalonego ficzera;
+  2. statusy szły z checkoutu, który może stać na innej gałęzi niż `main`;
+  3. „raz” w kroku 2 kłóciło się z „każdy push” w End of the run;
+  4. brak refa `origin/main` dawał kod 128 z pustym wyjściem, czyli fałszywe `no CI: no workflow`;
+  5. obejście przez PowerShell nie działało w sesji bez tego narzędzia.
+
+  Poprawione w forku `7093a30` (plugin `1.3.1-dotnet.31`, zainstalowany) i w przewodniku `4c4ff92`:
+  - lista otwartych ticketów jest w End of the run dla każdego przebiegu, po którym `main` zawiera ficzer,
+    ze statusami z `main` (`git grep`);
+  - `"sent":false` trafia do raportu raz;
+  - kod różny od 0 z `git ls-tree` daje `CI not checked`;
+  - brief przy wznowieniu idzie z `main`.
+
+  Nieaktualny `origin/main` przy późnym wznowieniu zostaje bez `git fetch`: krok 10 czyta ten sam ref do
+  tytułu przebiegu, a liczy się, czy wypchnięty commit miał workflow. Re-review: `pass`.
