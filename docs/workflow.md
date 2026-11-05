@@ -104,7 +104,9 @@ opisują strony forka: `D:\Projects\skills\docs\engineering\plan-feature.md` i
    - decyzję agent zapisuje pod `## Decision` w briefie i commituje razem z przyjętymi konwencjami na gałęzi
      ficzera, także przy „nie” (wtedy nic nie idzie do `main`);
    - po „OK” robi fast-forward `main`, `git push origin main`, usuwa worktree i gałąź i sprawdza CI
-     w przeglądarce aplikacji. Zatrzymuje się, gdy zdalny `main` poszedł dalej niż baza gałęzi: rebase należy
+     w przeglądarce aplikacji. Projekt bez remote `origin` (np. Koszyk przed ticketem 20) dostaje tylko
+     fast-forward lokalnego `main` i sprzątanie, bez pushu i CI. Zatrzymuje się, gdy `main` (zdalny, a bez
+     remote lokalny) poszedł dalej niż baza gałęzi: rebase należy
      do Ciebie.
 6. **Po ficzerze**: `/triage` dla nowych ticketów `needs-triage` (decyzja dotycząca wielu use case'ów idzie do
    ADR-a), a po większej porcji pracy `/retro`.
