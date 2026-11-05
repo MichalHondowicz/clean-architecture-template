@@ -18,7 +18,7 @@ np. przecinek w polu `Numeric` i podwójny alert „Brak dostępu”.
       allowlisty Koszyka.
 - [ ] AC2: Brief wymienia zmienione ekrany i pliki do sprawdzenia na emulatorze (`screenPaths`), a użytkownik
       sprawdza je na emulatorze przed `OK`.
-- [ ] AC3: Tabela pomiaru jest pełna i zapisana jako pomiar nr 2 (historia 47), obok pomiaru nr 1 z ticketu 10.
+- [x] AC3: Tabela pomiaru jest pełna i zapisana jako pomiar nr 2 (historia 47), obok pomiaru nr 1 z ticketu 10.
 - [ ] AC4: Obserwacje z ticketu 19 (wznowienie bez użytkownika, push przy pytaniu o zgodę) są zapisane, jeśli
       przebieg na nie trafi.
 - [ ] AC5: Rozjazdy pętli i dokumentów Koszyka są zapisane jako tickety `needs-triage`.
@@ -37,3 +37,24 @@ np. przecinek w polu `Numeric` i podwójny alert „Brak dostępu”.
   `.claude/worktrees/ux-cosmetics-1` zostaje do zamknięcia sesji `/ship` (blokada katalogu). Bez pushu.
 - Nie sprawdzone: ekrany `ListsPage` i `MembersPage` na emulatorze (AC2), pytania o zgodę i wznowienie (AC4).
   Ticket zostaje `ready-for-human`: AC1 wymaga przebiegu z remote, AC3 wpisu pomiaru nr 2.
+
+**2026-11-05, pomiar nr 2** (`D:\Projects\Koszyk\.scratch\ux-cosmetics-1\metrics.md`, na `main` Koszyka `b4b7b04`):
+
+| Etap | Rundy | Minuty | Okno 5h | Tydzień |
+|---|---|---|---|---|
+| 01 | 1 | 5 | 44% → 48% | 58% → 59% |
+| 02 | 2 | 9 | 48% → 53% | 59% → 59% |
+| 03 | 1 | 6 | 53% → 57% | 59% → 60% |
+| review gałęzi | 1 | 6 | 57% → 63% | 60% → 60% |
+| **suma** | 5 | 26 | +19 | +2 |
+
+Modele: `/ship` Sonnet, implementer Sonnet, weryfikator Haiku, recenzent ticketu Sonnet, review gałęzi Opus
+(Standards, Spec i re-review). Wynik: 3 `done`, 0 `needs-info`.
+
+Obok pomiaru nr 1 (ticket 10, `todo-comments`, backend w sandboksie: 5 rund, 34 minuty, 5h +22, tydzień +3):
+ficzer MAUI z 3 ticketami w Koszyku kosztował mniej, mimo dwóch buildów i 611 testów w każdym DoD (ok. 50 s).
+Różnica mieści się w zaokrągleniu procentów tygodnia do pełnych punktów, więc oba pomiary mówią to samo:
+ok. 2–3% tygodnia na ficzer z 3 ticketami. Czego tabela nie obejmuje: planowania (`/plan-feature` na Opusie,
+w pomiarze nr 1 szacowane na ok. 2% tygodnia) i ewentualnej równoległej pracy w innych sesjach w tym samym
+oknie. Wniosek do reguły z historii 48 (`docs/workflow.md`, „Reguła decyzji po pilotach”) należy do decyzji
+z ticketu 11: przy ok. 5% tygodnia na ficzer razem z planem próg 2 ficzerów tygodniowo jest daleko.
