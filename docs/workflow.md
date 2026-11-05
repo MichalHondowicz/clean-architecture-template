@@ -109,10 +109,10 @@ opisują strony forka: `D:\Projects\skills\docs\engineering\plan-feature.md` i
      dostaje tylko fast-forward lokalnego `main` i sprzątanie, bez pushu i CI. Zatrzymuje się, gdy `main`
      (zdalny, a bez remote lokalny) poszedł dalej niż baza gałęzi: rebase należy do Ciebie.
 6. **Po ficzerze**: `/triage` dla nowych ticketów `needs-triage` (decyzja dotycząca wielu use case'ów idzie do
-   ADR-a), a po większej porcji pracy `/retro`. Scalony ficzer jest dla `/ship` zamknięty: `/ship <feature>`
-   na nim tylko wymienia otwarte tickety i drogę dla każdego. Ticket, który po triage'u dostał
-   `ready-for-agent`, zrób przy komputerze przez `/implement` (sekcja „Przy komputerze”), a większą porcję
-   zaplanuj jako nowy ficzer przez `/plan-feature`.
+   ADR-a), a po większej porcji pracy `/retro`. Scalony ficzer jest dla `/ship` zamknięty: raport po scaleniu
+   i każdy późniejszy `/ship <feature>` tylko wymieniają jego otwarte tickety (statusy z `main`) i drogę dla
+   każdego. Ticket, który po triage'u dostał `ready-for-agent`, zrób przy komputerze przez `/implement`
+   (sekcja „Przy komputerze”), a większą porcję zaplanuj jako nowy ficzer przez `/plan-feature`.
 
 Na koniec sesji „kończymy” albo „zapisz stan”: skill `handoff` zapisuje w repo stan i prompt startowy dla
 następnej sesji.
