@@ -22,3 +22,18 @@ np. przecinek w polu `Numeric` i podwójny alert „Brak dostępu”.
 - [ ] AC4: Obserwacje z ticketu 19 (wznowienie bez użytkownika, push przy pytaniu o zgodę) są zapisane, jeśli
       przebieg na nie trafi.
 - [ ] AC5: Rozjazdy pętli i dokumentów Koszyka są zapisane jako tickety `needs-triage`.
+
+**2026-11-05, przebieg 1 (`ux-cosmetics-1`), zapis agenta z repozytorium Koszyka, bez raportu sesji `/ship`:**
+
+- Plan: commit `e78d1f6` w Koszyku. `/ship` 2026-11-04 22:02–22:33: tickety 01–03 `done` (rundy 1, 2, 1), runda
+  gałęzi 1 (nazwy testów ticketu 03), brief, decyzja „OK, 1 tak” (`b4b7b04`; konwencja `System.TimeProvider`
+  w `AGENTS.md`). Testy 99/5/130/611, 0 ostrzeżeń. Nowe `needs-triage`: 04 (e-mail „Ty” po synchronizacji, DTO
+  i API), 05 (nazwy testów `SuggestionsViewModelTests`).
+- `metrics.md` w Koszyku (`.scratch/ux-cosmetics-1/metrics.md`): 26 minut, 5h +19 pp (44% → 63%), tydzień +2 pp
+  (58% → 60%).
+- Po „OK” `main` nie został przesunięty: Koszyk nie ma remote (ticket 20), więc krok scalenia z `git fetch origin`
+  i `git push origin main` nie mógł przejść. 2026-11-05 na słowo użytkownika w tej sesji: `main` przesunięty
+  fast-forwardem na `b4b7b04`, worktree wyrejestrowany i gałąź `feat/ux-cosmetics-1` usunięta. Pusty folder
+  `.claude/worktrees/ux-cosmetics-1` zostaje do zamknięcia sesji `/ship` (blokada katalogu). Bez pushu.
+- Nie sprawdzone: ekrany `ListsPage` i `MembersPage` na emulatorze (AC2), pytania o zgodę i wznowienie (AC4).
+  Ticket zostaje `ready-for-human`: AC1 wymaga przebiegu z remote, AC3 wpisu pomiaru nr 2.
