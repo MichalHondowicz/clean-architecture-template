@@ -52,9 +52,11 @@ Modele: `/ship` Sonnet, implementer Sonnet, weryfikator Haiku, recenzent ticketu
 (Standards, Spec i re-review). Wynik: 3 `done`, 0 `needs-info`.
 
 Obok pomiaru nr 1 (ticket 10, `todo-comments`, backend w sandboksie: 5 rund, 34 minuty, 5h +22, tydzień +3):
-ficzer MAUI z 3 ticketami w Koszyku kosztował mniej, mimo dwóch buildów i 611 testów w każdym DoD (ok. 50 s).
-Różnica mieści się w zaokrągleniu procentów tygodnia do pełnych punktów, więc oba pomiary mówią to samo:
-ok. 2–3% tygodnia na ficzer z 3 ticketami. Czego tabela nie obejmuje: planowania (`/plan-feature` na Opusie,
-w pomiarze nr 1 szacowane na ok. 2% tygodnia) i ewentualnej równoległej pracy w innych sesjach w tym samym
-oknie. Wniosek do reguły z historii 48 (`docs/workflow.md`, „Reguła decyzji po pilotach”) należy do decyzji
-z ticketu 11: przy ok. 5% tygodnia na ficzer razem z planem próg 2 ficzerów tygodniowo jest daleko.
+ficzer MAUI z 3 ticketami w Koszyku kosztował mniej, choć jego DoD buduje dwie solucje (czas DoD zmierzony
+przed pilotem w tickecie 23: 49,5 s przy 587 testach mobilnych; po pilocie testów mobilnych jest 611, czasu
+w pilocie nikt nie mierzył). Różnica mieści się w zaokrągleniu procentów tygodnia do pełnych punktów, więc
+oba pomiary mówią to samo: ok. 2–3% tygodnia na ficzer z 3 ticketami. Czego tabela nie obejmuje: planowania
+(`/plan-feature` na Opusie; w pomiarze nr 1 zmierzone na ok. 2% tygodnia, tydzień z 57% do 59%; planowania
+ficzera MAUI nikt nie zmierzył) i ewentualnej równoległej pracy w innych sesjach w tym samym oknie. Wniosek
+do reguły z historii 48 (`docs/workflow.md`, „Reguła decyzji po pilotach”) należy do decyzji z ticketu 11:
+przy ok. 5% tygodnia na ficzer razem z planem (plan z pomiaru nr 1) próg 2 ficzerów tygodniowo jest daleko.
