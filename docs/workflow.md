@@ -105,7 +105,10 @@ opisują strony forka: `D:\Projects\skills\docs\engineering\plan-feature.md` i
      ficzera, także przy „nie” (wtedy nic nie idzie do `main`);
    - po „OK” robi fast-forward `main`, `git push origin main`, usuwa worktree i gałąź i sprawdza CI
      w przeglądarce aplikacji. Repozytorium bez plików w `.github/workflows` dostaje od razu wynik
-     `no CI: no workflow`, bez czekania na przebieg. Projekt bez remote `origin` (np. Koszyk przed ticketem 20)
+     `no CI: no workflow`, bez czekania na przebieg. Przy prywatnym repozytorium panel przeglądarki aplikacji
+     musi być zalogowany do GitHuba, a logujesz się w nim sam. Wylogowany panel dostaje od GitHuba
+     „Page not found”, więc pętla od razu zapisuje `CI not checked` i w raporcie prosi o zalogowanie.
+     Projekt bez remote `origin` (np. Koszyk przed ticketem 20)
      dostaje tylko fast-forward lokalnego `main` i sprzątanie, bez pushu i CI. Zatrzymuje się, gdy `main`
      (zdalny, a bez remote lokalny) poszedł dalej niż baza gałęzi: rebase należy do Ciebie.
 6. **Po ficzerze**: `/triage` dla nowych ticketów `needs-triage` (decyzja dotycząca wielu use case'ów idzie do
