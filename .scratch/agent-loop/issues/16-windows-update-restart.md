@@ -9,7 +9,7 @@ wie o nim rano od razu i wie, co wpisać.
 parametr ścieżki klucza), wywołanie w `wait-for-reset.ps1` i na starcie `/ship` (fork: `ship/SKILL.md`);
 przewodnik `docs/workflow.md`; obserwacja w kolejnym przebiegu nocnym.
 
-**Status:** ready-for-human
+**Status:** done
 
 **Skąd:** pilot 10, przebieg 2 (`todo-comment-count`, 2026-10-29). Sesja `/ship` czekała na reset okna
 5-godzinnego (23:50) w `wait-for-reset.ps1`, który trzyma komputer w czuwaniu. O 23:47:47
@@ -25,7 +25,7 @@ nie chroni przed restartem aktualizacji.
 - [x] Przewodnik `docs/workflow.md` mówi, jak rozpoznać rano restart systemu i jak wznowić przebieg: wiadomość
       w starej sesji `/ship` albo `/ship <feature>` w nowej.
 - [x] Wersja forka podbita.
-- [ ] Allowlista w `.claude/settings.json` ma wpisy dla `check-reboot.ps1` (dopisuje użytkownik, bo tryb auto
+- [x] Allowlista w `.claude/settings.json` ma wpisy dla `check-reboot.ps1` (dopisuje użytkownik, bo tryb auto
       blokuje edycję tego pliku), inaczej wywołanie pyta o zgodę w sesji bez nadzoru.
 
 ## Comments
@@ -67,3 +67,5 @@ aktualizacji to ustawienie systemu użytkownika, nie krok pętli.
   `"PowerShell(pwsh -NoProfile -NonInteractive -File .claude/hooks/check-reboot.ps1)"`. Sandbox ma swoją kopię
   hooków i ustawień: trzeba tam przenieść oba skrypty (`run-dod.ps1` z ticketu 17 i `check-reboot.ps1`) i te
   wpisy.
+
+**2026-11-11:** użytkownik dopisał wpisy `check-reboot.ps1` do allowlisty (sprawdzone na dysku, plik jest poprawnym JSON-em). Ticket `done`.

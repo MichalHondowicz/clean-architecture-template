@@ -110,3 +110,5 @@ pytania z „Do rozstrzygnięcia przy triage”:
    `"Bash(pwsh -NoProfile -NonInteractive -File .claude/hooks/notify.ps1 *)"` i
    `"PowerShell(pwsh -NoProfile -NonInteractive -File .claude/hooks/notify.ps1 *)"`.
 4. Sandbox ma swoją kopię hooków i ustawień: przenieś tam `notify.ps1` i te wpisy przed następnym przebiegiem.
+
+**2026-11-11:** użytkownik dopisał hook `Notification` i wpisy `notify.ps1` do `.claude/settings.json` (sprawdzone na dysku: hook leży w `hooks`, plik jest poprawnym JSON-em), `CLAUDE_NTFY_URL` jest ustawiony. AC5 zostaje otwarte do pierwszego pytania o zgodę w przebiegu `/ship` (ticket 19).
