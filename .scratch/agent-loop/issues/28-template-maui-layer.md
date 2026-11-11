@@ -10,7 +10,7 @@ i lista todo. Układ i wzorce bierze z Koszyka po pilocie 2.
 **Seams:** build `CleanArchitecture.slnx` (z głową Androida) i testy `Mobile.UnitTests` jako proces; testy
 architektury; integracja `Contracts` przez istniejące testy integracyjne Web.Api.
 
-**Status:** ready-for-agent
+**Status:** wontfix
 
 **Skąd:** ticket 11, decyzja 9 z bramki 2026-11-04 (historie 49, 50, 51). Koszyk nie ma projektu `Contracts`,
 więc ten element jest nowy w template'cie i do Koszyka nie wraca.
@@ -27,3 +27,9 @@ więc ten element jest nowy w template'cie i do Koszyka nie wraca.
       błędy, Sonar) bez żadnego wyciszenia. Reguła, której głowa MAUI nie może spełnić, wraca do użytkownika
       jako decyzja, nie jako `NoWarn`.
 - [ ] AC6: Build i pełne testy zielone, Central Package Management dla nowych pakietów.
+
+## Comments
+
+**2026-11-11, decyzja użytkownika (przegląd workflow):** `wontfix` na teraz. Warstwa MAUI w template'cie nie ma dziś
+drugiego odbiorcy, a Koszyk ma już `add-screen`, DoD mobilne i konwencje. Wraca jako nowy plan (`/plan-feature`),
+gdy ruszy drugi projekt MAUI.

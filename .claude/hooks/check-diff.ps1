@@ -36,11 +36,25 @@ $suppressionPatterns = @(
 # In analyzer config files any severity line is a suppression candidate.
 $analyzerConfigFile = '(^|/)\.editorconfig$|\.globalconfig$'
 
-function Find-Suppression([string]$path, [string]$addedLine) {
+# The one way around the rule is the user's own: a `#pragma warning disable` whose every id is listed in
+# `allowedSuppressions` of the DoD file (e.g. the diagnostic of an experimental API the project uses on purpose).
+# Any other form, a pragma naming another id as well, or one naming none (it disables everything) still counts.
+function Test-AllowedPragma([string]$addedLine, $allowedIds) {
+    if ($addedLine -notmatch '^\s*#pragma\s+warning\s+disable\s+([^/]+?)\s*(//.*)?$') {
+        return $false
+    }
+    $ids = @($Matches[1] -split '[,\s]+' | Where-Object { $_ })
+    $ids.Count -gt 0 -and @($ids | Where-Object { $_ -notin $allowedIds }).Count -eq 0
+}
+
+function Find-Suppression([string]$path, [string]$addedLine, $allowedIds) {
     if ($path -match $analyzerConfigFile -and $addedLine -match 'severity\s*=') {
         return $addedLine.Trim()
     }
     if ($path -match $codeOrBuildFile) {
+        if (Test-AllowedPragma $addedLine $allowedIds) {
+            return $null
+        }
         foreach ($pattern in $suppressionPatterns) {
             if ($addedLine -match $pattern) {
                 return $addedLine.Trim()
@@ -71,9 +85,12 @@ function Test-Generated([string]$path) {
 
 Push-Location $root
 try {
-    # The protected list comes from the base revision: the range under check may itself have weakened the DoD file.
+    # The protected list and the allowed suppressions come from the base revision: the range under check may itself
+    # have weakened the DoD file.
     $baseDod = & git show "${Base}:$DodRelativePath" 2>$null
     $dod = $LASTEXITCODE -eq 0 ? ($baseDod -join "`n" | ConvertFrom-Json) : (Read-Dod $root)
+
+    $allowedIds = @($dod.allowedSuppressions | Where-Object { $_ })
 
     $violations = [Collections.Generic.List[object]]::new()
     $testsToReview = [Collections.Generic.List[string]]::new()
@@ -108,7 +125,7 @@ try {
             continue
         }
         if ($file -and $line.StartsWith('+')) {
-            $suppression = Find-Suppression $file $line.Substring(1)
+            $suppression = Find-Suppression $file $line.Substring(1) $allowedIds
             if ($suppression -and -not (Test-Generated $file)) {
                 $violations.Add([ordered]@{ kind = 'suppression'; path = $file; detail = $suppression })
             }

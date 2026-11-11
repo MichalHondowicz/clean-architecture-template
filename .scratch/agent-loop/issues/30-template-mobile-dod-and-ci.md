@@ -7,7 +7,7 @@ zmienione ekrany, a CI buduje głowę Androida obok backendu.
 
 **Seams:** `run-dod.ps1 -Check commands` jako proces; przebieg CI na GitHubie po pushu na `main`.
 
-**Status:** ready-for-agent
+**Status:** wontfix
 
 **Skąd:** ticket 11, decyzja 9 z bramki 2026-11-04 (historie 53, 54, 56).
 
@@ -18,3 +18,9 @@ zmienione ekrany, a CI buduje głowę Androida obok backendu.
       solucję z głową Androida. Przebieg na `main` zielony, czas zapisany w `## Comments`.
 - [ ] AC4: Sandbox `D:\Projects\ship-sandbox` dostaje ten stan (merge z `main` template'u, kopie hooków
       z ticketów 12, 16, 17), żeby kolejne przebiegi tam miały warstwę mobilną.
+
+## Comments
+
+**2026-11-11, decyzja użytkownika (przegląd workflow):** `wontfix` na teraz. Warstwa MAUI w template'cie nie ma dziś
+drugiego odbiorcy, a Koszyk ma już `add-screen`, DoD mobilne i konwencje. Wraca jako nowy plan (`/plan-feature`),
+gdy ruszy drugi projekt MAUI.

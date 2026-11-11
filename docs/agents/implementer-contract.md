@@ -44,5 +44,8 @@ as above.
   Write are refused there; a change made any other way shows up in the verifier's diff check. If the ticket
   cannot be done without such a change, finish with `STATUS: stuck` and say why.
 - Never weaken a test or add an analyzer suppression (`AGENTS.md`). Changed existing tests are listed for the
-  verifier to judge.
+  verifier to judge. The only suppression that passes is a `#pragma warning disable` whose every id is in
+  `allowedSuppressions` of `dod.json`. If the ticket cannot be built without another one (an experimental API's
+  diagnostic, say), finish with `STATUS: stuck`, naming the id and why; never reach the same code by a detour
+  that hides it from the analyzer, such as reflection over a type's name.
 - Never push, switch branches, or change another ticket. In a branch round, change no ticket at all.

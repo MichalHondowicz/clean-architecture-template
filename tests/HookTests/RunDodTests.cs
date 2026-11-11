@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using HookTests.Infrastructure;
 using Shouldly;
 
@@ -331,6 +332,48 @@ public sealed class RunDodTests
 
         // Assert
         result.ExitCode.ShouldNotBe(2, result.Stderr);
+    }
+
+    [Fact]
+    public async Task RunDod_Should_StopAtTheFirstFailingSmokeCommand_WhenCheckingSmoke()
+    {
+        // Arrange
+        using var repository = DodRepository.CreateWithDodFile(DodWithSmoke(
+            DodRepository.Command("api-starts", "Write-Output 'healthy'"),
+            DodRepository.Command("login", "Write-Output 'no token'; exit 3"),
+            DodRepository.Command("never", "New-Item 'never-ran.txt'")));
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "smoke");
+
+        // Assert
+        result.ExitCode.ShouldBe(1);
+        FailedNames(result).ShouldBe("login");
+        Output(result).GetProperty("passed").EnumerateArray().Single().GetProperty("name").GetString().ShouldBe("api-starts");
+        File.Exists(repository.PathOf("never-ran.txt")).ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task RunDod_Should_RunNeitherCommandsNorSmoke_WhenCheckingSmokeWithoutASmokeList()
+    {
+        // Arrange
+        using var repository = DodRepository.Create([DodRepository.Command("build", "New-Item 'build-ran.txt'")]);
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Check", "smoke");
+
+        // Assert
+        result.ExitCode.ShouldBe(0);
+        Output(result).GetProperty("ok").GetBoolean().ShouldBeTrue();
+        Output(result).GetProperty("passed").GetArrayLength().ShouldBe(0);
+        File.Exists(repository.PathOf("build-ran.txt")).ShouldBeFalse();
+    }
+
+    private static string DodWithSmoke(params JsonObject[] smoke)
+    {
+        JsonObject dod = JsonNode.Parse(DodRepository.DodJson([DodRepository.Command("build", "exit 0")]))!.AsObject();
+        dod["smoke"] = new JsonArray([.. smoke]);
+        return dod.ToJsonString();
     }
 
     private static string[] OutputLines(JsonElement command) =>

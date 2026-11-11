@@ -97,7 +97,10 @@ Migrations: `dotnet ef migrations add {PascalCase_With_Underscores} --project sr
   suppression: no `#pragma warning disable`, `<NoWarn>`, `[SuppressMessage]`,
   `<TreatWarningsAsErrors>false`, `<CodeAnalysisTreatWarningsAsErrors>false`, `<WarningsNotAsErrors>`,
   analyzers switched off (`<RunAnalyzers>false`, `<EnableNETAnalyzers>false`) or `.editorconfig`
-  severity changes. Fix the code. The template's baseline suppressions (`NU1608` in
+  severity changes. Fix the code. The one exception is the user's: a `#pragma warning disable` that names
+  only ids listed in `allowedSuppressions` of `docs/agents/dod.json` (the diagnostic of an experimental API
+  the project uses on purpose). An id that is not listed is a question for the user, never a detour such as
+  reflection over a type's name. The template's baseline suppressions (`NU1608` in
   `Directory.Build.props`, `EXTEXP0018` in `src/Infrastructure/DependencyInjection.cs` and
   `tests/Application.UnitTests/Abstractions/BaseHandlerTest.cs`, and the existing
   `dotnet_diagnostic.*.severity = none` block in `.editorconfig`) predate this rule — don't add to or

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using HookTests.Infrastructure;
 using Shouldly;
 
@@ -185,6 +186,75 @@ public sealed class CheckDiffTests
         List<(string Kind, string Path)> violations = Violations(result);
         violations.ShouldContain(("solution-project-removed", "CleanArchitecture.slnx"));
         violations.Count.ShouldBe(1);
+    }
+
+    [Theory]
+    [InlineData("#pragma warning disable ASPIRECERTIFICATES001")]
+    [InlineData("#pragma warning disable ASPIRECERTIFICATES001, ASPIREHOSTING001 // experimental API")]
+    public async Task CheckDiff_Should_AllowPragma_WhenBaseDodListsEveryDisabledId(string addedLine)
+    {
+        // Arrange
+        using var repository = DodRepository.CreateWithDodFile(
+            DodWithAllowedSuppressions("ASPIRECERTIFICATES001", "ASPIREHOSTING001"));
+        repository.WriteFile("src/AppHost/AppHost.cs", "first line\n");
+        string baseCommit = repository.CommitAll("base");
+        repository.WriteFile("src/AppHost/AppHost.cs", $"first line\n{addedLine}\n");
+        repository.CommitAll("ticket");
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Base", baseCommit);
+
+        // Assert
+        result.ExitCode.ShouldBe(0);
+        Violations(result).ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData("src/AppHost/AppHost.cs", "#pragma warning disable ASPIRECERTIFICATES001, CA1822")]
+    [InlineData("src/AppHost/AppHost.cs", "#pragma warning disable")]
+    [InlineData("src/AppHost/AppHost.csproj", "<NoWarn>ASPIRECERTIFICATES001</NoWarn>")]
+    [InlineData("src/AppHost/AppHost.cs", "[SuppressMessage(\"Usage\", \"ASPIRECERTIFICATES001\")]")]
+    public async Task CheckDiff_Should_ReportSuppression_WhenItGoesBeyondTheAllowedPragmaIds(string relativePath, string addedLine)
+    {
+        // Arrange
+        using var repository = DodRepository.CreateWithDodFile(DodWithAllowedSuppressions("ASPIRECERTIFICATES001"));
+        repository.WriteFile(relativePath, "first line\n");
+        string baseCommit = repository.CommitAll("base");
+        repository.WriteFile(relativePath, $"first line\n{addedLine}\n");
+        repository.CommitAll("ticket");
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Base", baseCommit);
+
+        // Assert
+        result.ExitCode.ShouldBe(1);
+        Violations(result).ShouldContain(("suppression", relativePath));
+    }
+
+    [Fact]
+    public async Task CheckDiff_Should_ReportSuppression_WhenRangeItselfAllowsTheId()
+    {
+        // Arrange
+        using var repository = DodRepository.Create([]);
+        repository.WriteFile("src/AppHost/AppHost.cs", "first line\n");
+        string baseCommit = repository.CommitAll("base");
+        repository.WriteFile("docs/agents/dod.json", DodWithAllowedSuppressions("ASPIRECERTIFICATES001"));
+        repository.WriteFile("src/AppHost/AppHost.cs", "first line\n#pragma warning disable ASPIRECERTIFICATES001\n");
+        repository.CommitAll("ticket");
+
+        // Act
+        HookResult result = await HookProcess.RunScriptAsync(Script, repository.Root, "-Base", baseCommit);
+
+        // Assert
+        result.ExitCode.ShouldBe(1);
+        Violations(result).ShouldContain(("suppression", "src/AppHost/AppHost.cs"));
+    }
+
+    private static string DodWithAllowedSuppressions(params string[] ids)
+    {
+        JsonObject dod = JsonNode.Parse(DodRepository.DodJson([]))!.AsObject();
+        dod["allowedSuppressions"] = new JsonArray([.. ids.Select(id => JsonValue.Create(id))]);
+        return dod.ToJsonString();
     }
 
     private static List<(string Kind, string Path)> Violations(HookResult result)

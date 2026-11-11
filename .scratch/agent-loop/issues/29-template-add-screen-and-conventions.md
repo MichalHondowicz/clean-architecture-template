@@ -8,7 +8,7 @@ z ticketu 28) i sekcję konwencji mobilnych w `AGENTS.md`, obok backendowych.
 **Seams:** tekst skilla i `AGENTS.md`; wzorce zgodne z kodem template'u (`git grep`); obserwacja w następnym
 ficzerze z ekranem.
 
-**Status:** ready-for-agent
+**Status:** wontfix
 
 **Skąd:** ticket 11, decyzje 7 i 9 z bramki 2026-11-04 (historie 52, 55).
 
@@ -18,3 +18,9 @@ ficzerze z ekranem.
       pułapki głowy MAUI, które testy nie łapią. Tabela „Project skills” wskazuje `add-screen`.
 - [ ] AC3: `ca-review` sprawdza konwencje mobilne (checklista w `.claude/skills/ca-review/SKILL.md`).
 - [ ] AC4: `docs/workflow.md` opisuje warstwę mobilną w „Nowy projekt z template'u”.
+
+## Comments
+
+**2026-11-11, decyzja użytkownika (przegląd workflow):** `wontfix` na teraz. Warstwa MAUI w template'cie nie ma dziś
+drugiego odbiorcy, a Koszyk ma już `add-screen`, DoD mobilne i konwencje. Wraca jako nowy plan (`/plan-feature`),
+gdy ruszy drugi projekt MAUI.

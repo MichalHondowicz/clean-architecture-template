@@ -46,7 +46,7 @@ projekcie od razu. Per projekt trzeba dołożyć to, z czego skille procesu czyt
 | `GLOSSARY.md` i `docs/adr/` | słownik domeny i decyzje, których agent nie podważa |
 | `CLAUDE.md` = `@AGENTS.md` plus zdanie, że reguły idą do `AGENTS.md` | jedno źródło reguł |
 | `.claude/settings.json` z allowlistą komend | mniej pytań o zgodę przy buildzie i testach |
-| tylko dla pętli: `docs/agents/dod.json` | DoD projektu: sprawdzenia środowiska, komendy buildu i testów, chronione ścieżki, nazwa roli implementera, progi limitu, skill standardów |
+| tylko dla pętli: `docs/agents/dod.json` | DoD projektu: sprawdzenia środowiska, komendy buildu i testów, chronione ścieżki, nazwa roli implementera, progi limitu, skill standardów; opcjonalnie `screenPaths` (pliki ekranów do briefu), `smoke` (komendy, które raz przed briefem uruchamiają zbudowaną aplikację i same się kończą) i `allowedSuppressions` (identyfikatory diagnostyk, które wolno wyłączyć przez `#pragma warning disable`) |
 | tylko dla pętli: `docs/agents/implementer-contract.md` | wejście, wyjście i zakazy implementera, niezależne od modelu |
 | tylko dla pętli: `.claude/hooks/` i ich rejestracja w `.claude/settings.json` | `run-dod.ps1`, `check-diff.ps1`, `wait-for-reset.ps1`, `check-reboot.ps1`, `notify.ps1` (też hook `Notification`), `dod-gate.ps1` (`SubagentStop`), `guard-protected-paths.ps1` (`PreToolUse`) i wspólny `dod-common.ps1`, który cztery z nich wczytują; hooki rejestruje projekt, bo Claude Code ignoruje hooki we frontmatterze agentów z pluginu |
 | tylko dla pętli: wpisy allowlisty `/ship` | `git worktree`, `git switch`, `git merge --ff-only`, dokładnie `git push origin main`, a dla bramki 2 także `git fetch origin`, `git fetch . feat/*:main` i `git update-ref -d refs/heads/feat/*`; do tego skrypty z `.claude/hooks/`. Pełny wzór (Bash i PowerShell) w `.claude/settings.json` tego template'u |
@@ -94,7 +94,11 @@ opisują strony forka: `D:\Projects\skills\docs\engineering\plan-feature.md` i
    każdy w rundach implementer → weryfikator DoD → review Spec, najwyżej 3 rundy. Ticket, który nie zbiega,
    dostaje `needs-info` i brief w `## Comments`, a niezależne idą dalej. Uwaga spoza zakresu ticketu staje się
    nowym ticketem `needs-triage`. Na końcu review całej gałęzi na Opusie (Standards przez `ca-review` i Spec),
-   potem `.scratch/<feature>/brief.md` i push na telefon.
+   potem `.scratch/<feature>/brief.md` i push na telefon. Przed briefem pętla puszcza komendy `smoke` z `dod.json`
+   (jeśli są) i `check-diff.ps1` na całej gałęzi. Brief ma z tego sekcje **Smoke**, **Branch diff** (to, czego
+   nie widziała żadna runda, np. Twój ręczny commit na gałęzi) i **Check before OK**: lista rzeczy, których
+   pętla nie mogła uruchomić i które oglądasz sam przed odpowiedzią (ekrany na emulatorze, zachowania nigdy
+   nieuruchomione).
 5. **Bramka 2**: jedno pytanie w sesji `/ship`, z komputera albo przez Remote Control z telefonu. Odpowiadasz
    jedną wiadomością: „OK” scala, „nie” zostawia gałąź, a każda propozycja konwencji dostaje `tak` albo `nie`
    (np. `OK, 1 tak, 2 nie`):
@@ -265,6 +269,14 @@ zmian.
   - Albo zacommituj ticket ustawiony na `wontfix` i zrób zmianę poza ficzerem, przed `/ship` albo po
     scaleniu. Ticket, który ma go w `Blocked by`, nie ruszy, dopóki w tym samym commicie nie usuniesz tej
     zależności; brief wymienia takie tickety.
+- **Ticket, który wymaga wyciszenia analizatora** (np. diagnostyka eksperymentalnego API): implementer kończy
+  `STATUS: stuck` z identyfikatorem i powodem, zamiast obchodzić analizator refleksją. Decyzja jest Twoja,
+  w commicie na `feat/<feature>` razem z `**Decision:**` i ticketem ustawionym na `ready-for-agent`:
+  - dopisujesz identyfikator do `allowedSuppressions` w `docs/agents/dod.json` (plik chroniony, więc ręcznie);
+    `check-diff.ps1` przepuszcza wtedy `#pragma warning disable` tylko z identyfikatorami z tej listy;
+  - albo wskazujesz w `**Decision:**` inną drogę.
+
+  Brief pokaże Twój commit w **Branch diff**: scalenie go potwierdza.
 - **Ponowne review gałęzi**: usuń w commicie na gałęzi `brief.md` i `findings/branch-*.md`, potem `/ship`.
 - **Przerwana bramka 2**: decyzja jest zapisana w briefie. Dopóki `main` nie zawiera gałęzi, kolejny `/ship`
   pyta jeszcze raz („OK” liczy się tylko w sesji, która scala). Gdy `main` już ją zawiera, `/ship <feature>`
@@ -318,12 +330,20 @@ GitHubie pokazuje tylko status.
   katalog roboczy. Kopia zapasowa: remote `backup`.
 - **Kopie hooków w innych projektach** (Koszyk `D:\Projects\Koszyk`, sandbox `D:\Projects\ship-sandbox`): źródłem
   jest `.claude/hooks/` tego template'u, jedyne miejsce z testami (`tests/HookTests`). Zmiana hooka idzie tutaj,
-  z testem. Potem kopiujesz wszystkie skrypty z `.claude/hooks/` do projektu, a w jego commicie zapisujesz commit
-  template'u, z którego pochodzą. Kopię sprawdzasz porównaniem identyfikatorów blobów
-  (`git rev-parse HEAD:.claude/hooks/<plik>` w obu repozytoriach) i przebiegiem `run-dod.ps1 -Check commands`
-  w projekcie. Nowy skrypt albo nowy hook wymaga też wpisu w `.claude/settings.json` projektu (rejestracja albo
+  z testem i commitem. Potem `pwsh -NoProfile -File .claude/hooks/sync-hooks.ps1 -Target <katalog projektu>`
+  kopiuje wszystkie skrypty do `.claude/hooks/` projektu i zapisuje commit template'u w pliku
+  `.claude/hooks/SOURCE` (odmawia, gdy hooki template'u mają niezacommitowane zmiany). Kopię commitujesz
+  w projekcie i sprawdzasz przebiegiem `run-dod.ps1 -Check commands`. Nie synchronizuj projektu, w którym
+  ficzer czeka na bramkę 2: commit na jego `main` zatrzyma scalenie. Nowy skrypt albo nowy hook wymaga też wpisu w `.claude/settings.json` projektu (rejestracja albo
   allowlista), który dopisujesz sam. Koszyk ma kopie z `7629132`.
 - **Zmiana konwencji**: zawsze przez Twoją decyzję (bramka 2, `/retro`), nigdy „przy okazji” innej pracy.
+- **Pętla jest zamrożona** (decyzja 2026-11-11): skille i hooki zmieniasz tylko wtedy, gdy prawdziwy ficzer się
+  na czymś wyłoży. Bez pilotów i ticketów na zapas.
+- **Błąd w kroku deterministycznym `/ship`** (wybór ticketu, liczenie rund, wiersz pomiaru, kroki git bramki 2)
+  naprawiasz przeniesieniem tego kroku do skryptu w `.claude/hooks/` z testem w `tests/HookTests`, a skill
+  tylko go woła. Kolejne zdanie w skillu jest poprawką tylko dla kroków, które wymagają oceny.
+- **Warstwa MAUI w template'cie** (tickety 28–30) jest odłożona do drugiego projektu MAUI. Do tego czasu wzorcem
+  jest Koszyk (`add-screen`, DoD mobilne, `screenPaths`).
 
 ## Pułapki, które już kosztowały czas
 

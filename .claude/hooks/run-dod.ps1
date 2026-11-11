@@ -1,18 +1,20 @@
 # Script for /ship's pre-flight and the verifier, not a hook: runs one part of docs/agents/dod.json.
-# Usage, inside the repository: pwsh -File run-dod.ps1 -Check environment|commands [-TimeoutSeconds 300]
+# Usage, inside the repository: pwsh -File run-dod.ps1 -Check environment|commands|smoke [-TimeoutSeconds 300]
 #                               pwsh -File run-dod.ps1 -Check quota -FiveHourPercent <n> -WeeklyPercent <n>
 #   environment: every environment check; a failing check with a `start` command is started, then re-checked
 #                until it passes or the timeout runs out. Also prints "started":[name] with the checks it started,
 #                so /ship knows the environment was down before this check.
 #   commands:    the DoD commands in order, stopping at the first failure; also prints "passed":[{"name","output"}]
 #                with the last 20 lines of each command that passed.
+#   smoke:       the optional `smoke` commands, which run the built application once per feature (each must end
+#                by itself); reported like `commands`. A DoD file without `smoke` passes with nothing run.
 #   quota:       the plan usage /ship read, against the thresholds in `quota`, all percentages from 0 to 100;
 #                a window at or above its threshold fails as {"name":"weekly"|"fiveHour","used","threshold"}.
 # Prints {"ok":bool,"failed":[{"name","exitCode","output"}]}; exits 1 when something failed, 2 when the DoD
 # file is missing or unreadable, or the usage or thresholds a quota check needs are missing.
 
 param(
-    [Parameter(Mandatory)] [ValidateSet('environment', 'commands', 'quota')] [string]$Check,
+    [Parameter(Mandatory)] [ValidateSet('environment', 'commands', 'smoke', 'quota')] [string]$Check,
     [int]$TimeoutSeconds = 300,
     [string]$FiveHourPercent,
     [string]$WeeklyPercent
@@ -114,8 +116,9 @@ try {
     }
     else {
         # Waits while the DoD gate (or another run) is building and testing this repository.
+        $steps = $Check -eq 'smoke' ? @($dod.smoke | Where-Object { $_ }) : $dod.commands
         Invoke-DodExclusive $root {
-            foreach ($command in $dod.commands) {
+            foreach ($command in $steps) {
                 $result = Invoke-DodStep $command
                 if ($result.ExitCode -ne 0) {
                     $failed.Add([ordered]@{ name = $command.name; exitCode = $result.ExitCode; output = $result.Output })
@@ -132,7 +135,7 @@ finally {
 }
 
 $report = [ordered]@{ ok = $failed.Count -eq 0; failed = @($failed) }
-if ($Check -eq 'commands') {
+if ($Check -in 'commands', 'smoke') {
     $report.passed = @($passed)
 }
 else {
