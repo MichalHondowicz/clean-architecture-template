@@ -401,3 +401,7 @@ FodyWeavers.xsd
 
 # Feature worktrees created by /ship (Claude Code worktree location)
 .claude/worktrees/
+
+# Codex's own copies of the project skills and hooks; the source is .claude/
+.agents/
+.codex/
