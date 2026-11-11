@@ -29,7 +29,7 @@ your-project/
         └── ca-review/
 ```
 
-Works with both the standard and the Aspire variants of the template.
+Written for the standard variant of the template: docker-compose and Testcontainers, no .NET Aspire (ADR 0008).
 
 ## Try it
 

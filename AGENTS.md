@@ -111,6 +111,9 @@ Migrations: `dotnet ef migrations add {PascalCase_With_Underscores} --project sr
   pulls it in; never suppress the advisory.
 - **Central Package Management**: a new package is a `<PackageVersion>` in `Directory.Packages.props`
   plus a `<PackageReference>` without `Version` in the csproj.
+- **No .NET Aspire** (ADR 0008): no AppHost project, no `Aspire.*` package. The local environment is
+  `docker-compose.yml`, integration tests use Testcontainers, telemetry is OpenTelemetry + Serilog/Seq. A
+  feature that seems to need Aspire is a question for the user, never something to add along the way.
 - Verification commands must terminate on their own: no `dotnet run` or `docker compose up` as a
   verification step.
 - Chain `dotnet test --no-build` behind a successful build (`dotnet build ... && dotnet test ... --no-build`):
