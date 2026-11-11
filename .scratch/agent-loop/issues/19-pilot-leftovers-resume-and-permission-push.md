@@ -28,3 +28,8 @@ następnego prawdziwego ficzera puszczonego przez `/ship`, bez osobnego przebieg
 **2026-11-01, triage (decyzja użytkownika):** `ready-for-human`. To obserwacja, którą robi użytkownik przy
 następnym prawdziwym ficzerze, nie praca dla agenta. Najlepiej po ticketach 17 i 16, żeby wznowienie
 sprawdzić już ze sprawdzeniem środowiska i ostrzeżeniem o restarcie.
+
+**2026-11-11, przebieg `mobile-smoke-emulator` w Koszyku:** pauza o 16:51 do 20:40, restart systemu o 20:25, sesja dostała
+komunikat o przerwanym `wait-for-reset.ps1` i nic nie zrobiła (0 tur), jak w pilocie 10. Wznowienia bez restartu nadal
+nikt nie widział. Poprawka w forku (`1.3.1-dotnet.35`): taki komunikat oznacza „wznów z trackera”. Nie wiadomo, czy
+aplikacja daje sesji turę na ten komunikat; pokaże to następny restart w trakcie czekania.

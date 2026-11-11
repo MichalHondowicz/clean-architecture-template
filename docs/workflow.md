@@ -246,7 +246,9 @@ zmian.
     systemu pokazuje restart: `Get-WinEvent -FilterHashtable @{LogName='System'; Id=1074} -MaxEvents 3`.
   - **Jak wznowić:** napisz dowolną wiadomość w tej samej sesji `/ship` (np. „jak status?”). Pętla sprawdzi
     limit i środowisko i pójdzie dalej (pilot 10). Albo wpisz `/ship <feature>` w nowej sesji w głównym
-    checkoucie. Obie drogi wznawiają z trackera.
+    checkoucie. Obie drogi wznawiają z trackera. Od wersji `1.3.1-dotnet.35` skill każe sesji wznowić samej
+    po takim komunikacie. Czy aplikacja daje jej wtedy turę, pokaże następny restart: 2026-11-11 w Koszyku
+    (restart 20:25, reset okna 20:40) komunikat przyszedł, a sesja nie zrobiła nic, jeszcze na starej wersji.
 - **Po `needs-info`**: gdy choć jeden ticket ficzera nie jest `done` (nie liczą się `needs-triage`
   i `wontfix`), przebieg kończy się bez review gałęzi, briefu i bramki 2. Ticket zachowuje swoje cofnięte
   commity w historii i stash nazwany w briefie. Odblokowanie, dwie równoważne drogi:
