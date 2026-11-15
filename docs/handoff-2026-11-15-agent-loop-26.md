@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-11-15-agent-loop-27.md
+
 # Handoff: domknięcie pilota 2 (ticket 26) po E2E Release w Koszyku
 
 Pętla bez nadzoru jest zbudowana i zamrożona. W tym template'cie nie ma już pracy dla agenta: otwarte tickety
