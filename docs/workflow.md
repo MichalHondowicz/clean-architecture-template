@@ -296,7 +296,8 @@ zewnętrzny implementer. W przeciwnym razie zostaje Pro. Kontrakt implementera
 ten sam kontrakt i te same hooki.
 
 Wynik (2026-11-15, ticket 11): zostaje Pro. Oba pomiary dały ok. 2–3% limitu tygodniowego na ficzer
-z 3 ticketami, z planowaniem ok. 5%.
+z 3 ticketami, z planowaniem ok. 5%. To dolna granica: późniejsze przebiegi w Koszyku kosztowały od 4% do
+ponad 9% bez planu (ticket 26), co dalej mieści 2 ficzery tygodniowo.
 
 ## Korekta decyzji z bramki 2 po scaleniu
 

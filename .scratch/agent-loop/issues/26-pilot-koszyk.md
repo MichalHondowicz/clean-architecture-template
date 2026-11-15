@@ -65,3 +65,58 @@ przy ok. 5% tygodnia na ficzer razem z planem (plan z pomiaru nr 1) próg 2 ficz
 scalonego ficzera, niewidoczny brak tematu ntfy) i błąd Git Bash przy wznowieniu po scaleniu poprawione od
 razu w tickecie 31 (plugin `1.3.1-dotnet.30`). Rozjazdy Koszyka z przebiegu 1 to jego tickety 04 i 05,
 po triage'u 04 `ready-for-agent`, 05 `wontfix` (Koszyk `fbc74b3`). AC5 zostaje otwarte do końca pilota.
+
+**2026-11-15, przebiegi 2 i 3 z historii Koszyka** (zapis agenta z repozytorium Koszyka, `main` `b2d0ea8`, bez
+raportów sesji `/ship`; źródła: `git log`, reflog `origin/main`, `.scratch/<slug>/metrics.md` i `brief.md`,
+`docs/tasks/handoff-15-release-e2e-and-triage.md`):
+
+- **Przebieg 2, `emulator-tls-release-e2e`** (pierwszy z remote). Plan `0b180ef` 2026-11-10 21:36, `/ship`
+  21:39–22:32: tickety 01–03 `done` po 1 rundzie, review gałęzi 2 rundy, brief. Bramka 2 „OK, 1 tak” 2026-11-11
+  15:07 (`c69ede1`), `origin/main` przesunięty pushem o 15:08:20. Testy 99/5/136/14/622, 0 ostrzeżeń. Nowe
+  tickety Koszyka: 04, 05.
+- **Przebieg 3, `mobile-smoke-emulator`.** Plan `b0fe56f` 2026-11-11 16:00, `/ship` od 16:36: 01 i 02 `done` po
+  1 rundzie, pauza na limit 5-godzinny 16:51 (do 20:40), 03 `done` po 2 rundach (start 21:13, koniec 2026-11-12
+  16:52, „wznowiony po pauzie 5h i po błędzie limitu implementera”), review gałęzi 1 runda, brief 17:06. Bramka 2
+  „OK, 1 tak” 2026-11-12 20:44 (`626b1e5`), `origin/main` przesunięty pushem o 20:45:25. Testy 99/5/136/14/647,
+  smoke `mobile-login` zielony. Nowe tickety Koszyka: 04–07.
+
+| Przebieg | Rundy | Minuty | Okno 5h | Tydzień |
+|---|---|---|---|---|
+| 2 `emulator-tls-release-e2e` | 5 | 51 | 24% → 56% (+32) | 21% → 25% (+4) |
+| 3 `mobile-smoke-emulator`, 01 i 02 | 2 | 14 | 34% → 90% (+56) | 5% → 14% (+9) |
+| 3, ticket 03 (z pauzą i czekaniem) | 2 | 1179 | 47% → 17% | 22% → 48% |
+| 3, review gałęzi | 1 | 12 | 17% → 27% (+10) | 48% → 49% (+1) |
+
+Modele jak w pomiarze nr 2. Wiersz ticketu 03 obejmuje 19 godzin zegara i dwa okna 5-godzinne, a tydzień między
+pauzą a startem 03 urósł z 14% do 22% bez pracy `/ship`, więc była w nim praca innych sesji; ten wiersz nie mierzy
+kosztu ticketu. Suma w `metrics.md` przebiegu 3 („+66%*”, „+36%”) ma gwiazdkę bez objaśnienia w pliku. To, co da
+się porównać: przebieg 2 kosztował 4 pp tygodnia, a same tickety 01 i 02 przebiegu 3 kosztowały 9 pp w 14 minut.
+Oba wyniki są wyższe niż 2–3 pp z pomiarów nr 1 i 2. Próg z historii 48 (mniej niż 2 ficzery tygodniowo) dalej
+jest daleko, więc decyzja z ticketu 11 (zostaje Pro) się nie zmienia, ale liczba „ok. 5% na ficzer z planem”
+jest dolną granicą, nie średnią.
+
+Co te przebiegi mówią o kryteriach:
+
+- **AC1.** W obu przebiegach `origin/main` przesunął się pushem ok. 20 s po commicie bramki 2, czyli scalenie
+  i push zrobił krok `/ship`, nie użytkownik. Przebieg 2 doszedł do `main` bez udziału użytkownika poza bramkami.
+  Przebieg 3 nie: po restarcie systemu w trakcie czekania sesja nie ruszyła sama (ticket 19, wpis z 2026-11-11).
+  Druga część kryterium (pytania o zgodę trafiają do allowlisty) nie ma zapisu: z repozytorium nie widać, czy
+  w tych przebiegach padło jakiekolwiek pytanie o zgodę.
+- **AC2.** Oba briefy mają sekcję „Screens” ze zmienionymi plikami (`screenPaths`): 4 pliki głowy MAUI
+  w przebiegu 2, `MauiProgram.cs` i 8 plików XAML w przebiegu 3; brief przebiegu 3 ma też „Check before OK”.
+  Sprawdzenia na emulatorze przed `OK` nie było: brief przebiegu 2 mówi „E2E na emulatorach jeszcze nie robiony”,
+  a handoff Koszyka z 2026-11-13 wymienia jako zaległe obejrzenia `ux-cosmetics-1` (`ListsPage` jako Widz,
+  `MembersPage`, wiersz „Ty”) i wszystkie ekrany po przebudowie `MauiProgram`. Zostają do przebiegu E2E Release
+  z tego handoffu.
+- **AC4.** Wznowienie: zapisane w tickecie 19 (pauza zadziałała, restart o 20:25 przerwał czekanie, 0 tur).
+  Push przy pytaniu o zgodę: brak obserwacji, jak w AC1.
+- **AC5.** Rozjazdy pętli z tych przebiegów są zapisane i poprawione: ticket 32 (krok CI przy przeglądarce
+  wylogowanej z GitHuba), ticket 33 (z briefu przebiegu 2: nic nie sprawdzone na emulatorze, wyciszenie
+  analizatora obejściem przez refleksję; stąd smoke w DoD i `allowedSuppressions`), poprawka forka `.35`
+  (komunikat o przerwanym czekaniu). Rozjazdy Koszyka: 6 ticketów po triage z 2026-11-13 (Koszyk `166458a`):
+  TLS 04 `ready-for-agent`, TLS 05 `ready-for-human`, smoke 04–07 `ready-for-agent`.
+- **Seam „CI po scaleniu”.** Żaden z trzech przebiegów go nie sprawdził: workflow CI Koszyka powstał 2026-11-13
+  (`b2d0ea8`, ticket 24), po ostatnim scaleniu przez `/ship`.
+
+Ticket zostaje `ready-for-human`. Do zamknięcia brakuje: obejrzenia ekranów na emulatorze (AC2), obserwacji
+pytania o zgodę (AC1, AC4) i decyzji użytkownika, czy AC1 uznać za spełnione przebiegiem 2.

@@ -79,3 +79,8 @@ Wnioski z pilota 1 (kryterium 3) poszły w tickety 12–19 przed rozpisaniem. Os
 z historii 48 (mniej niż 2 ficzery po 3 tickety w tygodniowym limicie) jest daleko, więc ani Max 5x, ani
 zewnętrzny implementer nie są potrzebne. Ticket zamknięty. Ticket 26 zostaje otwarty ze swoimi kryteriami;
 pomiar nr 2 (jego AC3) jest zapisany.
+
+**2026-11-15, korekta liczby:** „ok. 5% z planowaniem” to dolna granica, nie średnia. Późniejsze przebiegi
+w Koszyku kosztowały więcej: `emulator-tls-release-e2e` 4 pp tygodnia bez planu, a dwa pierwsze tickety
+`mobile-smoke-emulator` 9 pp (ticket 26, wpis z 2026-11-15). Decyzja zostaje: nawet przy kilkunastu procentach
+na ficzer 2 ficzery tygodniowo się mieszczą.
