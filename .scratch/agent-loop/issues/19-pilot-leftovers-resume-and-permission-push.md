@@ -33,3 +33,7 @@ sprawdzić już ze sprawdzeniem środowiska i ostrzeżeniem o restarcie.
 komunikat o przerwanym `wait-for-reset.ps1` i nic nie zrobiła (0 tur), jak w pilocie 10. Wznowienia bez restartu nadal
 nikt nie widział. Poprawka w forku (`1.3.1-dotnet.35`): taki komunikat oznacza „wznów z trackera”. Nie wiadomo, czy
 aplikacja daje sesji turę na ten komunikat; pokaże to następny restart w trakcie czekania.
+
+**2026-11-15, z zamknięcia ticketu 26:** do drugiej obserwacji dochodzi część AC1 tamtego ticketu: gdy pytanie
+o zgodę padnie w przebiegu `/ship` w Koszyku, zapisz też, czy trafiło potem do allowlisty Koszyka. W trzech
+przebiegach pilota 2 nie ma zapisu żadnego pytania o zgodę.

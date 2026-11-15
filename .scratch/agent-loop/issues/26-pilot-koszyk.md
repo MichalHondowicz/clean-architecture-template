@@ -8,20 +8,20 @@ i bramkę 2 aż do `main` na GitHubie. To pilot 2 z pomiarem nr 2 i pierwsze spr
 **Seams:** seam 1 ze speca: statusy ticketów, `## Comments`, `metrics.md`, brief, historia gałęzi,
 powiadomienia, CI po scaleniu.
 
-**Status:** ready-for-human
+**Status:** done
 
 **Skąd:** ticket 11, decyzje 1 i 8 z bramki 2026-11-04 (historie 54, 58, 63). Zakres pilota: dwie lub trzy
 pozycje „kosmetyki UX” z modułu 15 (`D:\Projects\Koszyk\docs\tasks\state-15-mobile-polish-hardening.md`),
 np. przecinek w polu `Numeric` i podwójny alert „Brak dostępu”.
 
-- [ ] AC1: Ficzer dochodzi do `main` bez udziału użytkownika poza bramkami. Każde pytanie o zgodę trafia do
+- [x] AC1: Ficzer dochodzi do `main` bez udziału użytkownika poza bramkami. Każde pytanie o zgodę trafia do
       allowlisty Koszyka.
-- [ ] AC2: Brief wymienia zmienione ekrany i pliki do sprawdzenia na emulatorze (`screenPaths`), a użytkownik
+- [x] AC2: Brief wymienia zmienione ekrany i pliki do sprawdzenia na emulatorze (`screenPaths`), a użytkownik
       sprawdza je na emulatorze przed `OK`.
 - [x] AC3: Tabela pomiaru jest pełna i zapisana jako pomiar nr 2 (historia 47), obok pomiaru nr 1 z ticketu 10.
-- [ ] AC4: Obserwacje z ticketu 19 (wznowienie bez użytkownika, push przy pytaniu o zgodę) są zapisane, jeśli
+- [x] AC4: Obserwacje z ticketu 19 (wznowienie bez użytkownika, push przy pytaniu o zgodę) są zapisane, jeśli
       przebieg na nie trafi.
-- [ ] AC5: Rozjazdy pętli i dokumentów Koszyka są zapisane jako tickety `needs-triage`.
+- [x] AC5: Rozjazdy pętli i dokumentów Koszyka są zapisane jako tickety `needs-triage`.
 
 **2026-11-05, przebieg 1 (`ux-cosmetics-1`), zapis agenta z repozytorium Koszyka, bez raportu sesji `/ship`:**
 
@@ -120,3 +120,36 @@ Co te przebiegi mówią o kryteriach:
 
 Ticket zostaje `ready-for-human`. Do zamknięcia brakuje: obejrzenia ekranów na emulatorze (AC2), obserwacji
 pytania o zgodę (AC1, AC4) i decyzji użytkownika, czy AC1 uznać za spełnione przebiegiem 2.
+
+**2026-11-15 (wieczór), E2E Release w Koszyku, zapis agenta z repozytorium Koszyka** (`a0b236c`, `1ee6469`,
+`2d5d5ea`; pełny wynik: `D:\Projects\Koszyk\docs\tasks\state-15-mobile-polish-hardening.md`, sekcja „E2E Release
+po HTTPS”):
+
+- **AC2, zaległe obejrzenia ekranów są zrobione**, przez agenta po adb na `Pixel_6a` i `Pixel_6a_B`, na buildzie
+  Release E2E:
+  - `ux-cosmetics-1`: Widz na `ListsPage` nie widzi ✎, a swipe pokazuje tylko „Opuść listę”; `MembersPage` ma
+    wiersz „Ty” z nazwą i e-mailem, e-mail raz, bez pustej linii.
+  - `mobile-smoke-emulator`: po przebudowie `MauiProgram` działają listy, szczegóły listy, edycja pozycji,
+    członkowie, zaproszenie, sugestie i profil. Nie sprawdzano zapisu w popupach ani wylogowania.
+  - `emulator-tls-release-e2e`: logowanie przez Keycloak po HTTPS działa na obu urządzeniach, realtime działa.
+  Kryterium mówi „użytkownik sprawdza na emulatorze przed `OK`”. Tu sprawdził agent i po `OK` (3–10 dni po
+  scaleniu), więc checkbox zostaje pusty do decyzji użytkownika.
+- **Wniosek dla pętli:** ficzer `emulator-tls-release-e2e` przeszedł DoD, review i bramkę 2, a `api` nie
+  startowało przez AppHost (health check Keycloaka po HTTP na interfejsie zarządzania po HTTPS; poprawka
+  `1ee6469`). Znalazło to dopiero uruchomienie na emulatorach. Nie ustalono, czy błąd był w ficzerze od scalenia,
+  czy przyszedł z podbiciem Aspire do 13.6.5. To ta sama luka, którą opisał ticket 33 (brief: „nic nie
+  sprawdzono na emulatorze”); smoke z ticketu 33 pokrywa start aplikacji do ekranu logowania, nie start
+  backendu. Bez nowego ticketu: reguła zamrożenia wymaga nieudanego przebiegu `/ship`, a to wyszło poza pętlą.
+- **Stan Koszyka:** moduły 13 i 14 mają ✅ w roadmapie (część AC3 ticketu 27). Zamknięte w sesji tickety TLS 04,
+  05 i smoke 07. Plan `mobile-smoke-hardening` (`3f2f371`, smoke 04–06) leży na lokalnym `main` Koszyka, jeszcze
+  niewypchnięty (`origin/main` = `ff5cdbf`); to będzie czwarty przebieg `/ship` i pierwszy z CI po scaleniu.
+
+**2026-11-15, zamknięcie (decyzja użytkownika: „Tak, zamknij”):** `done`.
+
+- AC1 uznane przebiegiem 2 (`emulator-tls-release-e2e`). Część o pytaniach o zgodę i allowliście nie ma
+  obserwacji i przechodzi do ticketu 19.
+- AC2 uznane z adnotacją: ekrany obejrzał agent po adb, po scaleniu, nie użytkownik przed `OK`.
+- AC4: wznowienie zapisane w tickecie 19; pytanie o zgodę nie padło w żadnym zapisanym przebiegu.
+- AC5: rozjazdy zapisane w ticketach 31, 32, 33 i w ticketach Koszyka.
+- Seam „CI po scaleniu” przechodzi do ticketu 27: pierwszy przebieg `/ship` z CI Koszyka to
+  `mobile-smoke-hardening`.

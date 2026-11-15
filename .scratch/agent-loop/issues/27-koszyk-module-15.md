@@ -18,3 +18,16 @@
       dla emulatora z E2E Release (moduły 13 § 1.3–1.4 i 14 § 14).
 - [ ] AC2: Każdy ficzer doszedł do `main`. Ficzer, który nie zbiegł, ma brief `needs-info` i decyzję użytkownika.
 - [ ] AC3: Po E2E Release roadmapa w `AGENTS.md` Koszyka ma 13, 14 i 15 jako ✅ (decyzja 1 ze `state-15`).
+
+## Comments
+
+**2026-11-15, z zamknięcia ticketu 26:**
+
+- Ticket 26 jest `done`, więc ten ticket nie jest już zablokowany.
+- Do sprawdzenia przy pierwszym przebiegu `/ship` (`mobile-smoke-hardening`, plan w Koszyku `3f2f371`): seam
+  „CI po scaleniu”. Żaden przebieg pilota 2 go nie sprawdził, bo workflow CI Koszyka powstał 2026-11-13.
+- AC1: pozycja „wystawienie API po TLS dla emulatora z E2E Release” jest zrobiona (`emulator-tls-release-e2e`
+  scalony 2026-11-11, E2E Release zaliczone 2026-11-15). Doszedł ficzer `mobile-smoke-hardening`. Reszta zakresu:
+  sync i auth, motyw i branding, `ux-cosmetics-2`, backend i schemat (handoff Koszyka
+  `docs/tasks/handoff-15-smoke-hardening-and-next-feature.md`, sekcja 4, pytanie 4).
+- AC3: moduły 13 i 14 mają ✅ w roadmapie Koszyka od 2026-11-15 (`a0b236c`); 15 jeszcze nie.
