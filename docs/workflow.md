@@ -295,6 +295,9 @@ zewnętrzny implementer. W przeciwnym razie zostaje Pro. Kontrakt implementera
 (`docs/agents/implementer-contract.md`) jest przygotowany pod podmianę modelu: zewnętrzny implementer dostaje
 ten sam kontrakt i te same hooki.
 
+Wynik (2026-11-15, ticket 11): zostaje Pro. Oba pomiary dały ok. 2–3% limitu tygodniowego na ficzer
+z 3 ticketami, z planowaniem ok. 5%.
+
 ## Korekta decyzji z bramki 2 po scaleniu
 
 `/ship` nie ma ścieżki korekty. Gdy odpowiedź na bramce 2 była pomyłką, a ficzer jest już w `main`,

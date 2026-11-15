@@ -8,7 +8,7 @@ decyzja o planie według reguły pomiaru.
 
 **Seams:** brak (ticket planistyczny).
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] Tickety etapu 2 są opublikowane w trackerze, każdy z `Seams:` i kryteriami `AC1…n`.
 - [x] Historie 49–56 i 58 ze speca są w kryteriach tych ticketów: warstwa `Mobile`, `Mobile.Core`
@@ -18,7 +18,7 @@ decyzja o planie według reguły pomiaru.
 - [x] Wnioski z pilota 1, które zmieniają kształt pętli, są uwzględnione przed rozpisaniem.
 - [x] Historia 63 (Koszyk na pętli) jest w kryteriach ticketów: plik DoD Koszyka, hooki i ich rejestracja,
       konwencje, sprawdzenie na małym ficzerze, moduł 15 przez `/plan-feature`.
-- [ ] Po pilocie 2 decyzja według reguły: mniej niż 2 ficzery po 3 tickety w tygodniowym limicie Pro oznacza
+- [x] Po pilocie 2 decyzja według reguły: mniej niż 2 ficzery po 3 tickety w tygodniowym limicie Pro oznacza
       Max 5x albo zewnętrzny implementer, w przeciwnym razie zostaje Pro (historia 48).
 
 ## Comments
@@ -73,3 +73,9 @@ pętlę zamiast włączania starego pluginu, więc moduł 15 rusza dopiero po pr
 
 Wnioski z pilota 1 (kryterium 3) poszły w tickety 12–19 przed rozpisaniem. Ostatnie kryterium tego ticketu
 (decyzja o planie po pilocie 2) czeka na ticket 26.
+
+**2026-11-15, decyzja o planie (decyzja użytkownika):** zostaje Pro. Pomiar nr 1 (ticket 10) i pomiar nr 2
+(ticket 26) dają ok. 2–3% limitu tygodniowego na ficzer z 3 ticketami, a razem z planowaniem ok. 5%. Próg
+z historii 48 (mniej niż 2 ficzery po 3 tickety w tygodniowym limicie) jest daleko, więc ani Max 5x, ani
+zewnętrzny implementer nie są potrzebne. Ticket zamknięty. Ticket 26 zostaje otwarty ze swoimi kryteriami;
+pomiar nr 2 (jego AC3) jest zapisany.
