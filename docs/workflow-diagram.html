@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pętla agenta: od pomysłu do main</title>
+<style>
+  :root {
+    --bg: #f6f3ec; --card: #fffdf8; --ink: #1f2328; --muted: #5d6470; --line: #d9d3c5;
+    --you: #c2410c; --you-bg: #fdebe0; --you-line: #f0b08a;
+    --agent: #0f766e; --agent-bg: #dff3ef; --agent-line: #8ccfc4;
+    --guard: #6d28d9; --guard-bg: #efe8fd; --guard-line: #c4b0f3;
+    --warn: #92400e; --warn-bg: #fdf1d3;
+    --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15171b; --card: #1d2026; --ink: #e8e6e1; --muted: #a0a6b1; --line: #343943;
+      --you: #fdba8c; --you-bg: #3b2416; --you-line: #8a4a23;
+      --agent: #7fe0d2; --agent-bg: #12312e; --agent-line: #1f6a61;
+      --guard: #c9b5ff; --guard-bg: #2a2140; --guard-line: #5b45a0;
+      --warn: #f7cf7a; --warn-bg: #3a2c10;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 34px; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; margin: 44px 0 14px; letter-spacing: -0.01em; }
+  p.lead { color: var(--muted); margin: 0; max-width: 62ch; font-size: 17px; }
+  code { font-family: var(--mono); font-size: 0.88em; background: color-mix(in srgb, var(--line) 45%, transparent); padding: 1px 5px; border-radius: 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; font-size: 14px; color: var(--muted); }
+  .dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .card h3 { margin: 0 0 4px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .card .path { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 8px; word-break: break-all; }
+
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .row { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; }
+  .step { flex: 1 1 200px; border-radius: 12px; padding: 14px 16px; border: 1px solid; min-width: 0; }
+  .step .who { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .step .name { font-weight: 600; font-size: 17px; margin: 2px 0 4px; }
+  .step .what { font-size: 14px; color: var(--muted); }
+  .step .model { display: inline-block; margin-top: 8px; font-size: 12px; font-family: var(--mono); padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; }
+  .you { background: var(--you-bg); border-color: var(--you-line); }
+  .you .who, .you .name, .you .model { color: var(--you); }
+  .agent { background: var(--agent-bg); border-color: var(--agent-line); }
+  .agent .who, .agent .name, .agent .model { color: var(--agent); }
+  .arrow { flex: 0 0 34px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 20px; }
+  .down { text-align: center; color: var(--muted); font-size: 20px; line-height: 1; padding: 8px 0; }
+  .loop { border: 2px dashed var(--agent-line); border-radius: 16px; padding: 18px; background: color-mix(in srgb, var(--agent-bg) 35%, transparent); }
+  .loop > .title { font-weight: 600; font-size: 17px; color: var(--agent); }
+  .loop > .sub { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+  .lane { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin: 14px 0 8px; }
+  .note { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  @media (max-width: 760px) { .arrow { flex-basis: 100%; transform: rotate(90deg); height: 26px; } }
+
+  .guards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .guard { background: var(--guard-bg); border: 1px solid var(--guard-line); border-radius: 12px; padding: 13px 15px; }
+  .guard h3 { margin: 0 0 3px; font-size: 14px; font-family: var(--mono); color: var(--guard); }
+  .guard p { margin: 0; font-size: 14px; color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 14.5px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+  .pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+  .ok { background: var(--agent-bg); color: var(--agent); }
+  .wip { background: var(--warn-bg); color: var(--warn); }
+  .no { background: color-mix(in srgb, var(--line) 55%, transparent); color: var(--muted); }
+  footer { margin-top: 44px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Od pomysłu do <code>main</code> w dwóch decyzjach</h1>
+  <p class="lead">Opisujesz ficzer i zatwierdzasz plan. Agent buduje go sam, test po teście, a do Ciebie wraca dopiero z pytaniem, czy scalić.</p>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--you)"></span>Ty</span>
+    <span><span class="dot" style="background:var(--agent)"></span>agent</span>
+    <span><span class="dot" style="background:var(--guard)"></span>skrypt, który pilnuje agenta</span>
+  </div>
+
+  <h2>Z czego to się składa</h2>
+  <div class="grid3">
+    <div class="card"><h3>Template</h3><p>Szkielet backendu .NET 10 w Clean Architecture: konwencje, skille do pisania kodu, definicja ukończenia i skrypty kontrolne.</p><div class="path">D:\Projects\clean-architecture_new</div></div>
+    <div class="card"><h3>Plugin procesu</h3><p>Komendy <code>/plan-feature</code> i <code>/ship</code> oraz cztery role agentów. Działa w każdym projekcie.</p><div class="path">D:\Projects\skills (gałąź dotnet)</div></div>
+    <div class="card"><h3>Koszyk</h3><p>Prawdziwa aplikacja prowadzona tym sposobem: backend plus klient .NET MAUI. Wzorzec dla pracy mobilnej.</p><div class="path">D:\Projects\Koszyk</div></div>
+  </div>
+
+  <h2>Przepływ jednego ficzera</h2>
+  <div class="flow">
+    <div class="row">
+      <div class="step you"><div class="who">Ty</div><div class="name">Pomysł</div><div class="what">Jedno zdanie o tym, co ma powstać.</div></div>
+      <div class="arrow">→</div>
+      <div class="step agent"><div class="who">Agent</div><div class="name">/plan-feature</div><div class="what">Przepytuje Cię z pomysłu, pisze spec i tickety z kryteriami i nazwami testów.</div><span class="model">Opus</span></div>
+      <div class="arrow">→</div>
+      <div class="step you"><div class="who">Ty · bramka 1</div><div class="name">OK na plan</div><div class="what">Jedna decyzja o całym pakiecie. Dopiero wtedy powstaje commit <code>plan:</code>.</div></div>
+    </div>
+    <div class="down">↓</div>
+
+    <div class="loop">
+      <div class="title">/ship: pętla bez nadzoru</div>
+      <div class="sub">Osobny worktree i gałąź <code>feat/&lt;ficzer&gt;</code>. Odchodzisz od komputera.</div>
+
+      <div class="lane">Każdy ticket, najwyżej 3 rundy</div>
+      <div class="row">
+        <div class="step agent"><div class="who">Agent</div><div class="name">Implementer</div><div class="what">Najpierw czerwony test, potem kod. Commituje na gałęzi.</div><span class="model">Sonnet · runda 3: Opus</span></div>
+        <div class="arrow">→</div>
+        <div class="step agent"><div class="who">Agent</div><div class="name">Weryfikator</div><div class="what">Build, wszystkie testy, kontrola diffu i dowodów czerwieni.</div><span class="model">Haiku</span></div>
+        <div class="arrow">→</div>
+        <div class="step agent"><div class="who">Agent</div><div class="name">Review Spec</div><div class="what">Czy zmiana robi to, o co prosił ticket, i nic ponad.</div><span class="model">Sonnet</span></div>
+      </div>
+      <div class="note"><b>Uwagi w zakresie</b> wracają do implementera jako kolejna runda. <b>Po trzeciej rundzie</b> ticket dostaje <code>needs-info</code> z krótkim opisem dla Ciebie, a niezależne tickety idą dalej. <b>Uwagi spoza zakresu</b> stają się nowymi ticketami do triage'u.</div>
+
+      <div class="lane">Raz na ficzer, po ostatnim tickecie</div>
+      <div class="row">
+        <div class="step agent"><div class="who">Agent</div><div class="name">Review gałęzi</div><div class="what">Standardy projektu i zgodność ze spec dla całości. Najwyżej 3 rundy poprawek.</div><span class="model">Opus</span></div>
+        <div class="arrow">→</div>
+        <div class="step agent"><div class="who">Agent</div><div class="name">Smoke i diff gałęzi</div><div class="what">Uruchamia zbudowaną aplikację i sprawdza całą gałąź skryptem.</div></div>
+        <div class="arrow">→</div>
+        <div class="step agent"><div class="who">Agent</div><div class="name">Brief</div><div class="what">Co zrobione, wyniki testów, co obejrzeć przed OK. Push na telefon.</div></div>
+      </div>
+    </div>
+
+    <div class="down">↓</div>
+    <div class="row">
+      <div class="step you"><div class="who">Ty · bramka 2</div><div class="name">OK na scalenie</div><div class="what">Jedna wiadomość, także z telefonu: <code>OK, 1 tak, 2 nie</code>. Osobno decydujesz o każdej propozycji konwencji.</div></div>
+      <div class="arrow">→</div>
+      <div class="step agent"><div class="who">Agent</div><div class="name">main</div><div class="what">Fast-forward, <code>git push origin main</code>, sprzątanie worktree, sprawdzenie CI.</div></div>
+      <div class="arrow">→</div>
+      <div class="step you"><div class="who">Ty</div><div class="name">Triage</div><div class="what">Nowe tickety z uwag spoza zakresu: zrobić, odłożyć albo odrzucić.</div></div>
+    </div>
+  </div>
+
+  <h2>Co pilnuje agenta</h2>
+  <div class="guards">
+    <div class="guard"><h3>dod.json</h3><p>Definicja ukończenia: komendy buildu i testów, chronione ścieżki, progi limitu, smoke.</p></div>
+    <div class="guard"><h3>dod-gate.ps1</h3><p>Implementer nie może zgłosić sukcesu, dopóki build albo testy są czerwone.</p></div>
+    <div class="guard"><h3>guard-protected-paths.ps1</h3><p>Odmawia zapisu do konwencji, ADR-ów, hooków i testów architektury.</p></div>
+    <div class="guard"><h3>check-diff.ps1</h3><p>Wykrywa wyciszone analizatory, zmienione chronione pliki i projekty usunięte z solucji.</p></div>
+    <div class="guard"><h3>run-dod.ps1</h3><p>Startuje Dockera, puszcza DoD i smoke, porównuje zużycie limitu z progami.</p></div>
+    <div class="guard"><h3>allowlista</h3><p>Sesja działa w trybie auto. Dozwolone są tylko komendy wpisane w <code>settings.json</code>.</p></div>
+  </div>
+
+  <h2>Gdy coś pójdzie nie tak</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Sytuacja</th><th>Co robi pętla</th><th>Co robisz Ty</th></tr>
+    <tr><td>Ticket nie zbiega w 3 rundach</td><td>Cofa jego commity, ustawia <code>needs-info</code>, wysyła push</td><td>Odpowiadasz w sesji albo dopisujesz <code>Decision</code> w tickecie</td></tr>
+    <tr><td>Okno 5-godzinne na 90%</td><td>Zapisuje pauzę i czeka w tej samej sesji do resetu</td><td>Nic, o ile komputer się nie zrestartuje</td></tr>
+    <tr><td>Limit tygodniowy na 80%</td><td>Zapisuje pauzę, wysyła push z godziną resetu, kończy</td><td>Po resecie <code>/ship &lt;ficzer&gt;</code></td></tr>
+    <tr><td>Restart komputera w trakcie</td><td>Stan jest w commitach gałęzi, nic nie ginie</td><td>Dowolna wiadomość w sesji albo <code>/ship &lt;ficzer&gt;</code></td></tr>
+    <tr><td>Docker nie wstaje, bazowy build czerwony</td><td>Zatrzymuje cały ficzer i wysyła push</td><td>Naprawiasz środowisko, potem <code>/ship &lt;ficzer&gt;</code></td></tr>
+    <tr><td><code>main</code> poszedł dalej niż baza gałęzi</td><td>Zatrzymuje się przed scaleniem</td><td>Rebase jest Twój</td></tr>
+  </table>
+  </div>
+
+  <h2>Co jest obsługiwane</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Obszar</th><th>Stan</th><th>Szczegóły</th></tr>
+    <tr><td>Backend w template'cie</td><td><span class="pill ok">działa</span></td><td>Wzorce, skille, testy na prawdziwym PostgreSQL, CI na GitHubie</td></tr>
+    <tr><td>Logika aplikacji MAUI (Koszyk)</td><td><span class="pill ok">działa</span></td><td>ViewModele w osobnym projekcie z testami, skill <code>add-screen</code></td></tr>
+    <tr><td>Sprawdzenie ekranów na emulatorze</td><td><span class="pill wip">w budowie</span></td><td>Smoke przez <code>adb</code> ze zrzutem ekranu; przepływy E2E po nim</td></tr>
+    <tr><td>Dwa języki aplikacji (EN domyślny, PL dla polskiego systemu)</td><td><span class="pill no">do zaplanowania</span></td><td>Dziś teksty są wpisane na sztywno po polsku</td></tr>
+    <tr><td>Warstwa MAUI w template'cie</td><td><span class="pill no">odłożone</span></td><td>Do drugiego projektu MAUI; wzorcem jest Koszyk</td></tr>
+    <tr><td>Frontend webowy</td><td><span class="pill no">poza zakresem</span></td><td>Nigdy nie był planowany</td></tr>
+  </table>
+  </div>
+
+  <h2>Gdzie leży stan</h2>
+  <div class="grid3">
+    <div class="card"><h3>Tickety i spec</h3><p>Zwykłe pliki markdown. Status w linii <code>**Status:**</code>, historia w <code>## Comments</code>.</p><div class="path">.scratch/&lt;ficzer&gt;/issues/</div></div>
+    <div class="card"><h3>Przebieg</h3><p>Uwagi z każdej rundy, tabela kosztu i brief na bramkę 2. Wszystko w commitach gałęzi.</p><div class="path">.scratch/&lt;ficzer&gt;/findings · metrics.md · brief.md</div></div>
+    <div class="card"><h3>Zasady</h3><p>Konstytucja projektu, decyzje architektury i przewodnik dla Ciebie.</p><div class="path">AGENTS.md · docs/adr/ · docs/workflow.md</div></div>
+  </div>
+
+  <footer>Stan na 2026-11-11. Zmierzony koszt ficzera z 3 ticketami: 26–51 minut i 2–4% tygodniowego limitu, plus około 2% na planowanie. Pełny opis: <code>docs/workflow.md</code>.</footer>
+</main>
+</body>
+</html>
