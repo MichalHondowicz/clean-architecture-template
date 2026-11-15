@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-11-15-agent-loop-26.md
+
 # Handoff: Koszyk na pętli, ticket 23 i dalej
 
 Etap 2 pętli bez nadzoru jest rozpisany i zaczęty: najpierw przenosimy Koszyka (`D:\Projects\Koszyk`) na pętlę
