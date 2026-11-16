@@ -31,3 +31,45 @@
   sync i auth, motyw i branding, `ux-cosmetics-2`, backend i schemat (handoff Koszyka
   `docs/tasks/handoff-15-smoke-hardening-and-next-feature.md`, sekcja 4, pytanie 4).
 - AC3: moduły 13 i 14 mają ✅ w roadmapie Koszyka od 2026-11-15 (`a0b236c`); 15 jeszcze nie.
+
+**2026-11-15 (noc), przebieg `mobile-smoke-hardening` z historii Koszyka** (zapis agenta z repozytorium Koszyka,
+`main` `9db2b11`, bez raportu sesji `/ship`; źródła: `git log`, reflog `origin/main`,
+`.scratch/mobile-smoke-hardening/metrics.md`, `brief.md` i statusy ticketów):
+
+- Plan `3f2f371` 19:11, `/ship` 20:52–22:08: tickety 01–05 `done` (01 po 2 rundach, reszta po 1), review gałęzi
+  (standardy i spec na Opusie) z 1 rundą poprawek, brief 22:08. Bramka 2 „OK, 1 tak, 2 tak” 22:14 (`9db2b11`),
+  `origin/main` przesunięty pushem o 22:14:45, czyli 23 s po commicie bramki: scalił i wypchnął krok `/ship`.
+  Worktree i gałąź `feat/mobile-smoke-hardening` są usunięte.
+- Testy z briefu: Unit 99, Architecture 5, AppHost 15, Integration 136, Koszyk.Mobile.Tests 661; 0 ostrzeżeń.
+  Smoke `mobile-login` zielony (Pixel_6a_B, Release). Diff poza `.scratch`: 8 plików, +403/−29.
+- Nowe tickety Koszyka `needs-triage`: 06 (strażnik konwencji nie widzi wywołań przez zmienną), 07 (`taskkill`
+  w `mobile-smoke.ps1` bez limitu czasu).
+- Pauzy na limit nie było: historia nie ma commita `ship: pause`, okno 5h skończyło na 66%.
+
+| Etap | Rundy | Minuty | Okno 5h | Tydzień |
+|---|---|---|---|---|
+| Tickety 01–05 | 6 | 55 | 4% → 50% (+46) | 30% → 36% (+6) |
+| Review gałęzi | 1 | 17 | 50% → 66% (+16) | 36% → 38% (+2) |
+| Razem | 7 | 72 | +62 | +8 |
+
+Bez planu ficzer kosztował 8 pp tygodnia: więcej niż przebieg 2 pilota (4 pp) i mniej niż próg z historii 48.
+Wiersze nie obejmują pauzy, więc mierzą koszt.
+
+Co ten przebieg mówi o kryteriach:
+
+- **Seam „CI po scaleniu”.** To pierwsze scalenie przez `/ship` przy istniejącym workflow CI Koszyka (`build.yml`).
+  Review gałęzi wyłapał test, który byłby czerwony na ubuntu (`cmd /c start /b` z `[Fact]`), i zmienił go na
+  `[WindowsOnlyFact]` przed scaleniem (`c227c1a`). Wyniku CI dla `9db2b11` z repozytorium nie widać; seam zostaje
+  otwarty do odpowiedzi użytkownika.
+- **AC1.** Bez zmian: `mobile-smoke-hardening` doszedł jako ficzer spoza pierwotnej listy; następnego ficzera
+  modułu 15 Koszyk jeszcze nie zaplanował (brak nowego commita `plan:`).
+- **AC2.** `mobile-smoke-hardening` doszedł do `main` bez briefu `needs-info`. Z zakresu modułu 15 w `main` są:
+  `ux-cosmetics-1`, `emulator-tls-release-e2e`, `mobile-smoke-emulator`, `mobile-smoke-hardening`. Zostają: sync
+  i auth, motyw i branding, `ux-cosmetics-2`, backend i schemat.
+- **AC3.** Bez zmian: 15 nie ma ✅.
+
+Ticket zostaje `ready-for-human`.
+
+**2026-11-15 (noc), odpowiedź użytkownika:** CI Koszyka po scaleniu `mobile-smoke-hardening` (`9db2b11`) jest
+zielone. Seam „CI po scaleniu” jest sprawdzony: pierwszy przebieg `/ship` z workflow CI Koszyka doszedł do `main`
+z zielonym CI na ubuntu.

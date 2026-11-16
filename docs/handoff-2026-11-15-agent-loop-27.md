@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-11-16-agent-loop-next-ship.md
+
 # Handoff: obserwacje z przebiegu `mobile-smoke-hardening` (tickety 27, 19, 12)
 
 Pilot 2 jest zamknięty (ticket 26 `done`). W template'cie zostały trzy otwarte tickety, wszystkie

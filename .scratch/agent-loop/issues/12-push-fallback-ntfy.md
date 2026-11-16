@@ -112,3 +112,6 @@ pytania z „Do rozstrzygnięcia przy triage”:
 4. Sandbox ma swoją kopię hooków i ustawień: przenieś tam `notify.ps1` i te wpisy przed następnym przebiegiem.
 
 **2026-11-11:** użytkownik dopisał hook `Notification` i wpisy `notify.ps1` do `.claude/settings.json` (sprawdzone na dysku: hook leży w `hooks`, plik jest poprawnym JSON-em), `CLAUDE_NTFY_URL` jest ustawiony. AC5 zostaje otwarte do pierwszego pytania o zgodę w przebiegu `/ship` (ticket 19).
+
+**2026-11-15:** przebieg `/ship mobile-smoke-hardening` w Koszyku (ticket 27) przeszedł bez pytania o zgodę
+(odpowiedź użytkownika), więc hook `Notification` nie miał okazji się uruchomić. AC5 zostaje otwarte.

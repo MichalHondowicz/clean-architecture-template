@@ -37,3 +37,16 @@ aplikacja daje sesji turę na ten komunikat; pokaże to następny restart w trak
 **2026-11-15, z zamknięcia ticketu 26:** do drugiej obserwacji dochodzi część AC1 tamtego ticketu: gdy pytanie
 o zgodę padnie w przebiegu `/ship` w Koszyku, zapisz też, czy trafiło potem do allowlisty Koszyka. W trzech
 przebiegach pilota 2 nie ma zapisu żadnego pytania o zgodę.
+
+**2026-11-15 (noc), przebieg `mobile-smoke-hardening` w Koszyku** (zapis agenta z repozytorium Koszyka, `main`
+`9db2b11`; szczegóły przebiegu w tickecie 27):
+
+- **Wznowienie po pauzie:** brak obserwacji. Przebieg trwał 72 minuty w jednym oknie 5h (4% → 66%), historia nie
+  ma commita `ship: pause`, więc `wait-for-reset.ps1` nie ruszył. Poprawka forka `.35` dalej nie jest sprawdzona
+  na żywo.
+- **Pytanie o zgodę:** z repozytorium nie widać, czy padło. `.claude/` Koszyka nie zmienił się między planem
+  (`3f2f371`) a bramką 2 (`9db2b11`), więc do allowlisty w repozytorium nic nie doszło. Czy pytanie padło i czy
+  przyszło powiadomienie, wie użytkownik; do uzupełnienia po jego odpowiedzi (także AC5 ticketu 12).
+
+**2026-11-15 (noc), odpowiedź użytkownika:** w przebiegu `mobile-smoke-hardening` nie padło żadne pytanie o zgodę.
+Nie było więc czego wysłać ani dopisać do allowlisty. Oba kryteria zostają otwarte do następnego przebiegu `/ship`.
