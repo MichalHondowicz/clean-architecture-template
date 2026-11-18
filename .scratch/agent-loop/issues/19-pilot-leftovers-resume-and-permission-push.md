@@ -18,8 +18,11 @@ następnego prawdziwego ficzera puszczonego przez `/ship`, bez osobnego przebieg
 - Push przy pytaniu o zgodę: w trzech przebiegach pilota (todo-comments, todo-comment-count część 1–3)
   nie padło ani jedno pytanie o zgodę, więc nie było czego wysłać.
 
-- [ ] Pauza na limit 5-godzinny kończy się wznowieniem bez udziału użytkownika: `wait-for-reset.ps1` wraca,
+- [x] Pauza na limit 5-godzinny kończy się wznowieniem bez udziału użytkownika: `wait-for-reset.ps1` wraca,
       a pętla sama sprawdza limit i środowisko (ticket 17) i rusza z kolejnym ticketem (historie 40, 41).
+      Odhaczone 2026-11-18 decyzją użytkownika po przebiegu `sync-auth`: wznowienie bez użytkownika zaobserwowane;
+      ruszyło od rundy poprawek gałęzi (ticketów nie zostało), sprawdzenia limitu i środowiska repozytorium nie
+      pokazuje, restart w trakcie czekania (fork `.35`) niesprawdzony.
 - [ ] Pytanie o zgodę w sesji `/ship` w tle daje push na telefon. Jeśli push nie dociera jako powiadomienie,
       wynik trafia do ticketu 12 (fallback: hook `Notification` i ntfy) (historia 46).
 
@@ -50,3 +53,25 @@ przebiegach pilota 2 nie ma zapisu żadnego pytania o zgodę.
 
 **2026-11-15 (noc), odpowiedź użytkownika:** w przebiegu `mobile-smoke-hardening` nie padło żadne pytanie o zgodę.
 Nie było więc czego wysłać ani dopisać do allowlisty. Oba kryteria zostają otwarte do następnego przebiegu `/ship`.
+
+**2026-11-18, przebieg `sync-auth` w Koszyku** (zapis agenta z repozytorium Koszyka; szczegóły w tickecie 27):
+
+- **Pauza na limit 5h była, pierwsza od 2026-11-11:** `85ce167` „ship: pause, 5-hour limit” o 11:35 (okno 90%,
+  tydzień 51%), reset według `metrics.md` o 12:39. Następny commit pętli `9f49b6d` (runda 1 poprawek gałęzi) o
+  12:48, 9 minut po resecie; przebieg doszedł do bramki 2 o 14:53. Z repozytorium nie widać, czy przebieg ruszył
+  sam (`wait-for-reset.ps1` wrócił), czy po wejściu użytkownika do sesji. Do uzupełnienia po odpowiedzi
+  użytkownika; dopiero ona rozstrzyga pierwsze kryterium.
+- **Pytanie o zgodę:** z repozytorium nie widać. `.claude/` Koszyka nie zmienił się między planem (`bd0e4dc`) a
+  bramką 2 (`5d2378f`), więc do allowlisty w repozytorium nic nie doszło. Do uzupełnienia po odpowiedzi
+  użytkownika (także AC5 ticketu 12).
+
+**2026-11-18, odpowiedź użytkownika:** po pauzie przebieg `sync-auth` ruszył sam, bez wejścia użytkownika do
+sesji. To pierwsze zaobserwowane wznowienie bez udziału użytkownika (pierwsze kryterium). Różnice względem jego
+brzmienia: przebieg ruszył z rundą 1 poprawek review gałęzi, nie z kolejnym ticketem, bo tickety 01–07 były już
+`done`; sprawdzenia limitu i środowiska po wznowieniu repozytorium nie pokazuje. Ścieżka po restarcie w trakcie
+czekania (poprawka forka `.35`) dalej nie jest sprawdzona. Kryterium odhacza użytkownik.
+
+**2026-11-18, odpowiedź użytkownika:** w przebiegu `sync-auth` nie padło żadne pytanie o zgodę. To czwarty
+przebieg `/ship` z zapisem bez takiego pytania (pilot 10, pilot 2, `mobile-smoke-hardening`, `sync-auth`). Drugie
+kryterium zostaje otwarte; pytanie z handoffu 2026-11-16 (czekać do końca modułu 15, potem uznać, że allowlista
+je wyeliminowała) nadal stoi.

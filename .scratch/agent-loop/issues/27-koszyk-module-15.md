@@ -73,3 +73,43 @@ Ticket zostaje `ready-for-human`.
 **2026-11-15 (noc), odpowiedź użytkownika:** CI Koszyka po scaleniu `mobile-smoke-hardening` (`9db2b11`) jest
 zielone. Seam „CI po scaleniu” jest sprawdzony: pierwszy przebieg `/ship` z workflow CI Koszyka doszedł do `main`
 z zielonym CI na ubuntu.
+
+**2026-11-18, przebieg `sync-auth` z historii Koszyka** (zapis agenta z repozytorium Koszyka, `main` `9066b65`,
+bez raportu sesji `/ship`; źródła: `git log`, reflog `origin/main`, `.scratch/sync-auth/metrics.md`, `brief.md`,
+`gh run list`):
+
+- Bramka planowania `88f4336` 09:28 (decyzje, triage 06 i 07), plan `bd0e4dc` 09:55, `/ship` 10:00–14:52:
+  tickety 01–07 `done` (02 i 05 po 2 rundach, reszta po 1), pauza na limit 5h 11:35 (`85ce167`, okno 90%, do
+  12:39), review gałęzi (standardy i spec na Opusie) z 3 rundami poprawek, runda 3 implementera na Opusie, brief
+  14:53. Bramka 2 „OK, 1 tak, 2 tak, 3 tak” (`5d2378f` 14:59), `origin/main` przesunięty pushem o 15:00:48, czyli
+  55 s po commicie bramki: scalił i wypchnął krok `/ship`. Worktree zdjęty z `git worktree list`.
+- Testy z briefu: backend 99+5+15+136, mobile 730; 0 ostrzeżeń. Smoke logowania zielony uruchomiony bezpośrednio;
+  `run-dod.ps1 -Check smoke` zawiesił się na ponad 10 minut i został zabity (brief, „Smoke”). Diff: 48 plików,
+  +2664/−124.
+- Nowy ticket Koszyka `needs-triage`: 08 (`AuthHandler` po 401 może powtórzyć żądanie usera A z tokenem B).
+- **Po scaleniu:** ręczne E2E sync-auth (cztery punkty ze speca) znalazło błąd w punkcie 3: niewysłane zmiany
+  tego samego usera po ponownym logowaniu czekały na kolejną mutację. Poprawka `bf41be9` ręcznie, 15:53, potem
+  wynik E2E w specu (`2cfe185`): wszystkie 4 punkty zaliczone. Brief w „Uncertain” zapowiadał, że zmiany usera na
+  emulatorze nie sprawdzono.
+- **CI po scaleniu** (`gh run list`; od 2026-11-16 Koszyk ma `gh` na hoście): run dla `5d2378f` `success` (5m03s),
+  dla `bf41be9` `success` (5m32s).
+
+| Etap | Rundy | Minuty | Okno 5h | Tydzień |
+|---|---|---|---|---|
+| Tickety 01–07 | 9 | 90 | 38% → 83% (+45) | 44% → 50% (+6) |
+| Review gałęzi z pauzą | 3 rundy poprawek | 200 | 83% → 90%, nowe okno → 36% | 50% → 56% (+6) |
+| Razem | | 292 | | +12 |
+
+Bez planu ficzer kosztował 12 pp tygodnia (`mobile-smoke-hardening`: 8 pp). Wiersz review gałęzi obejmuje pauzę
+11:35–12:39, więc minut i okna 5h nie da się porównać; tydzień się nie odnawiał, więc +6 pp mierzy koszt. Review
+gałęzi kosztował tyle co siedem ticketów: spec padał trzy razy (historie 5, 17, 18).
+
+Co ten przebieg mówi o kryteriach:
+
+- **AC1.** Z listy doszło „niezawodność sync i auth”. 2026-11-18 Koszyk dostał ręcznie, poza pętlą, zmianę nazwy
+  produktu na Basketkin (`c71f75f`, `8917983`, `fbfb88f`, `9066b65`): to część „motyw i branding”, nie ficzer
+  pętli. Zostają: reszta motywu i brandingu, `ux-cosmetics-2`, backend i schemat.
+- **AC2.** `sync-auth` doszedł do `main` bez briefu `needs-info`, z jedną ręczną poprawką po E2E.
+- **AC3.** Bez zmian: 15 nie ma ✅ w roadmapie.
+
+Ticket zostaje `ready-for-human`.

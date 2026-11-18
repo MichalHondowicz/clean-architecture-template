@@ -115,3 +115,6 @@ pytania z „Do rozstrzygnięcia przy triage”:
 
 **2026-11-15:** przebieg `/ship mobile-smoke-hardening` w Koszyku (ticket 27) przeszedł bez pytania o zgodę
 (odpowiedź użytkownika), więc hook `Notification` nie miał okazji się uruchomić. AC5 zostaje otwarte.
+
+**2026-11-18:** przebieg `/ship sync-auth` w Koszyku (2026-11-16, ticket 27) też przeszedł bez pytania o zgodę
+(odpowiedź użytkownika). AC5 zostaje otwarte.
