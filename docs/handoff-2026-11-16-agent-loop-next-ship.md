@@ -1,3 +1,5 @@
+> Nieaktualny. Wykonaj docs/handoff-2026-11-18-agent-loop-next-ship.md
+
 # Handoff: tickety pętli 12, 19 i 27 czekają na następny przebieg `/ship` w Koszyku
 
 W template'cie nie ma pracy dla agenta. Otwarte są trzy tickety pętli, wszystkie `ready-for-human`, i wszystkie
